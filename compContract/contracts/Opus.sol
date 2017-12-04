@@ -92,14 +92,17 @@ contract Opus {
         ownedNoteIds[msg.sender].push(_id);
     }
 
+    //set owned note for sale or not for sale
     function toggleForSale(uint _id) onlyComposer(_id) beforePitchLock() external {
         composition[_id].forSale = !composition[_id].forSale;
     }
 
+    //set an owned notes price
     function setNotePrice(uint _id, uint _price) onlyComposer(_id) beforePitchLock() external {
         composition[_id].price = _price;
     }
 
+    //get any notes owned by the sender
     function getOwnedNotes() external view returns (uint[]) {
 
         uint[] memory _ownedNotes = ownedNoteIds[msg.sender];
@@ -107,26 +110,35 @@ contract Opus {
         return _ownedNotes;
     }
 
+    //get specific note information
     function getNoteInformation(uint _id) external view returns (uint[4] _pitches,
                                                                 uint _duration,
                                                                 address _composer,
                                                                 bool _forSale,
                                                                 uint price
                                                                 ) {
-                                                                    
-
+        uint[4] memory pitches = composition[_id].pitches;
+        _pitches = pitches;
+        _duration = composition[_id].duration;
+        _composer = composition[_id].composer;
+        _forSale = composition[_id].forSale;
+        price = composition[_id].price;
     }
 
+    //get whole composition
     function getComposition() external view returns (uint[4][1000] _pitches,
                                                      uint[1000] _durations,
                                                      address[1000] _composers,
                                                      bool[1000] _forSales,
                                                      uint[1000] _prices
                                                     ) {
-                                                        
+        for (uint i = 0; i < 1000; i++) {
+            _pitches[i] = composition[i].pitches;
 
+            _durations[i] = composition[i].duration;
+            _composers[i] = composition[i].composer;
+            _forSales[i] = composition[i].forSale;
+            _prices[i] = composition[i].price;
+        }                                                                                               
     }
-
-
-
 }
