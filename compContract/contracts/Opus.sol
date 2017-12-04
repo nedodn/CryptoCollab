@@ -12,7 +12,6 @@ contract Opus {
         address composer;
         bool forSale;
         uint price;
-        uint id;
     }
 
     //The composition will consist of a fixed number of notes, number may be subject to change
@@ -36,7 +35,6 @@ contract Opus {
             composition[i].composer = msg.sender;
             composition[i].forSale = true;
             composition[i].price = _initialPrice;
-            composition[i].id = i;
         }
     }
 
