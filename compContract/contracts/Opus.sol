@@ -93,8 +93,11 @@ contract Opus {
     }
 
     function toggleForSale(uint _id) onlyComposer(_id) beforePitchLock() external {
-        
         composition[_id].forSale = !composition[_id].forSale;
+    }
+
+    function setNotePrice(uint _id, uint _price) onlyComposer(_id) beforePitchLock() external {
+        composition[_id].price = _price;
     }
 
     function getOwnedNotes() external view returns (uint[]) {
@@ -102,6 +105,16 @@ contract Opus {
         uint[] memory _ownedNotes = ownedNoteIds[msg.sender];
 
         return _ownedNotes;
+    }
+
+    function getNoteInformation(uint _id) external view returns (uint[4] _pitches,
+                                                                uint _duration,
+                                                                address _composer,
+                                                                bool _forSale,
+                                                                uint price
+                                                                ) {
+                                                                    
+
     }
 
     function getComposition() external view returns (uint[4][1000] _pitches,
