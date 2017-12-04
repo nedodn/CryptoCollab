@@ -18,6 +18,9 @@ contract Opus {
     note[1000] composition;
     mapping (address => uint[]) ownedNoteIds;
 
+    uint durationLockTime;
+    uint pitchLockTime;
+
     modifier noteForSale(uint _id) {
         require(composition[_id].forSale);
         _;
@@ -28,17 +31,33 @@ contract Opus {
         _;
     }
 
+    modifier beforeDurationLock() {
+        require(now < durationLockTime);
+        _;
+    }
+
+    modifier beforePitchLock() {
+        require(now < pitchLockTime);
+        _;
+    }
+
     //Constructor that gives all notes to sender, sets them for sale, and sets their price to an initial value
-    function Opus(uint _initialPrice) {
+    function Opus(uint _initialPrice, uint _durationLockTime, uint _pitchLockTime) {
+
+        require(_durationLockTime > now && _pitchLockTime > _durationLockTime);
 
         for (uint i = 0; i < 1000; i++) {
             composition[i].composer = msg.sender;
             composition[i].forSale = true;
             composition[i].price = _initialPrice;
         }
+
+        durationLockTime = _durationLockTime;
+        pitchLockTime = _pitchLockTime;
     }
 
-    function setNotePitches(uint _id, uint[4] _pitches) onlyComposer(_id) external {
+    //lets owner of a note change the pitches, after a certain amount of time pitches will be locked, end of composition 
+    function setNotePitches(uint _id, uint[4] _pitches) onlyComposer(_id) beforePitchLock() external {
 
         for (uint i = 0; i < 4; i++) {
             composition[_id].pitches[i] = _pitches[i];
@@ -46,7 +65,9 @@ contract Opus {
 
     }
 
-    function setNoteDuration(uint _id, uint _duration) onlyComposer(_id) external {
+
+    //lets owner of note change the duration, after a certain amount of time durations will be locked
+    function setNoteDuration(uint _id, uint _duration) onlyComposer(_id) beforeDurationLock() external {
 
         require(_duration >= 1 && _duration <= 8);
 
@@ -54,7 +75,8 @@ contract Opus {
 
     }
 
-    function purchaseNote(uint _id, uint _price, bool _forSale) noteForSale(_id) external payable {
+    //lets someone purchase a note that is listed for sale, give it a new price. 
+    function purchaseNote(uint _id, uint _price) noteForSale(_id) beforePitchLock() external payable {
 
         uint price = composition[_id].price;
         require(msg.value == price);
@@ -65,9 +87,14 @@ contract Opus {
 
         composition[_id].composer == msg.sender;
         composition[_id].price = _price;
-        composition[_id].forSale = _forSale;
+        composition[_id].forSale = false;
 
         ownedNoteIds[msg.sender].push(_id);
+    }
+
+    function toggleForSale(uint _id) onlyComposer(_id) beforePitchLock() external {
+        
+        composition[_id].forSale = !composition[_id].forSale;
     }
 
     function getOwnedNotes() external view returns (uint[]) {
