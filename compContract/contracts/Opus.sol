@@ -14,12 +14,15 @@ contract Opus {
         uint price;
     }
 
+    address owner;
+
     //The composition will consist of a fixed number of notes, number may be subject to change
     note[1000] composition;
     mapping (address => uint[]) ownedNoteIds;
 
     uint durationLockTime;
     uint pitchLockTime;
+    bool composingStarted;
 
     modifier noteForSale(uint _id) {
         require(composition[_id].forSale);
@@ -42,18 +45,25 @@ contract Opus {
     }
 
     //Constructor that gives all notes to sender, sets them for sale, and sets their price to an initial value
-    function Opus(uint _initialPrice, uint _durationLockTime, uint _pitchLockTime) {
+    function Opus(uint _durationLockTime, uint _pitchLockTime) {
 
         require(_durationLockTime > now && _pitchLockTime > _durationLockTime);
+
+        owner = msg.sender;
+
+        durationLockTime = _durationLockTime;
+        pitchLockTime = _pitchLockTime;
+        composingStarted = false;
+    }
+
+    function startComposing() external {
+        require(owner == msg.sender && !composingStarted);
 
         for (uint i = 0; i < 1000; i++) {
             composition[i].composer = msg.sender;
             composition[i].forSale = true;
-            composition[i].price = _initialPrice;
+            composition[i].price = 0.01 ether;
         }
-
-        durationLockTime = _durationLockTime;
-        pitchLockTime = _pitchLockTime;
     }
 
     //lets owner of a note change the pitches, after a certain amount of time pitches will be locked, end of composition 
@@ -77,6 +87,7 @@ contract Opus {
 
     //lets someone purchase a note that is listed for sale, give it a new price. 
     function purchaseNote(uint _id, uint _price) noteForSale(_id) beforePitchLock() external payable {
+        require(composition[_id].composer != msg.sender);
 
         uint price = composition[_id].price;
         require(msg.value == price);
