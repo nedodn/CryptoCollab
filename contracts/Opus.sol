@@ -20,10 +20,6 @@ contract Opus {
     mapping (address => uint) ownedNotes;
     noteId[] placedNotes;
 
-    uint durationLockTime;
-    uint pitchLockTime;
-    bool composingStarted;
-
     modifier beforeEndTime() {
         require(now < endTime);
         _;
