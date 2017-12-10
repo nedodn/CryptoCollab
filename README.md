@@ -4,10 +4,12 @@ Repository for the EthDev hackathon. Decentralized Music Composition Project
 
 To run:
 
- 1. Install truffle: $npm install -g truffle
+ 1. Download project
+
+ 2. Install truffle: $npm install -g truffle
  
- 2. Install project: $npm install
+ 3. Install project: $npm install
  
- 3. Migrate Contracts: $truffle migrate
+ 4. Migrate Contracts: $truffle migrate
  
- 4. Run dev server: $npm run dev
+ 5. Run dev server: $npm run dev
