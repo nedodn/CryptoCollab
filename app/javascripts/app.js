@@ -24,24 +24,8 @@ window.App = {
     // Bootstrap the Opus abstraction for Use.
     Opus.setProvider(web3.currentProvider);
 
-    // Get the initial account balance so it can be displayed.
-    web3.eth.getAccounts(function(err, accs) {
-      if (err != null) {
-        alert("There was an error fetching your accounts.");
-        return;
-      }
-
-      if (accs.length == 0) {
-        alert("Couldn't get any accounts! Make sure your Ethereum client is configured correctly.");
-        return;
-      }
-
-      accounts = accs;
-      account = accounts[0];
-
-      self.buildTable();
-      self.getComp();
-    });
+    self.buildTable();
+    self.getComp();
   },
 
   setStatus: function(message) {
@@ -55,67 +39,51 @@ window.App = {
     $("#tableLabel").html("");
     
     $("#tableLabel").append("<th>Pitch</th>");
-    for(let i = 0; i < 1000; i++) {
+    for(let i = 0; i < 100; i++) {
       $("#tableLabel").append("<th>Note: " + (i + 1) + " </th>");
     }
     
     for(let i = 0; i < 128; i++) {
-      $("#comp").append("<tr><td> " + (128 - i) + "</td>");
-      for(let x = 0; x < 1000; x++) {
-        $("comp").append("<td id=' " + i.toString() + "note" + x.toString() + "'>    </td>");
+      $("#comp").append("<tr><td>" + (128 - i) + "</td>");
+      for(let x = 0; x < 100; x++) {
+        $("#comp").append("<td id='" + i.toString() + "note" + x.toString() + "'>   </td>");
       }
+      $("#comp").append("</tr>");
     }
   },
 
   getComp: function() {
-    var self = this;
-
     Opus.deployed().then(function(instance) {
-      return instance.getComposition.call({from: account});
-    }).then(function(comp) {
-      for(let i = 0; i < 1000; i++) {
-
+      instance.getComposition.call({gas: 50000000, from: web3.eth.accounts[0]}).then(function(comp) {
+      for(let i = 0; i < 128; i++) {
+        for(let x = 0; x < 100; x++) {
+          if(comp[i[x]] == true) {
+            let elem = "#" + i.toString() + "note" + x.toString() + "";
+            $(`${elem}`).css("color", "black");
+          }
+        }
       }
-  }
-},
+      instance.getOwnedNotes.call({from:web3.eth.accounts[0]}).then(function(notes) {
+        $("#owned").text(notes);
+      })
+  })
+})
+}
 
-  refreshBalance: function() {
-    var self = this;
 
-    var meta;
-    MetaCoin.deployed().then(function(instance) {
-      meta = instance;
-      return meta.getBalance.call(account, {from: account});
-    }).then(function(value) {
-      var balance_element = document.getElementById("balance");
-      balance_element.innerHTML = value.valueOf();
-    }).catch(function(e) {
-      console.log(e);
-      self.setStatus("Error getting balance; see log.");
-    });
-  },
-
-  sendCoin: function() {
-    var self = this;
-
-    var amount = parseInt(document.getElementById("amount").value);
-    var receiver = document.getElementById("receiver").value;
-
-    this.setStatus("Initiating transaction... (please wait)");
-
-    var meta;
-    MetaCoin.deployed().then(function(instance) {
-      meta = instance;
-      return meta.sendCoin(receiver, amount, {from: account});
-    }).then(function() {
-      self.setStatus("Transaction complete!");
-      self.refreshBalance();
-    }).catch(function(e) {
-      console.log(e);
-      self.setStatus("Error sending coin; see log.");
-    });
-  }
 };
+
+window.purchaseNotes = function() {
+
+  let num = $("#purchase").val();
+  let price = num * 0.01;
+
+  Opus.deployed().then(function(instance) {
+    instance.purchaseNote(num, {value: web3.toWei(price,"ether"), from: web3.eth.accounts[0]}).then(function(v) {
+      console.log("it worked?");
+  })
+})
+}
 
 window.addEventListener('load', function() {
   // Checking if Web3 has been injected by the browser (Mist/MetaMask)

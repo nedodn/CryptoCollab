@@ -8,7 +8,7 @@ contract Opus {
         address placer;
     }
 
-    bool[129][100] composition;
+    bool[128][100] composition;
 
     uint notes = 5000;
     uint notesAvailable;
@@ -30,7 +30,7 @@ contract Opus {
     }
 
     modifier isValidNote(uint _pitch, uint _place) {
-        require(_pitch >= 0 && _pitch < 129);
+        require(_pitch >= 0 && _pitch < 128);
         require(_place >= 0 && _place < 100);
         _;
     }
@@ -45,7 +45,7 @@ contract Opus {
     }
 
     function purchaseNote(uint numNotes) beforeEndTime() external payable {
-        require(numNotes < 100 && numNotes <= notesAvailable && msg.value == (numNotes * notePrice));
+        require(numNotes <= 100 && numNotes <= notesAvailable && msg.value == (numNotes * notePrice));
 
         if (ownedNotes[msg.sender] == 0) {
             ownedNotes[msg.sender] = numNotes;
@@ -101,10 +101,30 @@ contract Opus {
         }
     }
 
-    function getComposition() external view returns (bool[129][100] _composition) {
-        bool[129][100] memory temp = composition;
+    function getComposition() external view returns (bool[128][100] _composition) {
+        bool[128][100] memory temp = composition;
         return temp;
     }
+
+    function getOwnedNotes() external view returns (uint _notes) {
+        return ownedNotes[msg.sender];
+    }
+
+    // function getPlacedNotes() external view returns (uint[] _pitches,
+    //                                                 uint[] _places) {
+    //     uint[] memory pitches;
+    //     uint[] memory places;
+
+    //     uint num = 0;
+        
+    //     for (uint i = 0; i < placedNotes.length; i++) {
+    //         if (placedNotes[i].placer == msg.sender) {
+    //             pitches[num] = placedNotes[i].pitch;
+    //             places[num] = placedNotes[i].place;
+    //             num++;  
+    //         }
+    //     }
+    // }
 
 
 }
