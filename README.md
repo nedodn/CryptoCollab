@@ -2,7 +2,7 @@
 Repository for the EthDev hackathon. Decentralized Music Composition Project
 
 
-To run:
+To run (must have some Ethereum network running):
 
  1. Download project
 
