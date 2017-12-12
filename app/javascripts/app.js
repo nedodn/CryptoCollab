@@ -3,7 +3,9 @@ import "../stylesheets/app.css";
 
 // Import libraries we need.
 import { default as Web3} from 'web3';
-import { default as contract } from 'truffle-contract'
+import { default as contract } from 'truffle-contract';
+
+var BigNumber = require('bignumber.js');
 
 // Import our contract artifacts and turn them into usable abstractions.
 import opus_artifacts from '../../build/contracts/Opus.json'
@@ -26,6 +28,8 @@ window.App = {
 
     self.buildTable();
     self.getComp();
+    self.getNotes();
+    self.getPlacedNotes();
   },
 
   setStatus: function(message) {
@@ -42,35 +46,60 @@ window.App = {
     for(let i = 0; i < 100; i++) {
       $("#tableLabel").append("<th>Note: " + (i + 1) + " </th>");
     }
+
+    let line = "";
     
     for(let i = 0; i < 128; i++) {
-      $("#comp").append("<tr><td>" + (128 - i) + "</td>");
+      line = line + "<tr><td>" + (127- i) + "</td>";
       for(let x = 0; x < 100; x++) {
-        $("#comp").append("<td id='" + i.toString() + "note" + x.toString() + "'>   </td>");
+       line = line + "<td id='" + i.toString() + "note" + x.toString() + "'onclick='toggleNote(this)'>   </td>";
       }
-      $("#comp").append("</tr>");
+      line = line + "</tr>";
     }
+
+    $("#comp").html(line);
   },
 
   getComp: function() {
     Opus.deployed().then(function(instance) {
-      instance.getComposition.call({gas: 50000000, from: web3.eth.accounts[0]}).then(function(comp) {
-      for(let i = 0; i < 128; i++) {
-        for(let x = 0; x < 100; x++) {
-          if(comp[i[x]] == true) {
-            let elem = "#" + i.toString() + "note" + x.toString() + "";
-            $(`${elem}`).css("color", "black");
+      for (let i = 0; i < 128; i++) {
+        instance.getNoteLine.call(i, {from: web3.eth.accounts[0]}).then(function(line) {
+          for (let x = 0; x < 100; x++) {
+            if (line[x] == true) {
+              let elem = "#" + i.toString() + "note" + x.toString() + "";
+              $(`${elem}`).css("background-color", "black");
+            }
+          }
+        })
+      }
+})
+},
+
+  getNotes: function() {
+    Opus.deployed().then(function(instance) {
+      instance.getOwnedNotes.call({from: web3.eth.accounts[0]}).then(function(_notes) {
+        $("#owned").text(_notes.toNumber() + " Notes Owned");
+    })
+  })
+},
+
+  getPlacedNotes: function() {
+    Opus.deployed().then(function(instance) {
+      instance.getPlacedNotes.call({from: web3.eth.accounts[0]}).then(function(_notes) {
+        let pitches = _notes[0];
+        let places = _notes[1];
+        for(let i = 0; i < pitches.length; i++) {
+          if(pitches[i] == 129) {
+            continue;
+          }
+          else {
+          let id = "#" + pitches[i].toString() + "note" + places[i].toString();
+          $(`${id}`).css("background-color", "purple");
           }
         }
-      }
-      instance.getOwnedNotes.call({from:web3.eth.accounts[0]}).then(function(notes) {
-        $("#owned").text(notes);
       })
-  })
-})
-}
-
-
+    })
+  }
 };
 
 window.purchaseNotes = function() {
@@ -79,16 +108,57 @@ window.purchaseNotes = function() {
   let price = num * 0.01;
 
   Opus.deployed().then(function(instance) {
-    instance.purchaseNote(num, {value: web3.toWei(price,"ether"), from: web3.eth.accounts[0]}).then(function(v) {
-      console.log("it worked?");
+    instance.purchaseNote(num, {value: web3.toWei(price,"ether"), from: web3.eth.accounts[0]}).then(function(x) {
   })
 })
+}
+
+window.returnNotes = function() {
+
+  let num = $("#return").val();
+
+  Opus.deployed().then(function(instance) {
+    instance.returnNotes(num, {gas: 75000, from: web3.eth.accounts[0]}).then(function() {
+    })
+  })
+}
+
+window.toggleNote = function(el) {
+
+  let _pitch, _place;
+  let id = el.id;
+
+  console.log(id);
+  
+  let n = id.indexOf("n");
+
+  _pitch = id.substr(0,n);
+
+  let e = id.indexOf("e");
+
+  _place = id.substr(e+1);
+
+  Opus.deployed().then(function(instance) {
+    instance.getNote.call(_pitch, _place, {from: web3.eth.accounts[0]}).then(function (_note) {
+      if(!_note) {
+        instance.placeNote(_pitch, _place, {from: web3.eth.accounts[0]}).then(function(x) {
+          location.reload();
+        })
+      }
+      else {
+        console.log("here");
+        instance.removeNote(_pitch, _place, {gas: 75000, from: web3.eth.accounts[0]}).then(function(x) {
+          location.reload();
+        })
+      }
+    })
+  })
 }
 
 window.addEventListener('load', function() {
   // Checking if Web3 has been injected by the browser (Mist/MetaMask)
   if (typeof web3 !== 'undefined') {
-    console.warn("Using web3 detected from external source. If you find that your accounts don't appear or you have 0 MetaCoin, ensure you've configured that source properly. If using MetaMask, see the following link. Feel free to delete this warning. :) http://truffleframework.com/tutorials/truffle-and-metamask")
+    console.warn("Using web3 detected from external source.")
     // Use Mist/MetaMask's provider
     window.web3 = new Web3(web3.currentProvider);
   } else {
