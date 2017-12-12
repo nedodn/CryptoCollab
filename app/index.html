@@ -6,10 +6,12 @@
   <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet' type='text/css'>  
 </head>
 <body>
-  <h1>Opus</h1>
+  <h1>Opus</h1><br>
 
-  <input type="number" placeholder="Number of Notes to Purchase" id="purchase"><br>
+  <input type="number" placeholder="Number of Notes to Purchase, Price: 0.01 ETH" id="purchase"><br>
   <a href="#" onclick="purchaseNotes()" class="btn btn-danger">Purchase</a><br>
+  <input type="number" placeholder="Number of Notes to Return" id="return"><br>
+  <a href="#" onclick="returnNotes()" class="btn btn-danger">Return</a><br>
   <h2 id="owned"></h2>
 
   <table class="table table-bordered" id="compTable">
@@ -24,7 +26,6 @@
 
   <span id="status"></span>
   <br>
-  <span class="hint"><strong>Hint:</strong> open the browser developer console to view any errors and warnings.</span>
 </body>
 <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>
 <script src="./app.js"></script>
