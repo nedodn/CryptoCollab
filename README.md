@@ -33,4 +33,4 @@ To run (must have some Ethereum network running):
  7. Composing will end on a chosen date, for this demo it is Dec. 31 2017.
  
  ## Other Info
-  1. The y-axis of the grid represents MIDI values 0-127, x-axis represents the notes place in the piece
+  1. The y-axis of the grid represents MIDI values 0-127, x-axis represents the note's place in the piece
