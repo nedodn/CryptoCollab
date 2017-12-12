@@ -1,5 +1,5 @@
 # CryptoCollab
-Repository for the EthDev hackathon. Decentralized Music Composition Project
+Repository for the EthDev hackathon. Decentralized MIDI Composition Project
 
 Hosted at https://nedodn.github.io/CryptoCollab/ and on the Rinkeby Test Network
 Contract located at https://rinkeby.etherscan.io/address/0xadf7305bf5791e651fe534c4d8e43847e91ba667
@@ -31,3 +31,6 @@ To run (must have some Ethereum network running):
  6. Return unused notes for a refund
  
  7. Composing will end on a chosen date, for this demo it is Dec. 31 2017.
+ 
+ ##Other Info
+  1. The y-axis of the grid represents MIDI values 0-127, x-axis represents the notes place in the piece
