@@ -26,6 +26,8 @@ To run (must have some Ethereum network running):
  
  4. Notes you have placed will show up as purple, while other notes will be black
  
- 5. Return unused notes for a refund
+ 5. Remove notes you have place by clicking on them and confirming the transaction
  
- 6. Composing will end on a chosen date, for this demo it is Dec. 31 2017.
+ 6. Return unused notes for a refund
+ 
+ 7. Composing will end on a chosen date, for this demo it is Dec. 31 2017.
