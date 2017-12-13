@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 74);
+/******/ 	return __webpack_require__(__webpack_require__.s = 75);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -1751,7 +1751,7 @@
  */
 
 
-var BigNumber = __webpack_require__(16);
+var BigNumber = __webpack_require__(23);
 var sha3 = __webpack_require__(24);
 var utf8 = __webpack_require__(53);
 
@@ -3610,7 +3610,7 @@ module.exports = {
  * @date 2015
  */
 
-var BigNumber = __webpack_require__(16);
+var BigNumber = __webpack_require__(23);
 var utils = __webpack_require__(2);
 var c = __webpack_require__(34);
 var SolidityParam = __webpack_require__(59);
@@ -6257,7 +6257,7 @@ module.exports = Method;
  */
 
 var utils = __webpack_require__(4);
-var errors = __webpack_require__(22);
+var errors = __webpack_require__(21);
 
 var Method = function (options) {
     this.name = options.name;
@@ -6402,6 +6402,1076 @@ module.exports = Method;
 
 /***/ }),
 /* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+;(function (root, factory) {
+	if (true) {
+		// CommonJS
+		module.exports = exports = factory(__webpack_require__(0));
+	}
+	else if (typeof define === "function" && define.amd) {
+		// AMD
+		define(["./core"], factory);
+	}
+	else {
+		// Global (browser)
+		factory(root.CryptoJS);
+	}
+}(this, function (CryptoJS) {
+
+	(function () {
+	    // Shortcuts
+	    var C = CryptoJS;
+	    var C_lib = C.lib;
+	    var WordArray = C_lib.WordArray;
+	    var C_enc = C.enc;
+
+	    /**
+	     * Base64 encoding strategy.
+	     */
+	    var Base64 = C_enc.Base64 = {
+	        /**
+	         * Converts a word array to a Base64 string.
+	         *
+	         * @param {WordArray} wordArray The word array.
+	         *
+	         * @return {string} The Base64 string.
+	         *
+	         * @static
+	         *
+	         * @example
+	         *
+	         *     var base64String = CryptoJS.enc.Base64.stringify(wordArray);
+	         */
+	        stringify: function (wordArray) {
+	            // Shortcuts
+	            var words = wordArray.words;
+	            var sigBytes = wordArray.sigBytes;
+	            var map = this._map;
+
+	            // Clamp excess bits
+	            wordArray.clamp();
+
+	            // Convert
+	            var base64Chars = [];
+	            for (var i = 0; i < sigBytes; i += 3) {
+	                var byte1 = (words[i >>> 2]       >>> (24 - (i % 4) * 8))       & 0xff;
+	                var byte2 = (words[(i + 1) >>> 2] >>> (24 - ((i + 1) % 4) * 8)) & 0xff;
+	                var byte3 = (words[(i + 2) >>> 2] >>> (24 - ((i + 2) % 4) * 8)) & 0xff;
+
+	                var triplet = (byte1 << 16) | (byte2 << 8) | byte3;
+
+	                for (var j = 0; (j < 4) && (i + j * 0.75 < sigBytes); j++) {
+	                    base64Chars.push(map.charAt((triplet >>> (6 * (3 - j))) & 0x3f));
+	                }
+	            }
+
+	            // Add padding
+	            var paddingChar = map.charAt(64);
+	            if (paddingChar) {
+	                while (base64Chars.length % 4) {
+	                    base64Chars.push(paddingChar);
+	                }
+	            }
+
+	            return base64Chars.join('');
+	        },
+
+	        /**
+	         * Converts a Base64 string to a word array.
+	         *
+	         * @param {string} base64Str The Base64 string.
+	         *
+	         * @return {WordArray} The word array.
+	         *
+	         * @static
+	         *
+	         * @example
+	         *
+	         *     var wordArray = CryptoJS.enc.Base64.parse(base64String);
+	         */
+	        parse: function (base64Str) {
+	            // Shortcuts
+	            var base64StrLength = base64Str.length;
+	            var map = this._map;
+	            var reverseMap = this._reverseMap;
+
+	            if (!reverseMap) {
+	                    reverseMap = this._reverseMap = [];
+	                    for (var j = 0; j < map.length; j++) {
+	                        reverseMap[map.charCodeAt(j)] = j;
+	                    }
+	            }
+
+	            // Ignore padding
+	            var paddingChar = map.charAt(64);
+	            if (paddingChar) {
+	                var paddingIndex = base64Str.indexOf(paddingChar);
+	                if (paddingIndex !== -1) {
+	                    base64StrLength = paddingIndex;
+	                }
+	            }
+
+	            // Convert
+	            return parseLoop(base64Str, base64StrLength, reverseMap);
+
+	        },
+
+	        _map: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='
+	    };
+
+	    function parseLoop(base64Str, base64StrLength, reverseMap) {
+	      var words = [];
+	      var nBytes = 0;
+	      for (var i = 0; i < base64StrLength; i++) {
+	          if (i % 4) {
+	              var bits1 = reverseMap[base64Str.charCodeAt(i - 1)] << ((i % 4) * 2);
+	              var bits2 = reverseMap[base64Str.charCodeAt(i)] >>> (6 - (i % 4) * 2);
+	              words[nBytes >>> 2] |= (bits1 | bits2) << (24 - (nBytes % 4) * 8);
+	              nBytes++;
+	          }
+	      }
+	      return WordArray.create(words, nBytes);
+	    }
+	}());
+
+
+	return CryptoJS.enc.Base64;
+
+}));
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
+;(function (root, factory, undef) {
+	if (true) {
+		// CommonJS
+		module.exports = exports = factory(__webpack_require__(0), __webpack_require__(50), __webpack_require__(48));
+	}
+	else if (typeof define === "function" && define.amd) {
+		// AMD
+		define(["./core", "./sha1", "./hmac"], factory);
+	}
+	else {
+		// Global (browser)
+		factory(root.CryptoJS);
+	}
+}(this, function (CryptoJS) {
+
+	(function () {
+	    // Shortcuts
+	    var C = CryptoJS;
+	    var C_lib = C.lib;
+	    var Base = C_lib.Base;
+	    var WordArray = C_lib.WordArray;
+	    var C_algo = C.algo;
+	    var MD5 = C_algo.MD5;
+
+	    /**
+	     * This key derivation function is meant to conform with EVP_BytesToKey.
+	     * www.openssl.org/docs/crypto/EVP_BytesToKey.html
+	     */
+	    var EvpKDF = C_algo.EvpKDF = Base.extend({
+	        /**
+	         * Configuration options.
+	         *
+	         * @property {number} keySize The key size in words to generate. Default: 4 (128 bits)
+	         * @property {Hasher} hasher The hash algorithm to use. Default: MD5
+	         * @property {number} iterations The number of iterations to perform. Default: 1
+	         */
+	        cfg: Base.extend({
+	            keySize: 128/32,
+	            hasher: MD5,
+	            iterations: 1
+	        }),
+
+	        /**
+	         * Initializes a newly created key derivation function.
+	         *
+	         * @param {Object} cfg (Optional) The configuration options to use for the derivation.
+	         *
+	         * @example
+	         *
+	         *     var kdf = CryptoJS.algo.EvpKDF.create();
+	         *     var kdf = CryptoJS.algo.EvpKDF.create({ keySize: 8 });
+	         *     var kdf = CryptoJS.algo.EvpKDF.create({ keySize: 8, iterations: 1000 });
+	         */
+	        init: function (cfg) {
+	            this.cfg = this.cfg.extend(cfg);
+	        },
+
+	        /**
+	         * Derives a key from a password.
+	         *
+	         * @param {WordArray|string} password The password.
+	         * @param {WordArray|string} salt A salt.
+	         *
+	         * @return {WordArray} The derived key.
+	         *
+	         * @example
+	         *
+	         *     var key = kdf.compute(password, salt);
+	         */
+	        compute: function (password, salt) {
+	            // Shortcut
+	            var cfg = this.cfg;
+
+	            // Init hasher
+	            var hasher = cfg.hasher.create();
+
+	            // Initial values
+	            var derivedKey = WordArray.create();
+
+	            // Shortcuts
+	            var derivedKeyWords = derivedKey.words;
+	            var keySize = cfg.keySize;
+	            var iterations = cfg.iterations;
+
+	            // Generate key
+	            while (derivedKeyWords.length < keySize) {
+	                if (block) {
+	                    hasher.update(block);
+	                }
+	                var block = hasher.update(password).finalize(salt);
+	                hasher.reset();
+
+	                // Iterations
+	                for (var i = 1; i < iterations; i++) {
+	                    block = hasher.finalize(block);
+	                    hasher.reset();
+	                }
+
+	                derivedKey.concat(block);
+	            }
+	            derivedKey.sigBytes = keySize * 4;
+
+	            return derivedKey;
+	        }
+	    });
+
+	    /**
+	     * Derives a key from a password.
+	     *
+	     * @param {WordArray|string} password The password.
+	     * @param {WordArray|string} salt A salt.
+	     * @param {Object} cfg (Optional) The configuration options to use for this computation.
+	     *
+	     * @return {WordArray} The derived key.
+	     *
+	     * @static
+	     *
+	     * @example
+	     *
+	     *     var key = CryptoJS.EvpKDF(password, salt);
+	     *     var key = CryptoJS.EvpKDF(password, salt, { keySize: 8 });
+	     *     var key = CryptoJS.EvpKDF(password, salt, { keySize: 8, iterations: 1000 });
+	     */
+	    C.EvpKDF = function (password, salt, cfg) {
+	        return EvpKDF.create(cfg).compute(password, salt);
+	    };
+	}());
+
+
+	return CryptoJS.EvpKDF;
+
+}));
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+;(function (root, factory) {
+	if (true) {
+		// CommonJS
+		module.exports = exports = factory(__webpack_require__(0));
+	}
+	else if (typeof define === "function" && define.amd) {
+		// AMD
+		define(["./core"], factory);
+	}
+	else {
+		// Global (browser)
+		factory(root.CryptoJS);
+	}
+}(this, function (CryptoJS) {
+
+	(function (Math) {
+	    // Shortcuts
+	    var C = CryptoJS;
+	    var C_lib = C.lib;
+	    var WordArray = C_lib.WordArray;
+	    var Hasher = C_lib.Hasher;
+	    var C_algo = C.algo;
+
+	    // Constants table
+	    var T = [];
+
+	    // Compute constants
+	    (function () {
+	        for (var i = 0; i < 64; i++) {
+	            T[i] = (Math.abs(Math.sin(i + 1)) * 0x100000000) | 0;
+	        }
+	    }());
+
+	    /**
+	     * MD5 hash algorithm.
+	     */
+	    var MD5 = C_algo.MD5 = Hasher.extend({
+	        _doReset: function () {
+	            this._hash = new WordArray.init([
+	                0x67452301, 0xefcdab89,
+	                0x98badcfe, 0x10325476
+	            ]);
+	        },
+
+	        _doProcessBlock: function (M, offset) {
+	            // Swap endian
+	            for (var i = 0; i < 16; i++) {
+	                // Shortcuts
+	                var offset_i = offset + i;
+	                var M_offset_i = M[offset_i];
+
+	                M[offset_i] = (
+	                    (((M_offset_i << 8)  | (M_offset_i >>> 24)) & 0x00ff00ff) |
+	                    (((M_offset_i << 24) | (M_offset_i >>> 8))  & 0xff00ff00)
+	                );
+	            }
+
+	            // Shortcuts
+	            var H = this._hash.words;
+
+	            var M_offset_0  = M[offset + 0];
+	            var M_offset_1  = M[offset + 1];
+	            var M_offset_2  = M[offset + 2];
+	            var M_offset_3  = M[offset + 3];
+	            var M_offset_4  = M[offset + 4];
+	            var M_offset_5  = M[offset + 5];
+	            var M_offset_6  = M[offset + 6];
+	            var M_offset_7  = M[offset + 7];
+	            var M_offset_8  = M[offset + 8];
+	            var M_offset_9  = M[offset + 9];
+	            var M_offset_10 = M[offset + 10];
+	            var M_offset_11 = M[offset + 11];
+	            var M_offset_12 = M[offset + 12];
+	            var M_offset_13 = M[offset + 13];
+	            var M_offset_14 = M[offset + 14];
+	            var M_offset_15 = M[offset + 15];
+
+	            // Working varialbes
+	            var a = H[0];
+	            var b = H[1];
+	            var c = H[2];
+	            var d = H[3];
+
+	            // Computation
+	            a = FF(a, b, c, d, M_offset_0,  7,  T[0]);
+	            d = FF(d, a, b, c, M_offset_1,  12, T[1]);
+	            c = FF(c, d, a, b, M_offset_2,  17, T[2]);
+	            b = FF(b, c, d, a, M_offset_3,  22, T[3]);
+	            a = FF(a, b, c, d, M_offset_4,  7,  T[4]);
+	            d = FF(d, a, b, c, M_offset_5,  12, T[5]);
+	            c = FF(c, d, a, b, M_offset_6,  17, T[6]);
+	            b = FF(b, c, d, a, M_offset_7,  22, T[7]);
+	            a = FF(a, b, c, d, M_offset_8,  7,  T[8]);
+	            d = FF(d, a, b, c, M_offset_9,  12, T[9]);
+	            c = FF(c, d, a, b, M_offset_10, 17, T[10]);
+	            b = FF(b, c, d, a, M_offset_11, 22, T[11]);
+	            a = FF(a, b, c, d, M_offset_12, 7,  T[12]);
+	            d = FF(d, a, b, c, M_offset_13, 12, T[13]);
+	            c = FF(c, d, a, b, M_offset_14, 17, T[14]);
+	            b = FF(b, c, d, a, M_offset_15, 22, T[15]);
+
+	            a = GG(a, b, c, d, M_offset_1,  5,  T[16]);
+	            d = GG(d, a, b, c, M_offset_6,  9,  T[17]);
+	            c = GG(c, d, a, b, M_offset_11, 14, T[18]);
+	            b = GG(b, c, d, a, M_offset_0,  20, T[19]);
+	            a = GG(a, b, c, d, M_offset_5,  5,  T[20]);
+	            d = GG(d, a, b, c, M_offset_10, 9,  T[21]);
+	            c = GG(c, d, a, b, M_offset_15, 14, T[22]);
+	            b = GG(b, c, d, a, M_offset_4,  20, T[23]);
+	            a = GG(a, b, c, d, M_offset_9,  5,  T[24]);
+	            d = GG(d, a, b, c, M_offset_14, 9,  T[25]);
+	            c = GG(c, d, a, b, M_offset_3,  14, T[26]);
+	            b = GG(b, c, d, a, M_offset_8,  20, T[27]);
+	            a = GG(a, b, c, d, M_offset_13, 5,  T[28]);
+	            d = GG(d, a, b, c, M_offset_2,  9,  T[29]);
+	            c = GG(c, d, a, b, M_offset_7,  14, T[30]);
+	            b = GG(b, c, d, a, M_offset_12, 20, T[31]);
+
+	            a = HH(a, b, c, d, M_offset_5,  4,  T[32]);
+	            d = HH(d, a, b, c, M_offset_8,  11, T[33]);
+	            c = HH(c, d, a, b, M_offset_11, 16, T[34]);
+	            b = HH(b, c, d, a, M_offset_14, 23, T[35]);
+	            a = HH(a, b, c, d, M_offset_1,  4,  T[36]);
+	            d = HH(d, a, b, c, M_offset_4,  11, T[37]);
+	            c = HH(c, d, a, b, M_offset_7,  16, T[38]);
+	            b = HH(b, c, d, a, M_offset_10, 23, T[39]);
+	            a = HH(a, b, c, d, M_offset_13, 4,  T[40]);
+	            d = HH(d, a, b, c, M_offset_0,  11, T[41]);
+	            c = HH(c, d, a, b, M_offset_3,  16, T[42]);
+	            b = HH(b, c, d, a, M_offset_6,  23, T[43]);
+	            a = HH(a, b, c, d, M_offset_9,  4,  T[44]);
+	            d = HH(d, a, b, c, M_offset_12, 11, T[45]);
+	            c = HH(c, d, a, b, M_offset_15, 16, T[46]);
+	            b = HH(b, c, d, a, M_offset_2,  23, T[47]);
+
+	            a = II(a, b, c, d, M_offset_0,  6,  T[48]);
+	            d = II(d, a, b, c, M_offset_7,  10, T[49]);
+	            c = II(c, d, a, b, M_offset_14, 15, T[50]);
+	            b = II(b, c, d, a, M_offset_5,  21, T[51]);
+	            a = II(a, b, c, d, M_offset_12, 6,  T[52]);
+	            d = II(d, a, b, c, M_offset_3,  10, T[53]);
+	            c = II(c, d, a, b, M_offset_10, 15, T[54]);
+	            b = II(b, c, d, a, M_offset_1,  21, T[55]);
+	            a = II(a, b, c, d, M_offset_8,  6,  T[56]);
+	            d = II(d, a, b, c, M_offset_15, 10, T[57]);
+	            c = II(c, d, a, b, M_offset_6,  15, T[58]);
+	            b = II(b, c, d, a, M_offset_13, 21, T[59]);
+	            a = II(a, b, c, d, M_offset_4,  6,  T[60]);
+	            d = II(d, a, b, c, M_offset_11, 10, T[61]);
+	            c = II(c, d, a, b, M_offset_2,  15, T[62]);
+	            b = II(b, c, d, a, M_offset_9,  21, T[63]);
+
+	            // Intermediate hash value
+	            H[0] = (H[0] + a) | 0;
+	            H[1] = (H[1] + b) | 0;
+	            H[2] = (H[2] + c) | 0;
+	            H[3] = (H[3] + d) | 0;
+	        },
+
+	        _doFinalize: function () {
+	            // Shortcuts
+	            var data = this._data;
+	            var dataWords = data.words;
+
+	            var nBitsTotal = this._nDataBytes * 8;
+	            var nBitsLeft = data.sigBytes * 8;
+
+	            // Add padding
+	            dataWords[nBitsLeft >>> 5] |= 0x80 << (24 - nBitsLeft % 32);
+
+	            var nBitsTotalH = Math.floor(nBitsTotal / 0x100000000);
+	            var nBitsTotalL = nBitsTotal;
+	            dataWords[(((nBitsLeft + 64) >>> 9) << 4) + 15] = (
+	                (((nBitsTotalH << 8)  | (nBitsTotalH >>> 24)) & 0x00ff00ff) |
+	                (((nBitsTotalH << 24) | (nBitsTotalH >>> 8))  & 0xff00ff00)
+	            );
+	            dataWords[(((nBitsLeft + 64) >>> 9) << 4) + 14] = (
+	                (((nBitsTotalL << 8)  | (nBitsTotalL >>> 24)) & 0x00ff00ff) |
+	                (((nBitsTotalL << 24) | (nBitsTotalL >>> 8))  & 0xff00ff00)
+	            );
+
+	            data.sigBytes = (dataWords.length + 1) * 4;
+
+	            // Hash final blocks
+	            this._process();
+
+	            // Shortcuts
+	            var hash = this._hash;
+	            var H = hash.words;
+
+	            // Swap endian
+	            for (var i = 0; i < 4; i++) {
+	                // Shortcut
+	                var H_i = H[i];
+
+	                H[i] = (((H_i << 8)  | (H_i >>> 24)) & 0x00ff00ff) |
+	                       (((H_i << 24) | (H_i >>> 8))  & 0xff00ff00);
+	            }
+
+	            // Return final computed hash
+	            return hash;
+	        },
+
+	        clone: function () {
+	            var clone = Hasher.clone.call(this);
+	            clone._hash = this._hash.clone();
+
+	            return clone;
+	        }
+	    });
+
+	    function FF(a, b, c, d, x, s, t) {
+	        var n = a + ((b & c) | (~b & d)) + x + t;
+	        return ((n << s) | (n >>> (32 - s))) + b;
+	    }
+
+	    function GG(a, b, c, d, x, s, t) {
+	        var n = a + ((b & d) | (c & ~d)) + x + t;
+	        return ((n << s) | (n >>> (32 - s))) + b;
+	    }
+
+	    function HH(a, b, c, d, x, s, t) {
+	        var n = a + (b ^ c ^ d) + x + t;
+	        return ((n << s) | (n >>> (32 - s))) + b;
+	    }
+
+	    function II(a, b, c, d, x, s, t) {
+	        var n = a + (c ^ (b | ~d)) + x + t;
+	        return ((n << s) | (n >>> (32 - s))) + b;
+	    }
+
+	    /**
+	     * Shortcut function to the hasher's object interface.
+	     *
+	     * @param {WordArray|string} message The message to hash.
+	     *
+	     * @return {WordArray} The hash.
+	     *
+	     * @static
+	     *
+	     * @example
+	     *
+	     *     var hash = CryptoJS.MD5('message');
+	     *     var hash = CryptoJS.MD5(wordArray);
+	     */
+	    C.MD5 = Hasher._createHelper(MD5);
+
+	    /**
+	     * Shortcut function to the HMAC's object interface.
+	     *
+	     * @param {WordArray|string} message The message to hash.
+	     * @param {WordArray|string} key The secret key.
+	     *
+	     * @return {WordArray} The HMAC.
+	     *
+	     * @static
+	     *
+	     * @example
+	     *
+	     *     var hmac = CryptoJS.HmacMD5(message, key);
+	     */
+	    C.HmacMD5 = Hasher._createHmacHelper(MD5);
+	}(Math));
+
+
+	return CryptoJS.MD5;
+
+}));
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*
+    This file is part of web3.js.
+
+    web3.js is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    web3.js is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with web3.js.  If not, see <http://www.gnu.org/licenses/>.
+*/
+/**
+ * @file property.js
+ * @author Fabian Vogelsteller <fabian@frozeman.de>
+ * @author Marek Kotewicz <marek@ethdev.com>
+ * @date 2015
+ */
+
+var utils = __webpack_require__(2);
+
+var Property = function (options) {
+    this.name = options.name;
+    this.getter = options.getter;
+    this.setter = options.setter;
+    this.outputFormatter = options.outputFormatter;
+    this.inputFormatter = options.inputFormatter;
+    this.requestManager = null;
+};
+
+Property.prototype.setRequestManager = function (rm) {
+    this.requestManager = rm;
+};
+
+/**
+ * Should be called to format input args of method
+ *
+ * @method formatInput
+ * @param {Array}
+ * @return {Array}
+ */
+Property.prototype.formatInput = function (arg) {
+    return this.inputFormatter ? this.inputFormatter(arg) : arg;
+};
+
+/**
+ * Should be called to format output(result) of method
+ *
+ * @method formatOutput
+ * @param {Object}
+ * @return {Object}
+ */
+Property.prototype.formatOutput = function (result) {
+    return this.outputFormatter && result !== null && result !== undefined ? this.outputFormatter(result) : result;
+};
+
+/**
+ * Should be used to extract callback from array of arguments. Modifies input param
+ *
+ * @method extractCallback
+ * @param {Array} arguments
+ * @return {Function|Null} callback, if exists
+ */
+Property.prototype.extractCallback = function (args) {
+    if (utils.isFunction(args[args.length - 1])) {
+        return args.pop(); // modify the args array!
+    }
+};
+
+
+/**
+ * Should attach function to method
+ *
+ * @method attachToObject
+ * @param {Object}
+ * @param {Function}
+ */
+Property.prototype.attachToObject = function (obj) {
+    var proto = {
+        get: this.buildGet(),
+        enumerable: true
+    };
+
+    var names = this.name.split('.');
+    var name = names[0];
+    if (names.length > 1) {
+        obj[names[0]] = obj[names[0]] || {};
+        obj = obj[names[0]];
+        name = names[1];
+    }
+
+    Object.defineProperty(obj, name, proto);
+    obj[asyncGetterName(name)] = this.buildAsyncGet();
+};
+
+var asyncGetterName = function (name) {
+    return 'get' + name.charAt(0).toUpperCase() + name.slice(1);
+};
+
+Property.prototype.buildGet = function () {
+    var property = this;
+    return function get() {
+        return property.formatOutput(property.requestManager.send({
+            method: property.getter
+        }));
+    };
+};
+
+Property.prototype.buildAsyncGet = function () {
+    var property = this;
+    var get = function (callback) {
+        property.requestManager.sendAsync({
+            method: property.getter
+        }, function (err, result) {
+            callback(err, property.formatOutput(result));
+        });
+    };
+    get.request = this.request.bind(this);
+    return get;
+};
+
+/**
+ * Should be called to create pure JSONRPC request which can be used in batch request
+ *
+ * @method request
+ * @param {...} params
+ * @return {Object} jsonrpc request
+ */
+Property.prototype.request = function () {
+    var payload = {
+        method: this.getter,
+        params: [],
+        callback: this.extractCallback(Array.prototype.slice.call(arguments))
+    };
+    payload.format = this.formatOutput.bind(this);
+    return payload;
+};
+
+module.exports = Property;
+
+
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*
+    This file is part of web3.js.
+
+    web3.js is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    web3.js is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with web3.js.  If not, see <http://www.gnu.org/licenses/>.
+*/
+/**
+ * @file method.js
+ * @author Marek Kotewicz <marek@ethdev.com>
+ * @date 2015
+ */
+
+var utils = __webpack_require__(3);
+var errors = __webpack_require__(27);
+
+var Method = function (options) {
+    this.name = options.name;
+    this.call = options.call;
+    this.params = options.params || 0;
+    this.inputFormatter = options.inputFormatter;
+    this.outputFormatter = options.outputFormatter;
+    this.requestManager = null;
+};
+
+Method.prototype.setRequestManager = function (rm) {
+    this.requestManager = rm;
+};
+
+/**
+ * Should be used to determine name of the jsonrpc method based on arguments
+ *
+ * @method getCall
+ * @param {Array} arguments
+ * @return {String} name of jsonrpc method
+ */
+Method.prototype.getCall = function (args) {
+    return utils.isFunction(this.call) ? this.call(args) : this.call;
+};
+
+/**
+ * Should be used to extract callback from array of arguments. Modifies input param
+ *
+ * @method extractCallback
+ * @param {Array} arguments
+ * @return {Function|Null} callback, if exists
+ */
+Method.prototype.extractCallback = function (args) {
+    if (utils.isFunction(args[args.length - 1])) {
+        return args.pop(); // modify the args array!
+    }
+};
+
+/**
+ * Should be called to check if the number of arguments is correct
+ * 
+ * @method validateArgs
+ * @param {Array} arguments
+ * @throws {Error} if it is not
+ */
+Method.prototype.validateArgs = function (args) {
+    if (args.length !== this.params) {
+        throw errors.InvalidNumberOfParams();
+    }
+};
+
+/**
+ * Should be called to format input args of method
+ * 
+ * @method formatInput
+ * @param {Array}
+ * @return {Array}
+ */
+Method.prototype.formatInput = function (args) {
+    if (!this.inputFormatter) {
+        return args;
+    }
+
+    return this.inputFormatter.map(function (formatter, index) {
+        return formatter ? formatter(args[index]) : args[index];
+    });
+};
+
+/**
+ * Should be called to format output(result) of method
+ *
+ * @method formatOutput
+ * @param {Object}
+ * @return {Object}
+ */
+Method.prototype.formatOutput = function (result) {
+    return this.outputFormatter && result ? this.outputFormatter(result) : result;
+};
+
+/**
+ * Should create payload from given input args
+ *
+ * @method toPayload
+ * @param {Array} args
+ * @return {Object}
+ */
+Method.prototype.toPayload = function (args) {
+    var call = this.getCall(args);
+    var callback = this.extractCallback(args);
+    var params = this.formatInput(args);
+    this.validateArgs(params);
+
+    return {
+        method: call,
+        params: params,
+        callback: callback
+    };
+};
+
+Method.prototype.attachToObject = function (obj) {
+    var func = this.buildCall();
+    func.call = this.call; // TODO!!! that's ugly. filter.js uses it
+    var name = this.name.split('.');
+    if (name.length > 1) {
+        obj[name[0]] = obj[name[0]] || {};
+        obj[name[0]][name[1]] = func;
+    } else {
+        obj[name[0]] = func; 
+    }
+};
+
+Method.prototype.buildCall = function() {
+    var method = this;
+    var send = function () {
+        var payload = method.toPayload(Array.prototype.slice.call(arguments));
+        if (payload.callback) {
+            return method.requestManager.sendAsync(payload, function (err, result) {
+                payload.callback(err, method.formatOutput(result));
+            });
+        }
+        return method.formatOutput(method.requestManager.send(payload));
+    };
+    send.request = this.request.bind(this);
+    return send;
+};
+
+/**
+ * Should be called to create pure JSONRPC request which can be used in batch request
+ *
+ * @method request
+ * @param {...} params
+ * @return {Object} jsonrpc request
+ */
+Method.prototype.request = function () {
+    var payload = this.toPayload(Array.prototype.slice.call(arguments));
+    payload.format = this.formatOutput.bind(this);
+    return payload;
+};
+
+module.exports = Method;
+
+
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports) {
+
+/*
+    This file is part of web3.js.
+
+    web3.js is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    web3.js is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with web3.js.  If not, see <http://www.gnu.org/licenses/>.
+*/
+/** 
+ * @file errors.js
+ * @author Marek Kotewicz <marek@ethdev.com>
+ * @date 2015
+ */
+
+module.exports = {
+    InvalidNumberOfSolidityArgs: function () {
+        return new Error('Invalid number of arguments to Solidity function');
+    },
+    InvalidNumberOfRPCParams: function () {
+        return new Error('Invalid number of input parameters to RPC method');
+    },
+    InvalidConnection: function (host){
+        return new Error('CONNECTION ERROR: Couldn\'t connect to node '+ host +'.');
+    },
+    InvalidProvider: function () {
+        return new Error('Provider not set or invalid');
+    },
+    InvalidResponse: function (result){
+        var message = !!result && !!result.error && !!result.error.message ? result.error.message : 'Invalid JSON RPC response: ' + JSON.stringify(result);
+        return new Error(message);
+    },
+    ConnectionTimeout: function (ms){
+        return new Error('CONNECTION TIMEOUT: timeout of ' + ms + ' ms achived');
+    }
+};
+
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*
+    This file is part of web3.js.
+
+    web3.js is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    web3.js is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with web3.js.  If not, see <http://www.gnu.org/licenses/>.
+*/
+/**
+ * @file property.js
+ * @author Fabian Vogelsteller <fabian@frozeman.de>
+ * @author Marek Kotewicz <marek@ethdev.com>
+ * @date 2015
+ */
+
+var utils = __webpack_require__(4);
+
+var Property = function (options) {
+    this.name = options.name;
+    this.getter = options.getter;
+    this.setter = options.setter;
+    this.outputFormatter = options.outputFormatter;
+    this.inputFormatter = options.inputFormatter;
+    this.requestManager = null;
+};
+
+Property.prototype.setRequestManager = function (rm) {
+    this.requestManager = rm;
+};
+
+/**
+ * Should be called to format input args of method
+ *
+ * @method formatInput
+ * @param {Array}
+ * @return {Array}
+ */
+Property.prototype.formatInput = function (arg) {
+    return this.inputFormatter ? this.inputFormatter(arg) : arg;
+};
+
+/**
+ * Should be called to format output(result) of method
+ *
+ * @method formatOutput
+ * @param {Object}
+ * @return {Object}
+ */
+Property.prototype.formatOutput = function (result) {
+    return this.outputFormatter && result !== null && result !== undefined ? this.outputFormatter(result) : result;
+};
+
+/**
+ * Should be used to extract callback from array of arguments. Modifies input param
+ *
+ * @method extractCallback
+ * @param {Array} arguments
+ * @return {Function|Null} callback, if exists
+ */
+Property.prototype.extractCallback = function (args) {
+    if (utils.isFunction(args[args.length - 1])) {
+        return args.pop(); // modify the args array!
+    }
+};
+
+
+/**
+ * Should attach function to method
+ *
+ * @method attachToObject
+ * @param {Object}
+ * @param {Function}
+ */
+Property.prototype.attachToObject = function (obj) {
+    var proto = {
+        get: this.buildGet(),
+        enumerable: true
+    };
+
+    var names = this.name.split('.');
+    var name = names[0];
+    if (names.length > 1) {
+        obj[names[0]] = obj[names[0]] || {};
+        obj = obj[names[0]];
+        name = names[1];
+    }
+
+    Object.defineProperty(obj, name, proto);
+    obj[asyncGetterName(name)] = this.buildAsyncGet();
+};
+
+var asyncGetterName = function (name) {
+    return 'get' + name.charAt(0).toUpperCase() + name.slice(1);
+};
+
+Property.prototype.buildGet = function () {
+    var property = this;
+    return function get() {
+        return property.formatOutput(property.requestManager.send({
+            method: property.getter
+        }));
+    };
+};
+
+Property.prototype.buildAsyncGet = function () {
+    var property = this;
+    var get = function (callback) {
+        property.requestManager.sendAsync({
+            method: property.getter
+        }, function (err, result) {
+            callback(err, property.formatOutput(result));
+        });
+    };
+    get.request = this.request.bind(this);
+    return get;
+};
+
+/**
+ * Should be called to create pure JSONRPC request which can be used in batch request
+ *
+ * @method request
+ * @param {...} params
+ * @return {Object} jsonrpc request
+ */
+Property.prototype.request = function () {
+    var payload = {
+        method: this.getter,
+        params: [],
+        callback: this.extractCallback(Array.prototype.slice.call(arguments))
+    };
+    payload.format = this.formatOutput.bind(this);
+    return payload;
+};
+
+module.exports = Property;
+
+
+
+/***/ }),
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_RESULT__;/*! bignumber.js v2.0.7 https://github.com/MikeMcl/bignumber.js/LICENCE */
@@ -9088,1076 +10158,6 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/*! bignumber.js v2.0.7 https://github.com/Mik
         global.BigNumber = BigNumber;
     }
 })(this);
-
-
-/***/ }),
-/* 17 */
-/***/ (function(module, exports, __webpack_require__) {
-
-;(function (root, factory) {
-	if (true) {
-		// CommonJS
-		module.exports = exports = factory(__webpack_require__(0));
-	}
-	else if (typeof define === "function" && define.amd) {
-		// AMD
-		define(["./core"], factory);
-	}
-	else {
-		// Global (browser)
-		factory(root.CryptoJS);
-	}
-}(this, function (CryptoJS) {
-
-	(function () {
-	    // Shortcuts
-	    var C = CryptoJS;
-	    var C_lib = C.lib;
-	    var WordArray = C_lib.WordArray;
-	    var C_enc = C.enc;
-
-	    /**
-	     * Base64 encoding strategy.
-	     */
-	    var Base64 = C_enc.Base64 = {
-	        /**
-	         * Converts a word array to a Base64 string.
-	         *
-	         * @param {WordArray} wordArray The word array.
-	         *
-	         * @return {string} The Base64 string.
-	         *
-	         * @static
-	         *
-	         * @example
-	         *
-	         *     var base64String = CryptoJS.enc.Base64.stringify(wordArray);
-	         */
-	        stringify: function (wordArray) {
-	            // Shortcuts
-	            var words = wordArray.words;
-	            var sigBytes = wordArray.sigBytes;
-	            var map = this._map;
-
-	            // Clamp excess bits
-	            wordArray.clamp();
-
-	            // Convert
-	            var base64Chars = [];
-	            for (var i = 0; i < sigBytes; i += 3) {
-	                var byte1 = (words[i >>> 2]       >>> (24 - (i % 4) * 8))       & 0xff;
-	                var byte2 = (words[(i + 1) >>> 2] >>> (24 - ((i + 1) % 4) * 8)) & 0xff;
-	                var byte3 = (words[(i + 2) >>> 2] >>> (24 - ((i + 2) % 4) * 8)) & 0xff;
-
-	                var triplet = (byte1 << 16) | (byte2 << 8) | byte3;
-
-	                for (var j = 0; (j < 4) && (i + j * 0.75 < sigBytes); j++) {
-	                    base64Chars.push(map.charAt((triplet >>> (6 * (3 - j))) & 0x3f));
-	                }
-	            }
-
-	            // Add padding
-	            var paddingChar = map.charAt(64);
-	            if (paddingChar) {
-	                while (base64Chars.length % 4) {
-	                    base64Chars.push(paddingChar);
-	                }
-	            }
-
-	            return base64Chars.join('');
-	        },
-
-	        /**
-	         * Converts a Base64 string to a word array.
-	         *
-	         * @param {string} base64Str The Base64 string.
-	         *
-	         * @return {WordArray} The word array.
-	         *
-	         * @static
-	         *
-	         * @example
-	         *
-	         *     var wordArray = CryptoJS.enc.Base64.parse(base64String);
-	         */
-	        parse: function (base64Str) {
-	            // Shortcuts
-	            var base64StrLength = base64Str.length;
-	            var map = this._map;
-	            var reverseMap = this._reverseMap;
-
-	            if (!reverseMap) {
-	                    reverseMap = this._reverseMap = [];
-	                    for (var j = 0; j < map.length; j++) {
-	                        reverseMap[map.charCodeAt(j)] = j;
-	                    }
-	            }
-
-	            // Ignore padding
-	            var paddingChar = map.charAt(64);
-	            if (paddingChar) {
-	                var paddingIndex = base64Str.indexOf(paddingChar);
-	                if (paddingIndex !== -1) {
-	                    base64StrLength = paddingIndex;
-	                }
-	            }
-
-	            // Convert
-	            return parseLoop(base64Str, base64StrLength, reverseMap);
-
-	        },
-
-	        _map: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='
-	    };
-
-	    function parseLoop(base64Str, base64StrLength, reverseMap) {
-	      var words = [];
-	      var nBytes = 0;
-	      for (var i = 0; i < base64StrLength; i++) {
-	          if (i % 4) {
-	              var bits1 = reverseMap[base64Str.charCodeAt(i - 1)] << ((i % 4) * 2);
-	              var bits2 = reverseMap[base64Str.charCodeAt(i)] >>> (6 - (i % 4) * 2);
-	              words[nBytes >>> 2] |= (bits1 | bits2) << (24 - (nBytes % 4) * 8);
-	              nBytes++;
-	          }
-	      }
-	      return WordArray.create(words, nBytes);
-	    }
-	}());
-
-
-	return CryptoJS.enc.Base64;
-
-}));
-
-/***/ }),
-/* 18 */
-/***/ (function(module, exports, __webpack_require__) {
-
-;(function (root, factory, undef) {
-	if (true) {
-		// CommonJS
-		module.exports = exports = factory(__webpack_require__(0), __webpack_require__(50), __webpack_require__(48));
-	}
-	else if (typeof define === "function" && define.amd) {
-		// AMD
-		define(["./core", "./sha1", "./hmac"], factory);
-	}
-	else {
-		// Global (browser)
-		factory(root.CryptoJS);
-	}
-}(this, function (CryptoJS) {
-
-	(function () {
-	    // Shortcuts
-	    var C = CryptoJS;
-	    var C_lib = C.lib;
-	    var Base = C_lib.Base;
-	    var WordArray = C_lib.WordArray;
-	    var C_algo = C.algo;
-	    var MD5 = C_algo.MD5;
-
-	    /**
-	     * This key derivation function is meant to conform with EVP_BytesToKey.
-	     * www.openssl.org/docs/crypto/EVP_BytesToKey.html
-	     */
-	    var EvpKDF = C_algo.EvpKDF = Base.extend({
-	        /**
-	         * Configuration options.
-	         *
-	         * @property {number} keySize The key size in words to generate. Default: 4 (128 bits)
-	         * @property {Hasher} hasher The hash algorithm to use. Default: MD5
-	         * @property {number} iterations The number of iterations to perform. Default: 1
-	         */
-	        cfg: Base.extend({
-	            keySize: 128/32,
-	            hasher: MD5,
-	            iterations: 1
-	        }),
-
-	        /**
-	         * Initializes a newly created key derivation function.
-	         *
-	         * @param {Object} cfg (Optional) The configuration options to use for the derivation.
-	         *
-	         * @example
-	         *
-	         *     var kdf = CryptoJS.algo.EvpKDF.create();
-	         *     var kdf = CryptoJS.algo.EvpKDF.create({ keySize: 8 });
-	         *     var kdf = CryptoJS.algo.EvpKDF.create({ keySize: 8, iterations: 1000 });
-	         */
-	        init: function (cfg) {
-	            this.cfg = this.cfg.extend(cfg);
-	        },
-
-	        /**
-	         * Derives a key from a password.
-	         *
-	         * @param {WordArray|string} password The password.
-	         * @param {WordArray|string} salt A salt.
-	         *
-	         * @return {WordArray} The derived key.
-	         *
-	         * @example
-	         *
-	         *     var key = kdf.compute(password, salt);
-	         */
-	        compute: function (password, salt) {
-	            // Shortcut
-	            var cfg = this.cfg;
-
-	            // Init hasher
-	            var hasher = cfg.hasher.create();
-
-	            // Initial values
-	            var derivedKey = WordArray.create();
-
-	            // Shortcuts
-	            var derivedKeyWords = derivedKey.words;
-	            var keySize = cfg.keySize;
-	            var iterations = cfg.iterations;
-
-	            // Generate key
-	            while (derivedKeyWords.length < keySize) {
-	                if (block) {
-	                    hasher.update(block);
-	                }
-	                var block = hasher.update(password).finalize(salt);
-	                hasher.reset();
-
-	                // Iterations
-	                for (var i = 1; i < iterations; i++) {
-	                    block = hasher.finalize(block);
-	                    hasher.reset();
-	                }
-
-	                derivedKey.concat(block);
-	            }
-	            derivedKey.sigBytes = keySize * 4;
-
-	            return derivedKey;
-	        }
-	    });
-
-	    /**
-	     * Derives a key from a password.
-	     *
-	     * @param {WordArray|string} password The password.
-	     * @param {WordArray|string} salt A salt.
-	     * @param {Object} cfg (Optional) The configuration options to use for this computation.
-	     *
-	     * @return {WordArray} The derived key.
-	     *
-	     * @static
-	     *
-	     * @example
-	     *
-	     *     var key = CryptoJS.EvpKDF(password, salt);
-	     *     var key = CryptoJS.EvpKDF(password, salt, { keySize: 8 });
-	     *     var key = CryptoJS.EvpKDF(password, salt, { keySize: 8, iterations: 1000 });
-	     */
-	    C.EvpKDF = function (password, salt, cfg) {
-	        return EvpKDF.create(cfg).compute(password, salt);
-	    };
-	}());
-
-
-	return CryptoJS.EvpKDF;
-
-}));
-
-/***/ }),
-/* 19 */
-/***/ (function(module, exports, __webpack_require__) {
-
-;(function (root, factory) {
-	if (true) {
-		// CommonJS
-		module.exports = exports = factory(__webpack_require__(0));
-	}
-	else if (typeof define === "function" && define.amd) {
-		// AMD
-		define(["./core"], factory);
-	}
-	else {
-		// Global (browser)
-		factory(root.CryptoJS);
-	}
-}(this, function (CryptoJS) {
-
-	(function (Math) {
-	    // Shortcuts
-	    var C = CryptoJS;
-	    var C_lib = C.lib;
-	    var WordArray = C_lib.WordArray;
-	    var Hasher = C_lib.Hasher;
-	    var C_algo = C.algo;
-
-	    // Constants table
-	    var T = [];
-
-	    // Compute constants
-	    (function () {
-	        for (var i = 0; i < 64; i++) {
-	            T[i] = (Math.abs(Math.sin(i + 1)) * 0x100000000) | 0;
-	        }
-	    }());
-
-	    /**
-	     * MD5 hash algorithm.
-	     */
-	    var MD5 = C_algo.MD5 = Hasher.extend({
-	        _doReset: function () {
-	            this._hash = new WordArray.init([
-	                0x67452301, 0xefcdab89,
-	                0x98badcfe, 0x10325476
-	            ]);
-	        },
-
-	        _doProcessBlock: function (M, offset) {
-	            // Swap endian
-	            for (var i = 0; i < 16; i++) {
-	                // Shortcuts
-	                var offset_i = offset + i;
-	                var M_offset_i = M[offset_i];
-
-	                M[offset_i] = (
-	                    (((M_offset_i << 8)  | (M_offset_i >>> 24)) & 0x00ff00ff) |
-	                    (((M_offset_i << 24) | (M_offset_i >>> 8))  & 0xff00ff00)
-	                );
-	            }
-
-	            // Shortcuts
-	            var H = this._hash.words;
-
-	            var M_offset_0  = M[offset + 0];
-	            var M_offset_1  = M[offset + 1];
-	            var M_offset_2  = M[offset + 2];
-	            var M_offset_3  = M[offset + 3];
-	            var M_offset_4  = M[offset + 4];
-	            var M_offset_5  = M[offset + 5];
-	            var M_offset_6  = M[offset + 6];
-	            var M_offset_7  = M[offset + 7];
-	            var M_offset_8  = M[offset + 8];
-	            var M_offset_9  = M[offset + 9];
-	            var M_offset_10 = M[offset + 10];
-	            var M_offset_11 = M[offset + 11];
-	            var M_offset_12 = M[offset + 12];
-	            var M_offset_13 = M[offset + 13];
-	            var M_offset_14 = M[offset + 14];
-	            var M_offset_15 = M[offset + 15];
-
-	            // Working varialbes
-	            var a = H[0];
-	            var b = H[1];
-	            var c = H[2];
-	            var d = H[3];
-
-	            // Computation
-	            a = FF(a, b, c, d, M_offset_0,  7,  T[0]);
-	            d = FF(d, a, b, c, M_offset_1,  12, T[1]);
-	            c = FF(c, d, a, b, M_offset_2,  17, T[2]);
-	            b = FF(b, c, d, a, M_offset_3,  22, T[3]);
-	            a = FF(a, b, c, d, M_offset_4,  7,  T[4]);
-	            d = FF(d, a, b, c, M_offset_5,  12, T[5]);
-	            c = FF(c, d, a, b, M_offset_6,  17, T[6]);
-	            b = FF(b, c, d, a, M_offset_7,  22, T[7]);
-	            a = FF(a, b, c, d, M_offset_8,  7,  T[8]);
-	            d = FF(d, a, b, c, M_offset_9,  12, T[9]);
-	            c = FF(c, d, a, b, M_offset_10, 17, T[10]);
-	            b = FF(b, c, d, a, M_offset_11, 22, T[11]);
-	            a = FF(a, b, c, d, M_offset_12, 7,  T[12]);
-	            d = FF(d, a, b, c, M_offset_13, 12, T[13]);
-	            c = FF(c, d, a, b, M_offset_14, 17, T[14]);
-	            b = FF(b, c, d, a, M_offset_15, 22, T[15]);
-
-	            a = GG(a, b, c, d, M_offset_1,  5,  T[16]);
-	            d = GG(d, a, b, c, M_offset_6,  9,  T[17]);
-	            c = GG(c, d, a, b, M_offset_11, 14, T[18]);
-	            b = GG(b, c, d, a, M_offset_0,  20, T[19]);
-	            a = GG(a, b, c, d, M_offset_5,  5,  T[20]);
-	            d = GG(d, a, b, c, M_offset_10, 9,  T[21]);
-	            c = GG(c, d, a, b, M_offset_15, 14, T[22]);
-	            b = GG(b, c, d, a, M_offset_4,  20, T[23]);
-	            a = GG(a, b, c, d, M_offset_9,  5,  T[24]);
-	            d = GG(d, a, b, c, M_offset_14, 9,  T[25]);
-	            c = GG(c, d, a, b, M_offset_3,  14, T[26]);
-	            b = GG(b, c, d, a, M_offset_8,  20, T[27]);
-	            a = GG(a, b, c, d, M_offset_13, 5,  T[28]);
-	            d = GG(d, a, b, c, M_offset_2,  9,  T[29]);
-	            c = GG(c, d, a, b, M_offset_7,  14, T[30]);
-	            b = GG(b, c, d, a, M_offset_12, 20, T[31]);
-
-	            a = HH(a, b, c, d, M_offset_5,  4,  T[32]);
-	            d = HH(d, a, b, c, M_offset_8,  11, T[33]);
-	            c = HH(c, d, a, b, M_offset_11, 16, T[34]);
-	            b = HH(b, c, d, a, M_offset_14, 23, T[35]);
-	            a = HH(a, b, c, d, M_offset_1,  4,  T[36]);
-	            d = HH(d, a, b, c, M_offset_4,  11, T[37]);
-	            c = HH(c, d, a, b, M_offset_7,  16, T[38]);
-	            b = HH(b, c, d, a, M_offset_10, 23, T[39]);
-	            a = HH(a, b, c, d, M_offset_13, 4,  T[40]);
-	            d = HH(d, a, b, c, M_offset_0,  11, T[41]);
-	            c = HH(c, d, a, b, M_offset_3,  16, T[42]);
-	            b = HH(b, c, d, a, M_offset_6,  23, T[43]);
-	            a = HH(a, b, c, d, M_offset_9,  4,  T[44]);
-	            d = HH(d, a, b, c, M_offset_12, 11, T[45]);
-	            c = HH(c, d, a, b, M_offset_15, 16, T[46]);
-	            b = HH(b, c, d, a, M_offset_2,  23, T[47]);
-
-	            a = II(a, b, c, d, M_offset_0,  6,  T[48]);
-	            d = II(d, a, b, c, M_offset_7,  10, T[49]);
-	            c = II(c, d, a, b, M_offset_14, 15, T[50]);
-	            b = II(b, c, d, a, M_offset_5,  21, T[51]);
-	            a = II(a, b, c, d, M_offset_12, 6,  T[52]);
-	            d = II(d, a, b, c, M_offset_3,  10, T[53]);
-	            c = II(c, d, a, b, M_offset_10, 15, T[54]);
-	            b = II(b, c, d, a, M_offset_1,  21, T[55]);
-	            a = II(a, b, c, d, M_offset_8,  6,  T[56]);
-	            d = II(d, a, b, c, M_offset_15, 10, T[57]);
-	            c = II(c, d, a, b, M_offset_6,  15, T[58]);
-	            b = II(b, c, d, a, M_offset_13, 21, T[59]);
-	            a = II(a, b, c, d, M_offset_4,  6,  T[60]);
-	            d = II(d, a, b, c, M_offset_11, 10, T[61]);
-	            c = II(c, d, a, b, M_offset_2,  15, T[62]);
-	            b = II(b, c, d, a, M_offset_9,  21, T[63]);
-
-	            // Intermediate hash value
-	            H[0] = (H[0] + a) | 0;
-	            H[1] = (H[1] + b) | 0;
-	            H[2] = (H[2] + c) | 0;
-	            H[3] = (H[3] + d) | 0;
-	        },
-
-	        _doFinalize: function () {
-	            // Shortcuts
-	            var data = this._data;
-	            var dataWords = data.words;
-
-	            var nBitsTotal = this._nDataBytes * 8;
-	            var nBitsLeft = data.sigBytes * 8;
-
-	            // Add padding
-	            dataWords[nBitsLeft >>> 5] |= 0x80 << (24 - nBitsLeft % 32);
-
-	            var nBitsTotalH = Math.floor(nBitsTotal / 0x100000000);
-	            var nBitsTotalL = nBitsTotal;
-	            dataWords[(((nBitsLeft + 64) >>> 9) << 4) + 15] = (
-	                (((nBitsTotalH << 8)  | (nBitsTotalH >>> 24)) & 0x00ff00ff) |
-	                (((nBitsTotalH << 24) | (nBitsTotalH >>> 8))  & 0xff00ff00)
-	            );
-	            dataWords[(((nBitsLeft + 64) >>> 9) << 4) + 14] = (
-	                (((nBitsTotalL << 8)  | (nBitsTotalL >>> 24)) & 0x00ff00ff) |
-	                (((nBitsTotalL << 24) | (nBitsTotalL >>> 8))  & 0xff00ff00)
-	            );
-
-	            data.sigBytes = (dataWords.length + 1) * 4;
-
-	            // Hash final blocks
-	            this._process();
-
-	            // Shortcuts
-	            var hash = this._hash;
-	            var H = hash.words;
-
-	            // Swap endian
-	            for (var i = 0; i < 4; i++) {
-	                // Shortcut
-	                var H_i = H[i];
-
-	                H[i] = (((H_i << 8)  | (H_i >>> 24)) & 0x00ff00ff) |
-	                       (((H_i << 24) | (H_i >>> 8))  & 0xff00ff00);
-	            }
-
-	            // Return final computed hash
-	            return hash;
-	        },
-
-	        clone: function () {
-	            var clone = Hasher.clone.call(this);
-	            clone._hash = this._hash.clone();
-
-	            return clone;
-	        }
-	    });
-
-	    function FF(a, b, c, d, x, s, t) {
-	        var n = a + ((b & c) | (~b & d)) + x + t;
-	        return ((n << s) | (n >>> (32 - s))) + b;
-	    }
-
-	    function GG(a, b, c, d, x, s, t) {
-	        var n = a + ((b & d) | (c & ~d)) + x + t;
-	        return ((n << s) | (n >>> (32 - s))) + b;
-	    }
-
-	    function HH(a, b, c, d, x, s, t) {
-	        var n = a + (b ^ c ^ d) + x + t;
-	        return ((n << s) | (n >>> (32 - s))) + b;
-	    }
-
-	    function II(a, b, c, d, x, s, t) {
-	        var n = a + (c ^ (b | ~d)) + x + t;
-	        return ((n << s) | (n >>> (32 - s))) + b;
-	    }
-
-	    /**
-	     * Shortcut function to the hasher's object interface.
-	     *
-	     * @param {WordArray|string} message The message to hash.
-	     *
-	     * @return {WordArray} The hash.
-	     *
-	     * @static
-	     *
-	     * @example
-	     *
-	     *     var hash = CryptoJS.MD5('message');
-	     *     var hash = CryptoJS.MD5(wordArray);
-	     */
-	    C.MD5 = Hasher._createHelper(MD5);
-
-	    /**
-	     * Shortcut function to the HMAC's object interface.
-	     *
-	     * @param {WordArray|string} message The message to hash.
-	     * @param {WordArray|string} key The secret key.
-	     *
-	     * @return {WordArray} The HMAC.
-	     *
-	     * @static
-	     *
-	     * @example
-	     *
-	     *     var hmac = CryptoJS.HmacMD5(message, key);
-	     */
-	    C.HmacMD5 = Hasher._createHmacHelper(MD5);
-	}(Math));
-
-
-	return CryptoJS.MD5;
-
-}));
-
-/***/ }),
-/* 20 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/*
-    This file is part of web3.js.
-
-    web3.js is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Lesser General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    web3.js is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with web3.js.  If not, see <http://www.gnu.org/licenses/>.
-*/
-/**
- * @file property.js
- * @author Fabian Vogelsteller <fabian@frozeman.de>
- * @author Marek Kotewicz <marek@ethdev.com>
- * @date 2015
- */
-
-var utils = __webpack_require__(2);
-
-var Property = function (options) {
-    this.name = options.name;
-    this.getter = options.getter;
-    this.setter = options.setter;
-    this.outputFormatter = options.outputFormatter;
-    this.inputFormatter = options.inputFormatter;
-    this.requestManager = null;
-};
-
-Property.prototype.setRequestManager = function (rm) {
-    this.requestManager = rm;
-};
-
-/**
- * Should be called to format input args of method
- *
- * @method formatInput
- * @param {Array}
- * @return {Array}
- */
-Property.prototype.formatInput = function (arg) {
-    return this.inputFormatter ? this.inputFormatter(arg) : arg;
-};
-
-/**
- * Should be called to format output(result) of method
- *
- * @method formatOutput
- * @param {Object}
- * @return {Object}
- */
-Property.prototype.formatOutput = function (result) {
-    return this.outputFormatter && result !== null && result !== undefined ? this.outputFormatter(result) : result;
-};
-
-/**
- * Should be used to extract callback from array of arguments. Modifies input param
- *
- * @method extractCallback
- * @param {Array} arguments
- * @return {Function|Null} callback, if exists
- */
-Property.prototype.extractCallback = function (args) {
-    if (utils.isFunction(args[args.length - 1])) {
-        return args.pop(); // modify the args array!
-    }
-};
-
-
-/**
- * Should attach function to method
- *
- * @method attachToObject
- * @param {Object}
- * @param {Function}
- */
-Property.prototype.attachToObject = function (obj) {
-    var proto = {
-        get: this.buildGet(),
-        enumerable: true
-    };
-
-    var names = this.name.split('.');
-    var name = names[0];
-    if (names.length > 1) {
-        obj[names[0]] = obj[names[0]] || {};
-        obj = obj[names[0]];
-        name = names[1];
-    }
-
-    Object.defineProperty(obj, name, proto);
-    obj[asyncGetterName(name)] = this.buildAsyncGet();
-};
-
-var asyncGetterName = function (name) {
-    return 'get' + name.charAt(0).toUpperCase() + name.slice(1);
-};
-
-Property.prototype.buildGet = function () {
-    var property = this;
-    return function get() {
-        return property.formatOutput(property.requestManager.send({
-            method: property.getter
-        }));
-    };
-};
-
-Property.prototype.buildAsyncGet = function () {
-    var property = this;
-    var get = function (callback) {
-        property.requestManager.sendAsync({
-            method: property.getter
-        }, function (err, result) {
-            callback(err, property.formatOutput(result));
-        });
-    };
-    get.request = this.request.bind(this);
-    return get;
-};
-
-/**
- * Should be called to create pure JSONRPC request which can be used in batch request
- *
- * @method request
- * @param {...} params
- * @return {Object} jsonrpc request
- */
-Property.prototype.request = function () {
-    var payload = {
-        method: this.getter,
-        params: [],
-        callback: this.extractCallback(Array.prototype.slice.call(arguments))
-    };
-    payload.format = this.formatOutput.bind(this);
-    return payload;
-};
-
-module.exports = Property;
-
-
-
-/***/ }),
-/* 21 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/*
-    This file is part of web3.js.
-
-    web3.js is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Lesser General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    web3.js is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with web3.js.  If not, see <http://www.gnu.org/licenses/>.
-*/
-/**
- * @file method.js
- * @author Marek Kotewicz <marek@ethdev.com>
- * @date 2015
- */
-
-var utils = __webpack_require__(3);
-var errors = __webpack_require__(27);
-
-var Method = function (options) {
-    this.name = options.name;
-    this.call = options.call;
-    this.params = options.params || 0;
-    this.inputFormatter = options.inputFormatter;
-    this.outputFormatter = options.outputFormatter;
-    this.requestManager = null;
-};
-
-Method.prototype.setRequestManager = function (rm) {
-    this.requestManager = rm;
-};
-
-/**
- * Should be used to determine name of the jsonrpc method based on arguments
- *
- * @method getCall
- * @param {Array} arguments
- * @return {String} name of jsonrpc method
- */
-Method.prototype.getCall = function (args) {
-    return utils.isFunction(this.call) ? this.call(args) : this.call;
-};
-
-/**
- * Should be used to extract callback from array of arguments. Modifies input param
- *
- * @method extractCallback
- * @param {Array} arguments
- * @return {Function|Null} callback, if exists
- */
-Method.prototype.extractCallback = function (args) {
-    if (utils.isFunction(args[args.length - 1])) {
-        return args.pop(); // modify the args array!
-    }
-};
-
-/**
- * Should be called to check if the number of arguments is correct
- * 
- * @method validateArgs
- * @param {Array} arguments
- * @throws {Error} if it is not
- */
-Method.prototype.validateArgs = function (args) {
-    if (args.length !== this.params) {
-        throw errors.InvalidNumberOfParams();
-    }
-};
-
-/**
- * Should be called to format input args of method
- * 
- * @method formatInput
- * @param {Array}
- * @return {Array}
- */
-Method.prototype.formatInput = function (args) {
-    if (!this.inputFormatter) {
-        return args;
-    }
-
-    return this.inputFormatter.map(function (formatter, index) {
-        return formatter ? formatter(args[index]) : args[index];
-    });
-};
-
-/**
- * Should be called to format output(result) of method
- *
- * @method formatOutput
- * @param {Object}
- * @return {Object}
- */
-Method.prototype.formatOutput = function (result) {
-    return this.outputFormatter && result ? this.outputFormatter(result) : result;
-};
-
-/**
- * Should create payload from given input args
- *
- * @method toPayload
- * @param {Array} args
- * @return {Object}
- */
-Method.prototype.toPayload = function (args) {
-    var call = this.getCall(args);
-    var callback = this.extractCallback(args);
-    var params = this.formatInput(args);
-    this.validateArgs(params);
-
-    return {
-        method: call,
-        params: params,
-        callback: callback
-    };
-};
-
-Method.prototype.attachToObject = function (obj) {
-    var func = this.buildCall();
-    func.call = this.call; // TODO!!! that's ugly. filter.js uses it
-    var name = this.name.split('.');
-    if (name.length > 1) {
-        obj[name[0]] = obj[name[0]] || {};
-        obj[name[0]][name[1]] = func;
-    } else {
-        obj[name[0]] = func; 
-    }
-};
-
-Method.prototype.buildCall = function() {
-    var method = this;
-    var send = function () {
-        var payload = method.toPayload(Array.prototype.slice.call(arguments));
-        if (payload.callback) {
-            return method.requestManager.sendAsync(payload, function (err, result) {
-                payload.callback(err, method.formatOutput(result));
-            });
-        }
-        return method.formatOutput(method.requestManager.send(payload));
-    };
-    send.request = this.request.bind(this);
-    return send;
-};
-
-/**
- * Should be called to create pure JSONRPC request which can be used in batch request
- *
- * @method request
- * @param {...} params
- * @return {Object} jsonrpc request
- */
-Method.prototype.request = function () {
-    var payload = this.toPayload(Array.prototype.slice.call(arguments));
-    payload.format = this.formatOutput.bind(this);
-    return payload;
-};
-
-module.exports = Method;
-
-
-
-/***/ }),
-/* 22 */
-/***/ (function(module, exports) {
-
-/*
-    This file is part of web3.js.
-
-    web3.js is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Lesser General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    web3.js is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with web3.js.  If not, see <http://www.gnu.org/licenses/>.
-*/
-/** 
- * @file errors.js
- * @author Marek Kotewicz <marek@ethdev.com>
- * @date 2015
- */
-
-module.exports = {
-    InvalidNumberOfSolidityArgs: function () {
-        return new Error('Invalid number of arguments to Solidity function');
-    },
-    InvalidNumberOfRPCParams: function () {
-        return new Error('Invalid number of input parameters to RPC method');
-    },
-    InvalidConnection: function (host){
-        return new Error('CONNECTION ERROR: Couldn\'t connect to node '+ host +'.');
-    },
-    InvalidProvider: function () {
-        return new Error('Provider not set or invalid');
-    },
-    InvalidResponse: function (result){
-        var message = !!result && !!result.error && !!result.error.message ? result.error.message : 'Invalid JSON RPC response: ' + JSON.stringify(result);
-        return new Error(message);
-    },
-    ConnectionTimeout: function (ms){
-        return new Error('CONNECTION TIMEOUT: timeout of ' + ms + ' ms achived');
-    }
-};
-
-
-/***/ }),
-/* 23 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/*
-    This file is part of web3.js.
-
-    web3.js is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Lesser General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    web3.js is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with web3.js.  If not, see <http://www.gnu.org/licenses/>.
-*/
-/**
- * @file property.js
- * @author Fabian Vogelsteller <fabian@frozeman.de>
- * @author Marek Kotewicz <marek@ethdev.com>
- * @date 2015
- */
-
-var utils = __webpack_require__(4);
-
-var Property = function (options) {
-    this.name = options.name;
-    this.getter = options.getter;
-    this.setter = options.setter;
-    this.outputFormatter = options.outputFormatter;
-    this.inputFormatter = options.inputFormatter;
-    this.requestManager = null;
-};
-
-Property.prototype.setRequestManager = function (rm) {
-    this.requestManager = rm;
-};
-
-/**
- * Should be called to format input args of method
- *
- * @method formatInput
- * @param {Array}
- * @return {Array}
- */
-Property.prototype.formatInput = function (arg) {
-    return this.inputFormatter ? this.inputFormatter(arg) : arg;
-};
-
-/**
- * Should be called to format output(result) of method
- *
- * @method formatOutput
- * @param {Object}
- * @return {Object}
- */
-Property.prototype.formatOutput = function (result) {
-    return this.outputFormatter && result !== null && result !== undefined ? this.outputFormatter(result) : result;
-};
-
-/**
- * Should be used to extract callback from array of arguments. Modifies input param
- *
- * @method extractCallback
- * @param {Array} arguments
- * @return {Function|Null} callback, if exists
- */
-Property.prototype.extractCallback = function (args) {
-    if (utils.isFunction(args[args.length - 1])) {
-        return args.pop(); // modify the args array!
-    }
-};
-
-
-/**
- * Should attach function to method
- *
- * @method attachToObject
- * @param {Object}
- * @param {Function}
- */
-Property.prototype.attachToObject = function (obj) {
-    var proto = {
-        get: this.buildGet(),
-        enumerable: true
-    };
-
-    var names = this.name.split('.');
-    var name = names[0];
-    if (names.length > 1) {
-        obj[names[0]] = obj[names[0]] || {};
-        obj = obj[names[0]];
-        name = names[1];
-    }
-
-    Object.defineProperty(obj, name, proto);
-    obj[asyncGetterName(name)] = this.buildAsyncGet();
-};
-
-var asyncGetterName = function (name) {
-    return 'get' + name.charAt(0).toUpperCase() + name.slice(1);
-};
-
-Property.prototype.buildGet = function () {
-    var property = this;
-    return function get() {
-        return property.formatOutput(property.requestManager.send({
-            method: property.getter
-        }));
-    };
-};
-
-Property.prototype.buildAsyncGet = function () {
-    var property = this;
-    var get = function (callback) {
-        property.requestManager.sendAsync({
-            method: property.getter
-        }, function (err, result) {
-            callback(err, property.formatOutput(result));
-        });
-    };
-    get.request = this.request.bind(this);
-    return get;
-};
-
-/**
- * Should be called to create pure JSONRPC request which can be used in batch request
- *
- * @method request
- * @param {...} params
- * @return {Object} jsonrpc request
- */
-Property.prototype.request = function () {
-    var payload = {
-        method: this.getter,
-        params: [],
-        callback: this.extractCallback(Array.prototype.slice.call(arguments))
-    };
-    payload.format = this.formatOutput.bind(this);
-    return payload;
-};
-
-module.exports = Property;
-
 
 
 /***/ }),
@@ -13237,9 +13237,9 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/*! bignumber.js v2.0.7 https://github.com/Mik
 
 
 
-var base64 = __webpack_require__(75)
-var ieee754 = __webpack_require__(102)
-var isArray = __webpack_require__(104)
+var base64 = __webpack_require__(76)
+var ieee754 = __webpack_require__(103)
+var isArray = __webpack_require__(105)
 
 exports.Buffer = Buffer
 exports.SlowBuffer = SlowBuffer
@@ -15697,7 +15697,7 @@ function isnan (val) {
 
 
 /// required to define ETH_BIGNUMBER_ROUNDING_MODE
-var BigNumber = __webpack_require__(16);
+var BigNumber = __webpack_require__(23);
 
 var ETH_UNITS = [
     'wei',
@@ -16008,7 +16008,7 @@ module.exports = Filter;
  * @date 2015
  */
 
-var BigNumber = __webpack_require__(16);
+var BigNumber = __webpack_require__(23);
 
 var padLeft = function (string, bytes) {
     var result = string;
@@ -19605,7 +19605,7 @@ module.exports = Iban;
  * @date 2015
  */
 
-var Method = __webpack_require__(21);
+var Method = __webpack_require__(20);
 
 /// @returns an array of objects describing web3.eth.filter api methods
 var eth = function () {
@@ -20563,7 +20563,7 @@ module.exports = g;
 ;(function (root, factory, undef) {
 	if (true) {
 		// CommonJS
-		module.exports = exports = factory(__webpack_require__(0), __webpack_require__(33), __webpack_require__(79), __webpack_require__(77), __webpack_require__(17), __webpack_require__(19), __webpack_require__(50), __webpack_require__(57), __webpack_require__(95), __webpack_require__(58), __webpack_require__(96), __webpack_require__(32), __webpack_require__(94), __webpack_require__(48), __webpack_require__(90), __webpack_require__(18), __webpack_require__(1), __webpack_require__(80), __webpack_require__(82), __webpack_require__(81), __webpack_require__(84), __webpack_require__(83), __webpack_require__(85), __webpack_require__(86), __webpack_require__(87), __webpack_require__(89), __webpack_require__(88), __webpack_require__(78), __webpack_require__(76), __webpack_require__(97), __webpack_require__(93), __webpack_require__(92), __webpack_require__(91));
+		module.exports = exports = factory(__webpack_require__(0), __webpack_require__(33), __webpack_require__(80), __webpack_require__(78), __webpack_require__(16), __webpack_require__(18), __webpack_require__(50), __webpack_require__(57), __webpack_require__(96), __webpack_require__(58), __webpack_require__(97), __webpack_require__(32), __webpack_require__(95), __webpack_require__(48), __webpack_require__(91), __webpack_require__(17), __webpack_require__(1), __webpack_require__(81), __webpack_require__(83), __webpack_require__(82), __webpack_require__(85), __webpack_require__(84), __webpack_require__(86), __webpack_require__(87), __webpack_require__(88), __webpack_require__(90), __webpack_require__(89), __webpack_require__(79), __webpack_require__(77), __webpack_require__(98), __webpack_require__(94), __webpack_require__(93), __webpack_require__(92));
 	}
 	else if (typeof define === "function" && define.amd) {
 		// AMD
@@ -20762,15 +20762,15 @@ module.exports = g;
 
 var f = __webpack_require__(5);
 
-var SolidityTypeAddress = __webpack_require__(115);
-var SolidityTypeBool = __webpack_require__(116);
-var SolidityTypeInt = __webpack_require__(119);
-var SolidityTypeUInt = __webpack_require__(122);
-var SolidityTypeDynamicBytes = __webpack_require__(118);
-var SolidityTypeString = __webpack_require__(121);
-var SolidityTypeReal = __webpack_require__(120);
-var SolidityTypeUReal = __webpack_require__(123);
-var SolidityTypeBytes = __webpack_require__(117);
+var SolidityTypeAddress = __webpack_require__(116);
+var SolidityTypeBool = __webpack_require__(117);
+var SolidityTypeInt = __webpack_require__(120);
+var SolidityTypeUInt = __webpack_require__(123);
+var SolidityTypeDynamicBytes = __webpack_require__(119);
+var SolidityTypeString = __webpack_require__(122);
+var SolidityTypeReal = __webpack_require__(121);
+var SolidityTypeUReal = __webpack_require__(124);
+var SolidityTypeBytes = __webpack_require__(118);
 
 var isDynamic = function (solidityType, type) {
    return solidityType.isDynamicType(type) ||
@@ -21031,15 +21031,15 @@ module.exports = coder;
 
 var f = __webpack_require__(6);
 
-var SolidityTypeAddress = __webpack_require__(154);
-var SolidityTypeBool = __webpack_require__(155);
-var SolidityTypeInt = __webpack_require__(158);
-var SolidityTypeUInt = __webpack_require__(161);
-var SolidityTypeDynamicBytes = __webpack_require__(157);
-var SolidityTypeString = __webpack_require__(160);
-var SolidityTypeReal = __webpack_require__(159);
-var SolidityTypeUReal = __webpack_require__(162);
-var SolidityTypeBytes = __webpack_require__(156);
+var SolidityTypeAddress = __webpack_require__(155);
+var SolidityTypeBool = __webpack_require__(156);
+var SolidityTypeInt = __webpack_require__(159);
+var SolidityTypeUInt = __webpack_require__(162);
+var SolidityTypeDynamicBytes = __webpack_require__(158);
+var SolidityTypeString = __webpack_require__(161);
+var SolidityTypeReal = __webpack_require__(160);
+var SolidityTypeUReal = __webpack_require__(163);
+var SolidityTypeBytes = __webpack_require__(157);
 
 /**
  * SolidityCoder prototype should be used to encode/decode solidity params of any type
@@ -21547,15 +21547,15 @@ module.exports = coder;
 
 var f = __webpack_require__(7);
 
-var SolidityTypeAddress = __webpack_require__(186);
-var SolidityTypeBool = __webpack_require__(187);
-var SolidityTypeInt = __webpack_require__(190);
-var SolidityTypeUInt = __webpack_require__(193);
-var SolidityTypeDynamicBytes = __webpack_require__(189);
-var SolidityTypeString = __webpack_require__(192);
-var SolidityTypeReal = __webpack_require__(191);
-var SolidityTypeUReal = __webpack_require__(194);
-var SolidityTypeBytes = __webpack_require__(188);
+var SolidityTypeAddress = __webpack_require__(187);
+var SolidityTypeBool = __webpack_require__(188);
+var SolidityTypeInt = __webpack_require__(191);
+var SolidityTypeUInt = __webpack_require__(194);
+var SolidityTypeDynamicBytes = __webpack_require__(190);
+var SolidityTypeString = __webpack_require__(193);
+var SolidityTypeReal = __webpack_require__(192);
+var SolidityTypeUReal = __webpack_require__(195);
+var SolidityTypeBytes = __webpack_require__(189);
 
 var isDynamic = function (solidityType, type) {
    return solidityType.isDynamicType(type) ||
@@ -27935,21 +27935,557 @@ module.exports = XMLHttpRequest;
 
 /***/ }),
 /* 70 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return getNoteName; });
+function getNoteName(note) {
+    let name, color;
+
+    switch(note) {
+        case 127:
+            name = "C0";
+            color = true;
+            break;
+        case 126:
+            name = "C#0/Db0";
+            color = false;
+            break;
+        case 125:
+            name = "D0";
+            color = true;
+            break;
+        case 124:
+            name = "D#0/Eb0";
+            color = false;
+            break;
+        case 123:
+            name = "E0";
+            color = true;
+            break;
+        case 122:
+            name = "F0";
+            color = true;
+            break;
+        case 121:
+            name = "F#0/Gb0"
+            color = false;
+            break;
+        case 120:
+            name = "G0";
+            color = true;
+            break;
+        case 119:
+            name = "G#0/Ab0";
+            color = false;
+            break;
+        case 118:
+            name = "A0";
+            color = true;
+            break;
+        case 117:
+            name = "A#0/Bb0";
+            color = false;
+            break;
+        case 116:
+            name = "B0";
+            color = true;
+            break;
+        case 115:
+            name = "C1";
+            color = true;
+            break;
+        case 114:
+            name = "C#1/Db1";
+            color = false;
+            break;
+        case 113:
+            name = "D1";
+            color = true;
+            break;
+        case 112:
+            name = "D#1/Eb1";
+            color = false;
+            break;
+        case 111:
+            name = "E1";
+            color = true;
+            break;
+        case 110:
+            name = "F1";
+            color = true;
+            break;
+        case 109:
+            name = "F#1/Gb1"
+            color = false;
+            break;
+        case 108:
+            name = "G1";
+            color = true;
+            break;
+        case 107:
+            name = "G#1/Ab1";
+            color = false;
+            break;
+        case 106:
+            name = "A1";
+            color = true;
+            break;
+        case 105:
+            name = "A#1/Bb1";
+            color = false;
+            break;
+        case 104:
+            name = "B1";
+            color = true;
+            break;
+        case 103:
+            name = "C2";
+            color = true;
+            break;
+        case 102:
+            name = "C#2/Db2";
+            color = false;
+            break;
+        case 101:
+            name = "D2";
+            color = true;
+            break;
+        case 100:
+            name = "D#2/Eb2";
+            color = false;
+            break;
+        case 99:
+            name = "E2";
+            color = true;
+            break;
+        case 98:
+            name = "F2";
+            color = true;
+            break;
+        case 97:
+            name = "F#2/Gb2"
+            color = false;
+            break;
+        case 96:
+            name = "G2";
+            color = true;
+            break;
+        case 95:
+            name = "G#2/Ab2";
+            color = false;
+            break;
+        case 94:
+            name = "A2";
+            color = true;
+            break;
+        case 93:
+            name = "A#2/Bb2";
+            color = false;
+            break;
+        case 92:
+            name = "B2";
+            color = true;
+            break;
+        case 91:
+            name = "C3";
+            color = true;
+            break;
+        case 90:
+            name = "C#3/Db3";
+            color = false;
+            break;
+        case 89:
+            name = "D3";
+            color = true;
+            break;
+        case 88:
+            name = "D#3/Eb3";
+            color = false;
+            break;
+        case 87:
+            name = "E3";
+            color = true;
+            break;
+        case 86:
+            name = "F3";
+            color = true;
+            break;
+        case 85:
+            name = "F#3/Gb3"
+            color = false;
+            break;
+        case 84:
+            name = "G3";
+            color = true;
+            break;
+        case 83:
+            name = "G#3/Ab3";
+            color = false;
+            break;
+        case 82:
+            name = "A3";
+            color = true;
+            break;
+        case 81:
+            name = "A#3/Bb3";
+            color = false;
+            break;
+        case 80:
+            name = "B3";
+            color = true;
+            break;
+        case 79:
+            name = "C4";
+            color = true;
+            break;
+        case 78:
+            name = "C#4/Db4";
+            color = false;
+            break;
+        case 77:
+            name = "D4";
+            color = true;
+            break;
+        case 76:
+            name = "D#4/Eb4";
+            color = false;
+            break;
+        case 75:
+            name = "E4";
+            color = true;
+            break;
+        case 74:
+            name = "F4";
+            color = true;
+            break;
+        case 73:
+            name = "F#4/Gb4"
+            color = false;
+            break;
+        case 72:
+            name = "G4";
+            color = true;
+            break;
+        case 71:
+            name = "G#4/Ab4";
+            color = false;
+            break;
+        case 70:
+            name = "A4";
+            color = true;
+            break;
+        case 69:
+            name = "A#4/Bb4";
+            color = false;
+            break;
+        case 68:
+            name = "B4";
+            color = true;
+            break;
+        case 67:
+            name = "C5";
+            color = true;
+            break;
+        case 66:
+            name = "C#5/Db5";
+            color = false;
+            break;
+        case 65:
+            name = "D5";
+            color = true;
+            break;
+        case 64:
+            name = "D#5/Eb5";
+            color = false;
+            break;
+        case 63:
+            name = "E5";
+            color = true;
+            break;
+        case 62:
+            name = "F5";
+            color = true;
+            break;
+        case 61:
+            name = "F#5/Gb5"
+            color = false;
+            break;
+        case 60:
+            name = "G5";
+            color = true;
+            break;
+        case 59:
+            name = "G#5/Ab5";
+            color = false;
+            break;
+        case 58:
+            name = "A5";
+            color = true;
+            break;
+        case 57:
+            name = "A#5/Bb5";
+            color = false;
+            break;
+        case 56:
+            name = "B5";
+            color = true;
+            break;
+        case 55:
+            name = "C6";
+            color = true;
+            break;
+        case 54:
+            name = "C#6/Db6";
+            color = false;
+            break;
+        case 53:
+            name = "D6";
+            color = true;
+            break;
+        case 52:
+            name = "D#6/Eb6";
+            color = false;
+            break;
+        case 51:
+            name = "E6";
+            color = true;
+            break;
+        case 50:
+            name = "F6";
+            color = true;
+            break;
+        case 49:
+            name = "F#6/Gb6"
+            color = false;
+            break;
+        case 48:
+            name = "G6";
+            color = true;
+            break;
+        case 47:
+            name = "G#6/Ab6";
+            color = false;
+            break;
+        case 46:
+            name = "A6";
+            color = true;
+            break;
+        case 45:
+            name = "A#6/Bb6";
+            color = false;
+            break;
+        case 44:
+            name = "B6";
+            color = true;
+            break;
+        case 43:
+            name = "C7";
+            color = true;
+            break;
+        case 42:
+            name = "C#7/Db7";
+            color = false;
+            break;
+        case 41:
+            name = "D7";
+            color = true;
+            break;
+        case 40:
+            name = "D#7/Eb7";
+            color = false;
+            break;
+        case 39:
+            name = "E7";
+            color = true;
+            break;
+        case 38:
+            name = "F7";
+            color = true;
+            break;
+        case 37:
+            name = "F#7/Gb7"
+            color = false;
+            break;
+        case 36:
+            name = "G7";
+            color = true;
+            break;
+        case 35:
+            name = "G#7/Ab7";
+            color = false;
+            break;
+        case 34:
+            name = "A7";
+            color = true;
+            break;
+        case 33:
+            name = "A#7/Bb7";
+            color = false;
+            break;
+        case 32:
+            name = "B7";
+            color = true;
+            break;
+        case 31:
+            name = "C8";
+            color = true;
+            break;
+        case 30:
+            name = "C#8/Db8";
+            color = false;
+            break;
+        case 29:
+            name = "D8";
+            color = true;
+            break;
+        case 28:
+            name = "D#8/Eb8";
+            color = false;
+            break;
+        case 27:
+            name = "E8";
+            color = true;
+            break;
+        case 26:
+            name = "F8";
+            color = true;
+            break;
+        case 25:
+            name = "F#8/Gb8"
+            color = false;
+            break;
+        case 24:
+            name = "G8";
+            color = true;
+            break;
+        case 23:
+            name = "G#8/Ab8";
+            color = false;
+            break;
+        case 22:
+            name = "A8";
+            color = true;
+            break;
+        case 21:
+            name = "A#8/Bb8";
+            color = false;
+            break;
+        case 20:
+            name = "B8";
+            color = true;
+            break;
+        case 19:
+            name = "C9";
+            color = true;
+            break;
+        case 18:
+            name = "C#9/Db9";
+            color = false;
+            break;
+        case 17:
+            name = "D9";
+            color = true;
+            break;
+        case 16:
+            name = "D#9/Eb9";
+            color = false;
+            break;
+        case 15:
+            name = "E9";
+            color = true;
+            break;
+        case 14:
+            name = "F9";
+            color = true;
+            break;
+        case 13:
+            name = "F#9/Gb9"
+            color = false;
+            break;
+        case 12:
+            name = "G9";
+            color = true;
+            break;
+        case 11:
+            name = "G#9/Ab9";
+            color = false;
+            break;
+        case 10:
+            name = "A9";
+            color = true;
+            break;
+        case 9:
+            name = "A#9/Bb9";
+            color = false;
+            break;
+        case 8:
+            name = "B9";
+            color = true;
+            break;
+        case 7:
+            name = "C10";
+            color = true;
+            break;
+        case 6:
+            name = "C#10/Db10";
+            color = false;
+            break;
+        case 5:
+            name = "D10";
+            color = true;
+            break;
+        case 4:
+            name = "D#10/Eb10";
+            color = false;
+            break;
+        case 3:
+            name = "E10";
+            color = true;
+            break;
+        case 2:
+            name = "F10";
+            color = true;
+            break;
+        case 1:
+            name = "F#10/Gb10"
+            color = false;
+            break;
+        case 0:
+            name = "G10";
+            color = true;
+            break;
+    }
+
+    let noteName =  {
+        name: name,
+        color: color
+    }
+
+    return noteName
+
+}
+
+
+
+
+/***/ }),
+/* 71 */
 /***/ (function(module, exports) {
 
 module.exports = {"contractName":"Opus","abi":[{"constant":true,"inputs":[{"name":"_pitch","type":"uint256"}],"name":"getNoteLine","outputs":[{"name":"","type":"bool[100]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getOwnedNotes","outputs":[{"name":"_notes","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"withdraw","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"numNotes","type":"uint256"}],"name":"purchaseNote","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[],"name":"getPlacedNotes","outputs":[{"name":"","type":"uint256[]"},{"name":"","type":"uint256[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_pitch","type":"uint256"},{"name":"_place","type":"uint256"}],"name":"placeNote","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_pitch","type":"uint256"},{"name":"_place","type":"uint256"}],"name":"removeNote","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"numNotes","type":"uint256"}],"name":"returnNotes","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"_pitch","type":"uint256"},{"name":"_place","type":"uint256"}],"name":"getNote","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[{"name":"_endTime","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"}],"bytecode":"0x606060405261138861340055341561001657600080fd5b6040516020806110a4833981016040528080519060200190919050503361340360006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555080613404819055506134005461340181905550662386f26fc100006134028190555050610ffe806100a66000396000f300606060405260043610610099576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806302ccee021461009e5780632d731b69146100fd5780633ccfd60b146101265780637de04ebd1461013b5780638bc19c0414610153578063af33f6b114610205578063b78a6bf214610231578063c1e472be1461025d578063db491e8014610280575b600080fd5b34156100a957600080fd5b6100bf60048080359060200190919050506102c4565b6040518082606460200280838360005b838110156100ea5780820151818401526020810190506100cf565b5050505090500191505060405180910390f35b341561010857600080fd5b610110610353565b6040518082815260200191505060405180910390f35b341561013157600080fd5b61013961039e565b005b610151600480803590602001909190505061048e565b005b341561015e57600080fd5b610166610565565b604051808060200180602001838103835285818151815260200191508051906020019060200280838360005b838110156101ad578082015181840152602081019050610192565b50505050905001838103825284818151815260200191508051906020019060200280838360005b838110156101ef5780820151818401526020810190506101d4565b5050505090500194505050505060405180910390f35b341561021057600080fd5b61022f6004808035906020019091908035906020019091905050610772565b005b341561023c57600080fd5b61025b60048080359060200190919080359060200190919050506109e0565b005b341561026857600080fd5b61027e6004808035906020019091905050610c51565b005b341561028b57600080fd5b6102aa6004808035906020019091908035906020019091905050610d93565b604051808215151515815260200191505060405180910390f35b6102cc610f18565b6102d4610f18565b6000836080811015156102e357fe5b60040201606480602002604051908101604052809291908260648015610343576020028201916000905b82829054906101000a900460ff1615158152602001906001019060208260000104928301926001038202915080841161030d5790505b5050505050905080915050919050565b600061340660003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002054905080905090565b600061340454421115156103b157600080fd5b61340360009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614151561040e57600080fd5b3073ffffffffffffffffffffffffffffffffffffffff1631905061340360009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff166108fc829081150290604051600060405180830381858888f19350505050151561048b57600080fd5b50565b613404544210151561049f57600080fd5b606481111580156104b35750613401548111155b80156104c3575061340254810234145b15156104ce57600080fd5b8061340660003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020540161340660003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020819055508061340154036134018190555050565b61056d610f43565b610575610f43565b600061057f610f43565b610587610f43565b600061340560003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020805490509350836040518059106105dd5750595b90808252806020026020018201604052509250836040518059106105fe5750595b90808252806020026020018201604052509150600090505b61340560003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020805490508110156107645761340560003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020818154811015156106ae57fe5b90600052602060002090600202016000015483828151811015156106ce57fe5b906020019060200201818152505061340560003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000208181548110151561072957fe5b906000526020600020906002020160010154828281518110151561074957fe5b90602001906020020181815250508080600101915050610616565b828295509550505050509091565b61077a610f57565b613404544210151561078b57600080fd5b82826000821015801561079e5750608082105b15156107a957600080fd5b600081101580156107ba5750606481105b15156107c557600080fd5b600061340660003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002054118015610848575060008560808110151561081f57fe5b600402018460648110151561083057fe5b602091828204019190069054906101000a900460ff16155b151561085357600080fd5b848360000181815250508383602001818152505061340560003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002080548060010182816108b99190610f71565b91600052602060002090600202016000859091909150600082015181600001556020820151816001015550505060016000866080811015156108f757fe5b600402018560648110151561090857fe5b602091828204019190066101000a81548160ff021916908315150217905550336102008660808110151561093857fe5b606402018560648110151561094957fe5b0160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555061340660003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008154809291906001900391905055505050505050565b600061340454421015156109f357600080fd5b828260008210158015610a065750608082105b1515610a1157600080fd5b60008110158015610a225750606481105b1515610a2d57600080fd5b600085608081101515610a3c57fe5b6004020184606481101515610a4d57fe5b602091828204019190069054906101000a900460ff168015610adc57503373ffffffffffffffffffffffffffffffffffffffff1661020086608081101515610a9157fe5b6064020185606481101515610aa257fe5b0160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16145b1515610ae757600080fd5b60008086608081101515610af757fe5b6004020185606481101515610b0857fe5b602091828204019190066101000a81548160ff021916908315150217905550600061020086608081101515610b3957fe5b6064020185606481101515610b4a57fe5b0160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550610b94858533610dd8565b9250608161340560003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002084815481101515610be557fe5b90600052602060002090600202016000018190555061340660003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020600081548092919060010191905055505050505050565b60006134045442101515610c6457600080fd5b61340660003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020548211151515610cb357600080fd5b61340254820290508161340660003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020540361340660003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002081905550816134015401613401819055503373ffffffffffffffffffffffffffffffffffffffff166108fc829081150290604051600060405180830381858888f193505050501515610d8f57600080fd5b5050565b600080600084608081101515610da557fe5b6004020183606481101515610db657fe5b602091828204019190069054906101000a900460ff1690508091505092915050565b600080600090505b61340560003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002080549050811015610f0f578461340560008573ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002082815481101515610e7957fe5b906000526020600020906002020160000154148015610ef557508361340560008573ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002082815481101515610ee157fe5b906000526020600020906002020160010154145b15610f0257809150610f10565b8080600101915050610de0565b5b509392505050565b610c80604051908101604052806064905b60001515815260200190600190039081610f295790505090565b602060405190810160405280600081525090565b604080519081016040528060008152602001600081525090565b815481835581811511610f9e57600202816002028360005260206000209182019101610f9d9190610fa3565b5b505050565b610fcf91905b80821115610fcb57600080820160009055600182016000905550600201610fa9565b5090565b905600a165627a7a723058202998df1fde1abc6325414e325c76861e06275355c0ab37d9657b355a3273d0bf0029","deployedBytecode":"0x606060405260043610610099576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806302ccee021461009e5780632d731b69146100fd5780633ccfd60b146101265780637de04ebd1461013b5780638bc19c0414610153578063af33f6b114610205578063b78a6bf214610231578063c1e472be1461025d578063db491e8014610280575b600080fd5b34156100a957600080fd5b6100bf60048080359060200190919050506102c4565b6040518082606460200280838360005b838110156100ea5780820151818401526020810190506100cf565b5050505090500191505060405180910390f35b341561010857600080fd5b610110610353565b6040518082815260200191505060405180910390f35b341561013157600080fd5b61013961039e565b005b610151600480803590602001909190505061048e565b005b341561015e57600080fd5b610166610565565b604051808060200180602001838103835285818151815260200191508051906020019060200280838360005b838110156101ad578082015181840152602081019050610192565b50505050905001838103825284818151815260200191508051906020019060200280838360005b838110156101ef5780820151818401526020810190506101d4565b5050505090500194505050505060405180910390f35b341561021057600080fd5b61022f6004808035906020019091908035906020019091905050610772565b005b341561023c57600080fd5b61025b60048080359060200190919080359060200190919050506109e0565b005b341561026857600080fd5b61027e6004808035906020019091905050610c51565b005b341561028b57600080fd5b6102aa6004808035906020019091908035906020019091905050610d93565b604051808215151515815260200191505060405180910390f35b6102cc610f18565b6102d4610f18565b6000836080811015156102e357fe5b60040201606480602002604051908101604052809291908260648015610343576020028201916000905b82829054906101000a900460ff1615158152602001906001019060208260000104928301926001038202915080841161030d5790505b5050505050905080915050919050565b600061340660003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002054905080905090565b600061340454421115156103b157600080fd5b61340360009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614151561040e57600080fd5b3073ffffffffffffffffffffffffffffffffffffffff1631905061340360009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff166108fc829081150290604051600060405180830381858888f19350505050151561048b57600080fd5b50565b613404544210151561049f57600080fd5b606481111580156104b35750613401548111155b80156104c3575061340254810234145b15156104ce57600080fd5b8061340660003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020540161340660003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020819055508061340154036134018190555050565b61056d610f43565b610575610f43565b600061057f610f43565b610587610f43565b600061340560003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020805490509350836040518059106105dd5750595b90808252806020026020018201604052509250836040518059106105fe5750595b90808252806020026020018201604052509150600090505b61340560003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020805490508110156107645761340560003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020818154811015156106ae57fe5b90600052602060002090600202016000015483828151811015156106ce57fe5b906020019060200201818152505061340560003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000208181548110151561072957fe5b906000526020600020906002020160010154828281518110151561074957fe5b90602001906020020181815250508080600101915050610616565b828295509550505050509091565b61077a610f57565b613404544210151561078b57600080fd5b82826000821015801561079e5750608082105b15156107a957600080fd5b600081101580156107ba5750606481105b15156107c557600080fd5b600061340660003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002054118015610848575060008560808110151561081f57fe5b600402018460648110151561083057fe5b602091828204019190069054906101000a900460ff16155b151561085357600080fd5b848360000181815250508383602001818152505061340560003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002080548060010182816108b99190610f71565b91600052602060002090600202016000859091909150600082015181600001556020820151816001015550505060016000866080811015156108f757fe5b600402018560648110151561090857fe5b602091828204019190066101000a81548160ff021916908315150217905550336102008660808110151561093857fe5b606402018560648110151561094957fe5b0160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555061340660003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008154809291906001900391905055505050505050565b600061340454421015156109f357600080fd5b828260008210158015610a065750608082105b1515610a1157600080fd5b60008110158015610a225750606481105b1515610a2d57600080fd5b600085608081101515610a3c57fe5b6004020184606481101515610a4d57fe5b602091828204019190069054906101000a900460ff168015610adc57503373ffffffffffffffffffffffffffffffffffffffff1661020086608081101515610a9157fe5b6064020185606481101515610aa257fe5b0160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16145b1515610ae757600080fd5b60008086608081101515610af757fe5b6004020185606481101515610b0857fe5b602091828204019190066101000a81548160ff021916908315150217905550600061020086608081101515610b3957fe5b6064020185606481101515610b4a57fe5b0160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550610b94858533610dd8565b9250608161340560003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002084815481101515610be557fe5b90600052602060002090600202016000018190555061340660003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020600081548092919060010191905055505050505050565b60006134045442101515610c6457600080fd5b61340660003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020548211151515610cb357600080fd5b61340254820290508161340660003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020540361340660003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002081905550816134015401613401819055503373ffffffffffffffffffffffffffffffffffffffff166108fc829081150290604051600060405180830381858888f193505050501515610d8f57600080fd5b5050565b600080600084608081101515610da557fe5b6004020183606481101515610db657fe5b602091828204019190069054906101000a900460ff1690508091505092915050565b600080600090505b61340560003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002080549050811015610f0f578461340560008573ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002082815481101515610e7957fe5b906000526020600020906002020160000154148015610ef557508361340560008573ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002082815481101515610ee157fe5b906000526020600020906002020160010154145b15610f0257809150610f10565b8080600101915050610de0565b5b509392505050565b610c80604051908101604052806064905b60001515815260200190600190039081610f295790505090565b602060405190810160405280600081525090565b604080519081016040528060008152602001600081525090565b815481835581811511610f9e57600202816002028360005260206000209182019101610f9d9190610fa3565b5b505050565b610fcf91905b80821115610fcb57600080820160009055600182016000905550600201610fa9565b5090565b905600a165627a7a723058202998df1fde1abc6325414e325c76861e06275355c0ab37d9657b355a3273d0bf0029","sourceMap":"26:4716:1:-;;;386:4;373:17;;1138:158;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1185:10;1177:5;;:18;;;;;;;;;;;;;;;;;;1216:8;1206:7;:18;;;;1252:5;;1235:14;:22;;;;1279:10;1267:9;:22;;;;1138:158;26:4716;;;;;;","deployedSourceMap":"26:4716:1:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;3476:149;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;23:1:-1;8:100;33:3;30:1;27:2;8:100;;;99:1;94:3;90;84:5;80:1;75:3;71;64:6;52:2;49:1;45:3;40:15;;8:100;;;12:14;3:109;;;;;;;;;;;;;;;;3664:134:1;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;4581:159;;;;;;;;;;;;;;1364:306;;;;;;;;;;;;;;;;;;4064:464;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;23:1:-1;8:100;33:3;30:1;27:2;8:100;;;99:1;94:3;90;84:5;80:1;75:3;71;64:6;52:2;49:1;45:3;40:15;;8:100;;;12:14;3:109;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;23:1;8:100;33:3;30:1;27:2;8:100;;;99:1;94:3;90;84:5;80:1;75:3;71;64:6;52:2;49:1;45:3;40:15;;8:100;;;12:14;3:109;;;;;;;;;;;;;;;;;;;2087:445:1;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2580:447;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1703:333;;;;;;;;;;;;;;;;;;;;;;;;;;3869:152;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;3476:149;3533:9;;:::i;:::-;3554:21;;:::i;:::-;3578:11;3590:6;3578:19;;;;;;;;;;;;3554:43;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;3614:4;3607:11;;3476:149;;;;:::o;3664:134::-;3712:11;3744:12;:24;3757:10;3744:24;;;;;;;;;;;;;;;;3735:33;;3785:6;3778:13;;3664:134;:::o;4581:159::-;4674:11;921:7;;915:3;:13;907:22;;;;;;;;4657:5;;;;;;;;;;;4643:19;;:10;:19;;;4635:28;;;;;;;;4688:4;:12;;;4674:26;;4711:5;;;;;;;;;;;:14;;:22;4726:6;4711:22;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;4581:159;:::o;1364:306::-;841:7;;835:3;:13;827:22;;;;;;;;1464:3;1452:8;:15;;:45;;;;;1483:14;;1471:8;:26;;1452:45;:84;;;;;1526:9;;1515:8;:20;1501:9;:35;1452:84;1444:93;;;;;;;;1602:8;1575:12;:24;1588:10;1575:24;;;;;;;;;;;;;;;;:35;1548:12;:24;1561:10;1548:24;;;;;;;;;;;;;;;:62;;;;1655:8;1638:14;;:25;1621:14;:42;;;;1364:306;:::o;4064:464::-;4113:6;;:::i;:::-;4121;;:::i;:::-;4139:11;4193:21;;:::i;:::-;4245:20;;:::i;:::-;4310:6;4153:10;:22;4164:10;4153:22;;;;;;;;;;;;;;;:29;;;;4139:43;;4228:6;4217:18;;;;;;;;;;;;;;;;;;;;;;;;4193:42;;4279:6;4268:18;;;;;;;;;;;;;;;;;;;;;;;;4245:41;;4319:1;4310:10;;4305:183;4326:10;:22;4337:10;4326:22;;;;;;;;;;;;;;;:29;;;;4322:1;:33;4305:183;;;4389:10;:22;4400:10;4389:22;;;;;;;;;;;;;;;4412:1;4389:25;;;;;;;;;;;;;;;;;;;;:31;;;4376:7;4384:1;4376:10;;;;;;;;;;;;;;;;;:44;;;;;4446:10;:22;4457:10;4446:22;;;;;;;;;;;;;;;4469:1;4446:25;;;;;;;;;;;;;;;;;;;;:31;;;4434:6;4441:1;4434:9;;;;;;;;;;;;;;;;;:43;;;;;4357:3;;;;;;;4305:183;;;4506:7;4514:6;4498:23;;;;4064:464;;;;;;:::o;2087:445::-;2275:18;;:::i;:::-;841:7;;835:3;:13;827:22;;;;;;;;2160:6;2168;1028:1;1018:6;:11;;:27;;;;;1042:3;1033:6;:12;1018:27;1010:36;;;;;;;;1074:1;1064:6;:11;;:27;;;;;1088:3;1079:6;:12;1064:27;1056:36;;;;;;;;2230:1;2203:12;:24;2216:10;2203:24;;;;;;;;;;;;;;;;:28;:60;;;;;2236:11;2248:6;2236:19;;;;;;;;;;;;2256:6;2236:27;;;;;;;;;;;;;;;;;;;;;;;;;;;2235:28;2203:60;2195:69;;;;;;;;2316:6;2303:4;:10;;:19;;;;;2345:6;2332:4;:10;;:19;;;;;2362:10;:22;2373:10;2362:22;;;;;;;;;;;;;;;:33;;;;;;;;;;;:::i;:::-;;;;;;;;;;;;2390:4;2362:33;;;;;;;;;;;;;;;;;;;;;;;;2436:4;2406:11;2418:6;2406:19;;;;;;;;;;;;2426:6;2406:27;;;;;;;;;;;;;;;;;;:34;;;;;;;;;;;;;;;;;;2478:10;2450:9;2460:6;2450:17;;;;;;;;;;;;2468:6;2450:25;;;;;;;;;;;:38;;;;;;;;;;;;;;;;;;2499:12;:24;2512:10;2499:24;;;;;;;;;;;;;;;;:26;;;;;;;;;;;;;;859:1;;2087:445;;;:::o;2580:447::-;2866:14;841:7;;835:3;:13;827:22;;;;;;;;2654:6;2662;1028:1;1018:6;:11;;:27;;;;;1042:3;1033:6;:12;1018:27;1010:36;;;;;;;;1074:1;1064:6;:11;;:27;;;;;1088:3;1079:6;:12;1064:27;1056:36;;;;;;;;2697:11;2709:6;2697:19;;;;;;;;;;;;2717:6;2697:27;;;;;;;;;;;;;;;;;;;;;;;;;;;:70;;;;;2757:10;2728:39;;:9;2738:6;2728:17;;;;;;;;;;;;2746:6;2728:25;;;;;;;;;;;;;;;;;;;;:39;;;2697:70;2689:79;;;;;;;;2809:5;2779:11;2791:6;2779:19;;;;;;;;;;;;2799:6;2779:27;;;;;;;;;;;;;;;;;;:35;;;;;;;;;;;;;;;;;;2852:3;2824:9;2834:6;2824:17;;;;;;;;;;;;2842:6;2824:25;;;;;;;;;;;:31;;;;;;;;;;;;;;;;;;2883:45;2901:6;2909;2917:10;2883:17;:45::i;:::-;2866:62;;2981:3;2939:10;:22;2950:10;2939:22;;;;;;;;;;;;;;;2962:9;2939:33;;;;;;;;;;;;;;;;;;;;:39;;:45;;;;2994:12;:24;3007:10;2994:24;;;;;;;;;;;;;;;;:26;;;;;;;;;;;;;859:1;;2580:447;;;:::o;1703:333::-;1830:11;841:7;;835:3;:13;827:22;;;;;;;;1794:12;:24;1807:10;1794:24;;;;;;;;;;;;;;;;1782:8;:36;;1774:45;;;;;;;;1856:9;;1845:8;:20;1830:36;;1930:8;1903:12;:24;1916:10;1903:24;;;;;;;;;;;;;;;;:35;1876:12;:24;1889:10;1876:24;;;;;;;;;;;;;;;:62;;;;1982:8;1965:14;;:25;1948:14;:42;;;;2001:10;:19;;:27;2021:6;2001:27;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1703:333;;:::o;3869:152::-;3935:4;3951:10;3964:11;3976:6;3964:19;;;;;;;;;;;;3984:6;3964:27;;;;;;;;;;;;;;;;;;;;;;;;;;;3951:40;;4008:5;4001:12;;3869:152;;;;;:::o;3033:320::-;3125:4;3146:6;3155:1;3146:10;;3141:206;3162:10;:22;3173:10;3162:22;;;;;;;;;;;;;;;:29;;;;3158:1;:33;3141:206;;;3247:6;3216:10;:18;3227:6;3216:18;;;;;;;;;;;;;;;3235:1;3216:21;;;;;;;;;;;;;;;;;;;;:27;;;:37;:78;;;;;3288:6;3257:10;:18;3268:6;3257:18;;;;;;;;;;;;;;;3276:1;3257:21;;;;;;;;;;;;;;;;;;;;:27;;;:37;3216:78;3212:125;;;3321:1;3314:8;;;;3212:125;3193:3;;;;;;;3141:206;;;3033:320;;;;;;;:::o;26:4716::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::o;:::-;;;;;;;;;;;;;;;:::o;:::-;;;;;;;;;;;;;;;;;;;;:::o;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;;;;:::o;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::o","source":"pragma solidity ^0.4.17;\n\ncontract Opus {\n    //struct to hold placed note Ids\n    struct noteId {\n        uint pitch;\n        uint place;\n    }\n\n    //2d graph of notes and places, represents midi values 0-127 and position,\n    bool[100][128] composition;\n    //2d graph representing who owns a placed note\n    address[100][128] composers;\n\n    //total notes availble\n    uint notes = 5000;\n    //notes available for purchase\n    uint notesAvailable;\n    //individual note price\n    uint notePrice;\n    \n    //owner of contract\n    address owner;\n    //time when composing freezes\n    uint endTime;\n\n    //keeps track of notes placed by an address\n    mapping (address => noteId[]) ownedNotes;\n    //keeps track of an addresses remaing notes\n    mapping (address => uint) noteBalances;\n\n    modifier beforeEndTime() {\n        require(now < endTime);\n        _;\n    }\n\n    modifier afterEndTime() {\n        require(now > endTime);\n        _;\n    }\n\n    modifier isValidNote(uint _pitch, uint _place) {\n        require(_pitch >= 0 && _pitch < 128);\n        require(_place >= 0 && _place < 100);\n        _;\n    }\n    \n    //constructor\n    function Opus(uint _endTime) {\n        owner = msg.sender;\n\n        endTime = _endTime;\n\n        notesAvailable = notes;\n        notePrice = 0.01 ether;\n    }\n\n    //function to purchase notes, limited to 100 per purchase\n    function purchaseNote(uint numNotes) beforeEndTime() external payable {\n        require(numNotes <= 100 && numNotes <= notesAvailable && msg.value == (numNotes * notePrice));\n\n        noteBalances[msg.sender] = noteBalances[msg.sender] + numNotes;\n\n        notesAvailable = notesAvailable - numNotes;\n    }\n\n    //return unused notes;\n    function returnNotes(uint numNotes) beforeEndTime() external {\n        require(numNotes <= noteBalances[msg.sender]);\n\n        uint amount = (numNotes * notePrice);\n        noteBalances[msg.sender] = noteBalances[msg.sender] - numNotes;\n        notesAvailable = notesAvailable + numNotes;\n\n        msg.sender.transfer(amount);\n\n    }\n\n    //places a vaild note in the composition\n    function placeNote(uint _pitch, uint _place) beforeEndTime() isValidNote(_pitch, _place) external {\n        require(noteBalances[msg.sender] > 0 && !composition[_pitch][_place]);\n\n        noteId memory note;\n        note.pitch = _pitch;\n        note.place = _place;\n\n        ownedNotes[msg.sender].push(note);\n\n        composition[_pitch][_place] = true;\n        composers[_pitch][_place] = msg.sender;\n\n        noteBalances[msg.sender]--;\n    }\n\n    //removes owned note from composition\n    function removeNote(uint _pitch, uint _place) beforeEndTime() isValidNote(_pitch, _place) external {\n        require(composition[_pitch][_place] && composers[_pitch][_place] == msg.sender);\n\n        composition[_pitch][_place] = false;\n        composers[_pitch][_place] = 0x0;\n\n        uint noteIndex = getOwnedNoteIndex(_pitch, _place, msg.sender);\n\n        ownedNotes[msg.sender][noteIndex].pitch = 129;\n        noteBalances[msg.sender]++;\n    }\n\n    function getOwnedNoteIndex(uint _pitch, uint _place, address sender) internal view returns (uint) {\n        for (uint i = 0; i < ownedNotes[msg.sender].length; i++) {\n            if (ownedNotes[sender][i].pitch == _pitch && ownedNotes[sender][i].place == _place) {\n                return i;\n            }\n        }\n    }\n\n    //gets a line in the composition for viewing purposes and to prevent having to get the whole composition at once\n    function getNoteLine(uint _pitch) external view returns (bool[100]) {\n        bool[100] memory line = composition[_pitch];\n        return line;\n    }\n\n    //get note balance of sender\n    function getOwnedNotes() external view returns (uint _notes) {\n        _notes = noteBalances[msg.sender];\n        return _notes;\n    }\n\n    //returns whether or note a note exists at a pitch and place\n    function getNote(uint _pitch, uint _place) external view returns (bool) {\n        bool _note = composition[_pitch][_place];\n        return _note; \n    }\n\n    //returns notes placed by sender\n    function getPlacedNotes() external view returns (uint[], uint[]) {\n        uint length = ownedNotes[msg.sender].length;\n\n        uint[] memory pitches = new uint[](length);\n        uint[] memory places = new uint[](length);\n        \n        for (uint i = 0; i < ownedNotes[msg.sender].length; i++) {\n            pitches[i] = ownedNotes[msg.sender][i].pitch;\n            places[i] = ownedNotes[msg.sender][i].place;\n        }\n\n        return (pitches,places);\n    }\n\n    //withdraw balance after composing is done\n    function withdraw() afterEndTime() external {\n        require(msg.sender == owner);\n\n        uint amount = this.balance;\n\n        owner.transfer(amount);\n    }\n}","sourcePath":"/Users/nathanieloden/Documents/GitHub/EthDevHackathon/contracts/Opus.sol","ast":{"attributes":{"absolutePath":"/Users/nathanieloden/Documents/GitHub/EthDevHackathon/contracts/Opus.sol","exportedSymbols":{"Opus":[620]}},"children":[{"attributes":{"literals":["solidity","^","0.4",".17"]},"id":58,"name":"PragmaDirective","src":"0:24:1"},{"attributes":{"baseContracts":[null],"contractDependencies":[null],"contractKind":"contract","documentation":null,"fullyImplemented":true,"linearizedBaseContracts":[620],"name":"Opus","scope":621},"children":[{"attributes":{"canonicalName":"Opus.noteId","name":"noteId","scope":620,"visibility":"public"},"children":[{"attributes":{"constant":false,"name":"pitch","scope":63,"stateVariable":false,"storageLocation":"default","type":"uint256","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":59,"name":"ElementaryTypeName","src":"107:4:1"}],"id":60,"name":"VariableDeclaration","src":"107:10:1"},{"attributes":{"constant":false,"name":"place","scope":63,"stateVariable":false,"storageLocation":"default","type":"uint256","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":61,"name":"ElementaryTypeName","src":"127:4:1"}],"id":62,"name":"VariableDeclaration","src":"127:10:1"}],"id":63,"name":"StructDefinition","src":"83:61:1"},{"attributes":{"constant":false,"name":"composition","scope":620,"stateVariable":true,"storageLocation":"default","type":"bool[100] storage ref[128] storage ref","value":null,"visibility":"internal"},"children":[{"attributes":{"type":"bool[100] storage ref[128] storage pointer"},"children":[{"attributes":{"type":"bool[100] storage pointer"},"children":[{"attributes":{"name":"bool","type":"bool"},"id":64,"name":"ElementaryTypeName","src":"229:4:1"},{"attributes":{"argumentTypes":null,"hexvalue":"313030","isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"subdenomination":null,"token":"number","type":"int_const 100","value":"100"},"id":65,"name":"Literal","src":"234:3:1"}],"id":66,"name":"ArrayTypeName","src":"229:9:1"},{"attributes":{"argumentTypes":null,"hexvalue":"313238","isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"subdenomination":null,"token":"number","type":"int_const 128","value":"128"},"id":67,"name":"Literal","src":"239:3:1"}],"id":68,"name":"ArrayTypeName","src":"229:14:1"}],"id":69,"name":"VariableDeclaration","src":"229:26:1"},{"attributes":{"constant":false,"name":"composers","scope":620,"stateVariable":true,"storageLocation":"default","type":"address[100] storage ref[128] storage ref","value":null,"visibility":"internal"},"children":[{"attributes":{"type":"address[100] storage ref[128] storage pointer"},"children":[{"attributes":{"type":"address[100] storage pointer"},"children":[{"attributes":{"name":"address","type":"address"},"id":70,"name":"ElementaryTypeName","src":"312:7:1"},{"attributes":{"argumentTypes":null,"hexvalue":"313030","isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"subdenomination":null,"token":"number","type":"int_const 100","value":"100"},"id":71,"name":"Literal","src":"320:3:1"}],"id":72,"name":"ArrayTypeName","src":"312:12:1"},{"attributes":{"argumentTypes":null,"hexvalue":"313238","isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"subdenomination":null,"token":"number","type":"int_const 128","value":"128"},"id":73,"name":"Literal","src":"325:3:1"}],"id":74,"name":"ArrayTypeName","src":"312:17:1"}],"id":75,"name":"VariableDeclaration","src":"312:27:1"},{"attributes":{"constant":false,"name":"notes","scope":620,"stateVariable":true,"storageLocation":"default","type":"uint256","visibility":"internal"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":76,"name":"ElementaryTypeName","src":"373:4:1"},{"attributes":{"argumentTypes":null,"hexvalue":"35303030","isConstant":false,"isLValue":false,"isPure":true,"lValueRequested":false,"subdenomination":null,"token":"number","type":"int_const 5000","value":"5000"},"id":77,"name":"Literal","src":"386:4:1"}],"id":78,"name":"VariableDeclaration","src":"373:17:1"},{"attributes":{"constant":false,"name":"notesAvailable","scope":620,"stateVariable":true,"storageLocation":"default","type":"uint256","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":79,"name":"ElementaryTypeName","src":"431:4:1"}],"id":80,"name":"VariableDeclaration","src":"431:19:1"},{"attributes":{"constant":false,"name":"notePrice","scope":620,"stateVariable":true,"storageLocation":"default","type":"uint256","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":81,"name":"ElementaryTypeName","src":"484:4:1"}],"id":82,"name":"VariableDeclaration","src":"484:14:1"},{"attributes":{"constant":false,"name":"owner","scope":620,"stateVariable":true,"storageLocation":"default","type":"address","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"address","type":"address"},"id":83,"name":"ElementaryTypeName","src":"533:7:1"}],"id":84,"name":"VariableDeclaration","src":"533:13:1"},{"attributes":{"constant":false,"name":"endTime","scope":620,"stateVariable":true,"storageLocation":"default","type":"uint256","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":85,"name":"ElementaryTypeName","src":"586:4:1"}],"id":86,"name":"VariableDeclaration","src":"586:12:1"},{"attributes":{"constant":false,"name":"ownedNotes","scope":620,"stateVariable":true,"storageLocation":"default","type":"mapping(address => struct Opus.noteId storage ref[] storage ref)","value":null,"visibility":"internal"},"children":[{"attributes":{"type":"mapping(address => struct Opus.noteId storage ref[] storage ref)"},"children":[{"attributes":{"name":"address","type":"address"},"id":87,"name":"ElementaryTypeName","src":"662:7:1"},{"attributes":{"length":null,"type":"struct Opus.noteId storage ref[] storage pointer"},"children":[{"attributes":{"contractScope":null,"name":"noteId","referencedDeclaration":63,"type":"struct Opus.noteId storage pointer"},"id":88,"name":"UserDefinedTypeName","src":"673:6:1"}],"id":89,"name":"ArrayTypeName","src":"673:8:1"}],"id":90,"name":"Mapping","src":"653:29:1"}],"id":91,"name":"VariableDeclaration","src":"653:40:1"},{"attributes":{"constant":false,"name":"noteBalances","scope":620,"stateVariable":true,"storageLocation":"default","type":"mapping(address => uint256)","value":null,"visibility":"internal"},"children":[{"attributes":{"type":"mapping(address => uint256)"},"children":[{"attributes":{"name":"address","type":"address"},"id":92,"name":"ElementaryTypeName","src":"756:7:1"},{"attributes":{"name":"uint","type":"uint256"},"id":93,"name":"ElementaryTypeName","src":"767:4:1"}],"id":94,"name":"Mapping","src":"747:25:1"}],"id":95,"name":"VariableDeclaration","src":"747:38:1"},{"attributes":{"name":"beforeEndTime","visibility":"internal"},"children":[{"attributes":{"parameters":[null]},"children":[],"id":96,"name":"ParameterList","src":"814:2:1"},{"children":[{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"isStructConstructorCall":false,"lValueRequested":false,"names":[null],"type":"tuple()","type_conversion":false},"children":[{"attributes":{"argumentTypes":[{"typeIdentifier":"t_bool","typeString":"bool"}],"overloadedDeclarations":[null],"referencedDeclaration":635,"type":"function (bool) pure","value":"require"},"id":97,"name":"Identifier","src":"827:7:1"},{"attributes":{"argumentTypes":null,"commonType":{"typeIdentifier":"t_uint256","typeString":"uint256"},"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"<","type":"bool"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":634,"type":"uint256","value":"now"},"id":98,"name":"Identifier","src":"835:3:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":86,"type":"uint256","value":"endTime"},"id":99,"name":"Identifier","src":"841:7:1"}],"id":100,"name":"BinaryOperation","src":"835:13:1"}],"id":101,"name":"FunctionCall","src":"827:22:1"}],"id":102,"name":"ExpressionStatement","src":"827:22:1"},{"id":103,"name":"PlaceholderStatement","src":"859:1:1"}],"id":104,"name":"Block","src":"817:50:1"}],"id":105,"name":"ModifierDefinition","src":"792:75:1"},{"attributes":{"name":"afterEndTime","visibility":"internal"},"children":[{"attributes":{"parameters":[null]},"children":[],"id":106,"name":"ParameterList","src":"894:2:1"},{"children":[{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"isStructConstructorCall":false,"lValueRequested":false,"names":[null],"type":"tuple()","type_conversion":false},"children":[{"attributes":{"argumentTypes":[{"typeIdentifier":"t_bool","typeString":"bool"}],"overloadedDeclarations":[null],"referencedDeclaration":635,"type":"function (bool) pure","value":"require"},"id":107,"name":"Identifier","src":"907:7:1"},{"attributes":{"argumentTypes":null,"commonType":{"typeIdentifier":"t_uint256","typeString":"uint256"},"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":">","type":"bool"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":634,"type":"uint256","value":"now"},"id":108,"name":"Identifier","src":"915:3:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":86,"type":"uint256","value":"endTime"},"id":109,"name":"Identifier","src":"921:7:1"}],"id":110,"name":"BinaryOperation","src":"915:13:1"}],"id":111,"name":"FunctionCall","src":"907:22:1"}],"id":112,"name":"ExpressionStatement","src":"907:22:1"},{"id":113,"name":"PlaceholderStatement","src":"939:1:1"}],"id":114,"name":"Block","src":"897:50:1"}],"id":115,"name":"ModifierDefinition","src":"873:74:1"},{"attributes":{"name":"isValidNote","visibility":"internal"},"children":[{"children":[{"attributes":{"constant":false,"name":"_pitch","scope":143,"stateVariable":false,"storageLocation":"default","type":"uint256","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":116,"name":"ElementaryTypeName","src":"974:4:1"}],"id":117,"name":"VariableDeclaration","src":"974:11:1"},{"attributes":{"constant":false,"name":"_place","scope":143,"stateVariable":false,"storageLocation":"default","type":"uint256","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":118,"name":"ElementaryTypeName","src":"987:4:1"}],"id":119,"name":"VariableDeclaration","src":"987:11:1"}],"id":120,"name":"ParameterList","src":"973:26:1"},{"children":[{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"isStructConstructorCall":false,"lValueRequested":false,"names":[null],"type":"tuple()","type_conversion":false},"children":[{"attributes":{"argumentTypes":[{"typeIdentifier":"t_bool","typeString":"bool"}],"overloadedDeclarations":[null],"referencedDeclaration":635,"type":"function (bool) pure","value":"require"},"id":121,"name":"Identifier","src":"1010:7:1"},{"attributes":{"argumentTypes":null,"commonType":{"typeIdentifier":"t_bool","typeString":"bool"},"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"&&","type":"bool"},"children":[{"attributes":{"argumentTypes":null,"commonType":{"typeIdentifier":"t_uint256","typeString":"uint256"},"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":">=","type":"bool"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":117,"type":"uint256","value":"_pitch"},"id":122,"name":"Identifier","src":"1018:6:1"},{"attributes":{"argumentTypes":null,"hexvalue":"30","isConstant":false,"isLValue":false,"isPure":true,"lValueRequested":false,"subdenomination":null,"token":"number","type":"int_const 0","value":"0"},"id":123,"name":"Literal","src":"1028:1:1"}],"id":124,"name":"BinaryOperation","src":"1018:11:1"},{"attributes":{"argumentTypes":null,"commonType":{"typeIdentifier":"t_uint256","typeString":"uint256"},"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"<","type":"bool"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":117,"type":"uint256","value":"_pitch"},"id":125,"name":"Identifier","src":"1033:6:1"},{"attributes":{"argumentTypes":null,"hexvalue":"313238","isConstant":false,"isLValue":false,"isPure":true,"lValueRequested":false,"subdenomination":null,"token":"number","type":"int_const 128","value":"128"},"id":126,"name":"Literal","src":"1042:3:1"}],"id":127,"name":"BinaryOperation","src":"1033:12:1"}],"id":128,"name":"BinaryOperation","src":"1018:27:1"}],"id":129,"name":"FunctionCall","src":"1010:36:1"}],"id":130,"name":"ExpressionStatement","src":"1010:36:1"},{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"isStructConstructorCall":false,"lValueRequested":false,"names":[null],"type":"tuple()","type_conversion":false},"children":[{"attributes":{"argumentTypes":[{"typeIdentifier":"t_bool","typeString":"bool"}],"overloadedDeclarations":[null],"referencedDeclaration":635,"type":"function (bool) pure","value":"require"},"id":131,"name":"Identifier","src":"1056:7:1"},{"attributes":{"argumentTypes":null,"commonType":{"typeIdentifier":"t_bool","typeString":"bool"},"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"&&","type":"bool"},"children":[{"attributes":{"argumentTypes":null,"commonType":{"typeIdentifier":"t_uint256","typeString":"uint256"},"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":">=","type":"bool"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":119,"type":"uint256","value":"_place"},"id":132,"name":"Identifier","src":"1064:6:1"},{"attributes":{"argumentTypes":null,"hexvalue":"30","isConstant":false,"isLValue":false,"isPure":true,"lValueRequested":false,"subdenomination":null,"token":"number","type":"int_const 0","value":"0"},"id":133,"name":"Literal","src":"1074:1:1"}],"id":134,"name":"BinaryOperation","src":"1064:11:1"},{"attributes":{"argumentTypes":null,"commonType":{"typeIdentifier":"t_uint256","typeString":"uint256"},"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"<","type":"bool"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":119,"type":"uint256","value":"_place"},"id":135,"name":"Identifier","src":"1079:6:1"},{"attributes":{"argumentTypes":null,"hexvalue":"313030","isConstant":false,"isLValue":false,"isPure":true,"lValueRequested":false,"subdenomination":null,"token":"number","type":"int_const 100","value":"100"},"id":136,"name":"Literal","src":"1088:3:1"}],"id":137,"name":"BinaryOperation","src":"1079:12:1"}],"id":138,"name":"BinaryOperation","src":"1064:27:1"}],"id":139,"name":"FunctionCall","src":"1056:36:1"}],"id":140,"name":"ExpressionStatement","src":"1056:36:1"},{"id":141,"name":"PlaceholderStatement","src":"1102:1:1"}],"id":142,"name":"Block","src":"1000:110:1"}],"id":143,"name":"ModifierDefinition","src":"953:157:1"},{"attributes":{"constant":false,"implemented":true,"isConstructor":true,"modifiers":[null],"name":"Opus","payable":false,"scope":620,"stateMutability":"nonpayable","superFunction":null,"visibility":"public"},"children":[{"children":[{"attributes":{"constant":false,"name":"_endTime","scope":166,"stateVariable":false,"storageLocation":"default","type":"uint256","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":144,"name":"ElementaryTypeName","src":"1152:4:1"}],"id":145,"name":"VariableDeclaration","src":"1152:13:1"}],"id":146,"name":"ParameterList","src":"1151:15:1"},{"attributes":{"parameters":[null]},"children":[],"id":147,"name":"ParameterList","src":"1167:0:1"},{"children":[{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"=","type":"address"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":84,"type":"address","value":"owner"},"id":148,"name":"Identifier","src":"1177:5:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"member_name":"sender","referencedDeclaration":null,"type":"address"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":632,"type":"msg","value":"msg"},"id":149,"name":"Identifier","src":"1185:3:1"}],"id":150,"name":"MemberAccess","src":"1185:10:1"}],"id":151,"name":"Assignment","src":"1177:18:1"}],"id":152,"name":"ExpressionStatement","src":"1177:18:1"},{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"=","type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":86,"type":"uint256","value":"endTime"},"id":153,"name":"Identifier","src":"1206:7:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":145,"type":"uint256","value":"_endTime"},"id":154,"name":"Identifier","src":"1216:8:1"}],"id":155,"name":"Assignment","src":"1206:18:1"}],"id":156,"name":"ExpressionStatement","src":"1206:18:1"},{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"=","type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":80,"type":"uint256","value":"notesAvailable"},"id":157,"name":"Identifier","src":"1235:14:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":78,"type":"uint256","value":"notes"},"id":158,"name":"Identifier","src":"1252:5:1"}],"id":159,"name":"Assignment","src":"1235:22:1"}],"id":160,"name":"ExpressionStatement","src":"1235:22:1"},{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"=","type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":82,"type":"uint256","value":"notePrice"},"id":161,"name":"Identifier","src":"1267:9:1"},{"attributes":{"argumentTypes":null,"hexvalue":"302e3031","isConstant":false,"isLValue":false,"isPure":true,"lValueRequested":false,"subdenomination":"ether","token":"number","type":"int_const 10000000000000000","value":"0.01"},"id":162,"name":"Literal","src":"1279:10:1"}],"id":163,"name":"Assignment","src":"1267:22:1"}],"id":164,"name":"ExpressionStatement","src":"1267:22:1"}],"id":165,"name":"Block","src":"1167:129:1"}],"id":166,"name":"FunctionDefinition","src":"1138:158:1"},{"attributes":{"constant":false,"implemented":true,"isConstructor":false,"name":"purchaseNote","payable":true,"scope":620,"stateMutability":"payable","superFunction":null,"visibility":"external"},"children":[{"children":[{"attributes":{"constant":false,"name":"numNotes","scope":210,"stateVariable":false,"storageLocation":"default","type":"uint256","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":167,"name":"ElementaryTypeName","src":"1386:4:1"}],"id":168,"name":"VariableDeclaration","src":"1386:13:1"}],"id":169,"name":"ParameterList","src":"1385:15:1"},{"attributes":{"parameters":[null]},"children":[],"id":172,"name":"ParameterList","src":"1434:0:1"},{"attributes":{"arguments":[null]},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":105,"type":"modifier ()","value":"beforeEndTime"},"id":170,"name":"Identifier","src":"1401:13:1"}],"id":171,"name":"ModifierInvocation","src":"1401:15:1"},{"children":[{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"isStructConstructorCall":false,"lValueRequested":false,"names":[null],"type":"tuple()","type_conversion":false},"children":[{"attributes":{"argumentTypes":[{"typeIdentifier":"t_bool","typeString":"bool"}],"overloadedDeclarations":[null],"referencedDeclaration":635,"type":"function (bool) pure","value":"require"},"id":173,"name":"Identifier","src":"1444:7:1"},{"attributes":{"argumentTypes":null,"commonType":{"typeIdentifier":"t_bool","typeString":"bool"},"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"&&","type":"bool"},"children":[{"attributes":{"argumentTypes":null,"commonType":{"typeIdentifier":"t_bool","typeString":"bool"},"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"&&","type":"bool"},"children":[{"attributes":{"argumentTypes":null,"commonType":{"typeIdentifier":"t_uint256","typeString":"uint256"},"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"<=","type":"bool"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":168,"type":"uint256","value":"numNotes"},"id":174,"name":"Identifier","src":"1452:8:1"},{"attributes":{"argumentTypes":null,"hexvalue":"313030","isConstant":false,"isLValue":false,"isPure":true,"lValueRequested":false,"subdenomination":null,"token":"number","type":"int_const 100","value":"100"},"id":175,"name":"Literal","src":"1464:3:1"}],"id":176,"name":"BinaryOperation","src":"1452:15:1"},{"attributes":{"argumentTypes":null,"commonType":{"typeIdentifier":"t_uint256","typeString":"uint256"},"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"<=","type":"bool"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":168,"type":"uint256","value":"numNotes"},"id":177,"name":"Identifier","src":"1471:8:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":80,"type":"uint256","value":"notesAvailable"},"id":178,"name":"Identifier","src":"1483:14:1"}],"id":179,"name":"BinaryOperation","src":"1471:26:1"}],"id":180,"name":"BinaryOperation","src":"1452:45:1"},{"attributes":{"argumentTypes":null,"commonType":{"typeIdentifier":"t_uint256","typeString":"uint256"},"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"==","type":"bool"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"member_name":"value","referencedDeclaration":null,"type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":632,"type":"msg","value":"msg"},"id":181,"name":"Identifier","src":"1501:3:1"}],"id":182,"name":"MemberAccess","src":"1501:9:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isInlineArray":false,"isLValue":false,"isPure":false,"lValueRequested":false,"type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"commonType":{"typeIdentifier":"t_uint256","typeString":"uint256"},"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"*","type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":168,"type":"uint256","value":"numNotes"},"id":183,"name":"Identifier","src":"1515:8:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":82,"type":"uint256","value":"notePrice"},"id":184,"name":"Identifier","src":"1526:9:1"}],"id":185,"name":"BinaryOperation","src":"1515:20:1"}],"id":186,"name":"TupleExpression","src":"1514:22:1"}],"id":187,"name":"BinaryOperation","src":"1501:35:1"}],"id":188,"name":"BinaryOperation","src":"1452:84:1"}],"id":189,"name":"FunctionCall","src":"1444:93:1"}],"id":190,"name":"ExpressionStatement","src":"1444:93:1"},{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"=","type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":true,"type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":95,"type":"mapping(address => uint256)","value":"noteBalances"},"id":191,"name":"Identifier","src":"1548:12:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"member_name":"sender","referencedDeclaration":null,"type":"address"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":632,"type":"msg","value":"msg"},"id":192,"name":"Identifier","src":"1561:3:1"}],"id":193,"name":"MemberAccess","src":"1561:10:1"}],"id":194,"name":"IndexAccess","src":"1548:24:1"},{"attributes":{"argumentTypes":null,"commonType":{"typeIdentifier":"t_uint256","typeString":"uint256"},"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"+","type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":95,"type":"mapping(address => uint256)","value":"noteBalances"},"id":195,"name":"Identifier","src":"1575:12:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"member_name":"sender","referencedDeclaration":null,"type":"address"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":632,"type":"msg","value":"msg"},"id":196,"name":"Identifier","src":"1588:3:1"}],"id":197,"name":"MemberAccess","src":"1588:10:1"}],"id":198,"name":"IndexAccess","src":"1575:24:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":168,"type":"uint256","value":"numNotes"},"id":199,"name":"Identifier","src":"1602:8:1"}],"id":200,"name":"BinaryOperation","src":"1575:35:1"}],"id":201,"name":"Assignment","src":"1548:62:1"}],"id":202,"name":"ExpressionStatement","src":"1548:62:1"},{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"=","type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":80,"type":"uint256","value":"notesAvailable"},"id":203,"name":"Identifier","src":"1621:14:1"},{"attributes":{"argumentTypes":null,"commonType":{"typeIdentifier":"t_uint256","typeString":"uint256"},"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"-","type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":80,"type":"uint256","value":"notesAvailable"},"id":204,"name":"Identifier","src":"1638:14:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":168,"type":"uint256","value":"numNotes"},"id":205,"name":"Identifier","src":"1655:8:1"}],"id":206,"name":"BinaryOperation","src":"1638:25:1"}],"id":207,"name":"Assignment","src":"1621:42:1"}],"id":208,"name":"ExpressionStatement","src":"1621:42:1"}],"id":209,"name":"Block","src":"1434:236:1"}],"id":210,"name":"FunctionDefinition","src":"1364:306:1"},{"attributes":{"constant":false,"implemented":true,"isConstructor":false,"name":"returnNotes","payable":false,"scope":620,"stateMutability":"nonpayable","superFunction":null,"visibility":"external"},"children":[{"children":[{"attributes":{"constant":false,"name":"numNotes","scope":260,"stateVariable":false,"storageLocation":"default","type":"uint256","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":211,"name":"ElementaryTypeName","src":"1724:4:1"}],"id":212,"name":"VariableDeclaration","src":"1724:13:1"}],"id":213,"name":"ParameterList","src":"1723:15:1"},{"attributes":{"parameters":[null]},"children":[],"id":216,"name":"ParameterList","src":"1764:0:1"},{"attributes":{"arguments":[null]},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":105,"type":"modifier ()","value":"beforeEndTime"},"id":214,"name":"Identifier","src":"1739:13:1"}],"id":215,"name":"ModifierInvocation","src":"1739:15:1"},{"children":[{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"isStructConstructorCall":false,"lValueRequested":false,"names":[null],"type":"tuple()","type_conversion":false},"children":[{"attributes":{"argumentTypes":[{"typeIdentifier":"t_bool","typeString":"bool"}],"overloadedDeclarations":[null],"referencedDeclaration":635,"type":"function (bool) pure","value":"require"},"id":217,"name":"Identifier","src":"1774:7:1"},{"attributes":{"argumentTypes":null,"commonType":{"typeIdentifier":"t_uint256","typeString":"uint256"},"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"<=","type":"bool"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":212,"type":"uint256","value":"numNotes"},"id":218,"name":"Identifier","src":"1782:8:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":95,"type":"mapping(address => uint256)","value":"noteBalances"},"id":219,"name":"Identifier","src":"1794:12:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"member_name":"sender","referencedDeclaration":null,"type":"address"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":632,"type":"msg","value":"msg"},"id":220,"name":"Identifier","src":"1807:3:1"}],"id":221,"name":"MemberAccess","src":"1807:10:1"}],"id":222,"name":"IndexAccess","src":"1794:24:1"}],"id":223,"name":"BinaryOperation","src":"1782:36:1"}],"id":224,"name":"FunctionCall","src":"1774:45:1"}],"id":225,"name":"ExpressionStatement","src":"1774:45:1"},{"attributes":{"assignments":[227]},"children":[{"attributes":{"constant":false,"name":"amount","scope":260,"stateVariable":false,"storageLocation":"default","type":"uint256","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":226,"name":"ElementaryTypeName","src":"1830:4:1"}],"id":227,"name":"VariableDeclaration","src":"1830:11:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isInlineArray":false,"isLValue":false,"isPure":false,"lValueRequested":false,"type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"commonType":{"typeIdentifier":"t_uint256","typeString":"uint256"},"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"*","type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":212,"type":"uint256","value":"numNotes"},"id":228,"name":"Identifier","src":"1845:8:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":82,"type":"uint256","value":"notePrice"},"id":229,"name":"Identifier","src":"1856:9:1"}],"id":230,"name":"BinaryOperation","src":"1845:20:1"}],"id":231,"name":"TupleExpression","src":"1844:22:1"}],"id":232,"name":"VariableDeclarationStatement","src":"1830:36:1"},{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"=","type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":true,"type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":95,"type":"mapping(address => uint256)","value":"noteBalances"},"id":233,"name":"Identifier","src":"1876:12:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"member_name":"sender","referencedDeclaration":null,"type":"address"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":632,"type":"msg","value":"msg"},"id":234,"name":"Identifier","src":"1889:3:1"}],"id":235,"name":"MemberAccess","src":"1889:10:1"}],"id":236,"name":"IndexAccess","src":"1876:24:1"},{"attributes":{"argumentTypes":null,"commonType":{"typeIdentifier":"t_uint256","typeString":"uint256"},"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"-","type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":95,"type":"mapping(address => uint256)","value":"noteBalances"},"id":237,"name":"Identifier","src":"1903:12:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"member_name":"sender","referencedDeclaration":null,"type":"address"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":632,"type":"msg","value":"msg"},"id":238,"name":"Identifier","src":"1916:3:1"}],"id":239,"name":"MemberAccess","src":"1916:10:1"}],"id":240,"name":"IndexAccess","src":"1903:24:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":212,"type":"uint256","value":"numNotes"},"id":241,"name":"Identifier","src":"1930:8:1"}],"id":242,"name":"BinaryOperation","src":"1903:35:1"}],"id":243,"name":"Assignment","src":"1876:62:1"}],"id":244,"name":"ExpressionStatement","src":"1876:62:1"},{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"=","type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":80,"type":"uint256","value":"notesAvailable"},"id":245,"name":"Identifier","src":"1948:14:1"},{"attributes":{"argumentTypes":null,"commonType":{"typeIdentifier":"t_uint256","typeString":"uint256"},"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"+","type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":80,"type":"uint256","value":"notesAvailable"},"id":246,"name":"Identifier","src":"1965:14:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":212,"type":"uint256","value":"numNotes"},"id":247,"name":"Identifier","src":"1982:8:1"}],"id":248,"name":"BinaryOperation","src":"1965:25:1"}],"id":249,"name":"Assignment","src":"1948:42:1"}],"id":250,"name":"ExpressionStatement","src":"1948:42:1"},{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"isStructConstructorCall":false,"lValueRequested":false,"names":[null],"type":"tuple()","type_conversion":false},"children":[{"attributes":{"argumentTypes":[{"typeIdentifier":"t_uint256","typeString":"uint256"}],"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"member_name":"transfer","referencedDeclaration":null,"type":"function (uint256)"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"member_name":"sender","referencedDeclaration":null,"type":"address"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":632,"type":"msg","value":"msg"},"id":251,"name":"Identifier","src":"2001:3:1"}],"id":254,"name":"MemberAccess","src":"2001:10:1"}],"id":255,"name":"MemberAccess","src":"2001:19:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":227,"type":"uint256","value":"amount"},"id":256,"name":"Identifier","src":"2021:6:1"}],"id":257,"name":"FunctionCall","src":"2001:27:1"}],"id":258,"name":"ExpressionStatement","src":"2001:27:1"}],"id":259,"name":"Block","src":"1764:272:1"}],"id":260,"name":"FunctionDefinition","src":"1703:333:1"},{"attributes":{"constant":false,"implemented":true,"isConstructor":false,"name":"placeNote","payable":false,"scope":620,"stateMutability":"nonpayable","superFunction":null,"visibility":"external"},"children":[{"children":[{"attributes":{"constant":false,"name":"_pitch","scope":336,"stateVariable":false,"storageLocation":"default","type":"uint256","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":261,"name":"ElementaryTypeName","src":"2106:4:1"}],"id":262,"name":"VariableDeclaration","src":"2106:11:1"},{"attributes":{"constant":false,"name":"_place","scope":336,"stateVariable":false,"storageLocation":"default","type":"uint256","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":263,"name":"ElementaryTypeName","src":"2119:4:1"}],"id":264,"name":"VariableDeclaration","src":"2119:11:1"}],"id":265,"name":"ParameterList","src":"2105:26:1"},{"attributes":{"parameters":[null]},"children":[],"id":272,"name":"ParameterList","src":"2185:0:1"},{"attributes":{"arguments":[null]},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":105,"type":"modifier ()","value":"beforeEndTime"},"id":266,"name":"Identifier","src":"2132:13:1"}],"id":267,"name":"ModifierInvocation","src":"2132:15:1"},{"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":143,"type":"modifier (uint256,uint256)","value":"isValidNote"},"id":268,"name":"Identifier","src":"2148:11:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":262,"type":"uint256","value":"_pitch"},"id":269,"name":"Identifier","src":"2160:6:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":264,"type":"uint256","value":"_place"},"id":270,"name":"Identifier","src":"2168:6:1"}],"id":271,"name":"ModifierInvocation","src":"2148:27:1"},{"children":[{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"isStructConstructorCall":false,"lValueRequested":false,"names":[null],"type":"tuple()","type_conversion":false},"children":[{"attributes":{"argumentTypes":[{"typeIdentifier":"t_bool","typeString":"bool"}],"overloadedDeclarations":[null],"referencedDeclaration":635,"type":"function (bool) pure","value":"require"},"id":273,"name":"Identifier","src":"2195:7:1"},{"attributes":{"argumentTypes":null,"commonType":{"typeIdentifier":"t_bool","typeString":"bool"},"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"&&","type":"bool"},"children":[{"attributes":{"argumentTypes":null,"commonType":{"typeIdentifier":"t_uint256","typeString":"uint256"},"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":">","type":"bool"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":95,"type":"mapping(address => uint256)","value":"noteBalances"},"id":274,"name":"Identifier","src":"2203:12:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"member_name":"sender","referencedDeclaration":null,"type":"address"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":632,"type":"msg","value":"msg"},"id":275,"name":"Identifier","src":"2216:3:1"}],"id":276,"name":"MemberAccess","src":"2216:10:1"}],"id":277,"name":"IndexAccess","src":"2203:24:1"},{"attributes":{"argumentTypes":null,"hexvalue":"30","isConstant":false,"isLValue":false,"isPure":true,"lValueRequested":false,"subdenomination":null,"token":"number","type":"int_const 0","value":"0"},"id":278,"name":"Literal","src":"2230:1:1"}],"id":279,"name":"BinaryOperation","src":"2203:28:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"!","prefix":true,"type":"bool"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"bool"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"bool[100] storage ref"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":69,"type":"bool[100] storage ref[128] storage ref","value":"composition"},"id":280,"name":"Identifier","src":"2236:11:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":262,"type":"uint256","value":"_pitch"},"id":281,"name":"Identifier","src":"2248:6:1"}],"id":282,"name":"IndexAccess","src":"2236:19:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":264,"type":"uint256","value":"_place"},"id":283,"name":"Identifier","src":"2256:6:1"}],"id":284,"name":"IndexAccess","src":"2236:27:1"}],"id":285,"name":"UnaryOperation","src":"2235:28:1"}],"id":286,"name":"BinaryOperation","src":"2203:60:1"}],"id":287,"name":"FunctionCall","src":"2195:69:1"}],"id":288,"name":"ExpressionStatement","src":"2195:69:1"},{"attributes":{"assignments":[null],"initialValue":null},"children":[{"attributes":{"constant":false,"name":"note","scope":336,"stateVariable":false,"storageLocation":"memory","type":"struct Opus.noteId memory","value":null,"visibility":"internal"},"children":[{"attributes":{"contractScope":null,"name":"noteId","referencedDeclaration":63,"type":"struct Opus.noteId storage pointer"},"id":289,"name":"UserDefinedTypeName","src":"2275:6:1"}],"id":290,"name":"VariableDeclaration","src":"2275:18:1"}],"id":291,"name":"VariableDeclarationStatement","src":"2275:18:1"},{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"=","type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":true,"member_name":"pitch","referencedDeclaration":60,"type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":290,"type":"struct Opus.noteId memory","value":"note"},"id":292,"name":"Identifier","src":"2303:4:1"}],"id":294,"name":"MemberAccess","src":"2303:10:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":262,"type":"uint256","value":"_pitch"},"id":295,"name":"Identifier","src":"2316:6:1"}],"id":296,"name":"Assignment","src":"2303:19:1"}],"id":297,"name":"ExpressionStatement","src":"2303:19:1"},{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"=","type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":true,"member_name":"place","referencedDeclaration":62,"type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":290,"type":"struct Opus.noteId memory","value":"note"},"id":298,"name":"Identifier","src":"2332:4:1"}],"id":300,"name":"MemberAccess","src":"2332:10:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":264,"type":"uint256","value":"_place"},"id":301,"name":"Identifier","src":"2345:6:1"}],"id":302,"name":"Assignment","src":"2332:19:1"}],"id":303,"name":"ExpressionStatement","src":"2332:19:1"},{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"isStructConstructorCall":false,"lValueRequested":false,"names":[null],"type":"uint256","type_conversion":false},"children":[{"attributes":{"argumentTypes":[{"typeIdentifier":"t_struct$_noteId_$63_memory_ptr","typeString":"struct Opus.noteId memory"}],"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"member_name":"push","referencedDeclaration":null,"type":"function (struct Opus.noteId storage ref) returns (uint256)"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"struct Opus.noteId storage ref[] storage ref"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":91,"type":"mapping(address => struct Opus.noteId storage ref[] storage ref)","value":"ownedNotes"},"id":304,"name":"Identifier","src":"2362:10:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"member_name":"sender","referencedDeclaration":null,"type":"address"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":632,"type":"msg","value":"msg"},"id":305,"name":"Identifier","src":"2373:3:1"}],"id":306,"name":"MemberAccess","src":"2373:10:1"}],"id":307,"name":"IndexAccess","src":"2362:22:1"}],"id":308,"name":"MemberAccess","src":"2362:27:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":290,"type":"struct Opus.noteId memory","value":"note"},"id":309,"name":"Identifier","src":"2390:4:1"}],"id":310,"name":"FunctionCall","src":"2362:33:1"}],"id":311,"name":"ExpressionStatement","src":"2362:33:1"},{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"=","type":"bool"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":true,"type":"bool"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"bool[100] storage ref"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":69,"type":"bool[100] storage ref[128] storage ref","value":"composition"},"id":312,"name":"Identifier","src":"2406:11:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":262,"type":"uint256","value":"_pitch"},"id":313,"name":"Identifier","src":"2418:6:1"}],"id":315,"name":"IndexAccess","src":"2406:19:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":264,"type":"uint256","value":"_place"},"id":314,"name":"Identifier","src":"2426:6:1"}],"id":316,"name":"IndexAccess","src":"2406:27:1"},{"attributes":{"argumentTypes":null,"hexvalue":"74727565","isConstant":false,"isLValue":false,"isPure":true,"lValueRequested":false,"subdenomination":null,"token":"bool","type":"bool","value":"true"},"id":317,"name":"Literal","src":"2436:4:1"}],"id":318,"name":"Assignment","src":"2406:34:1"}],"id":319,"name":"ExpressionStatement","src":"2406:34:1"},{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"=","type":"address"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":true,"type":"address"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"address[100] storage ref"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":75,"type":"address[100] storage ref[128] storage ref","value":"composers"},"id":320,"name":"Identifier","src":"2450:9:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":262,"type":"uint256","value":"_pitch"},"id":321,"name":"Identifier","src":"2460:6:1"}],"id":323,"name":"IndexAccess","src":"2450:17:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":264,"type":"uint256","value":"_place"},"id":322,"name":"Identifier","src":"2468:6:1"}],"id":324,"name":"IndexAccess","src":"2450:25:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"member_name":"sender","referencedDeclaration":null,"type":"address"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":632,"type":"msg","value":"msg"},"id":325,"name":"Identifier","src":"2478:3:1"}],"id":326,"name":"MemberAccess","src":"2478:10:1"}],"id":327,"name":"Assignment","src":"2450:38:1"}],"id":328,"name":"ExpressionStatement","src":"2450:38:1"},{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"--","prefix":false,"type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":true,"type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":95,"type":"mapping(address => uint256)","value":"noteBalances"},"id":329,"name":"Identifier","src":"2499:12:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"member_name":"sender","referencedDeclaration":null,"type":"address"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":632,"type":"msg","value":"msg"},"id":330,"name":"Identifier","src":"2512:3:1"}],"id":331,"name":"MemberAccess","src":"2512:10:1"}],"id":332,"name":"IndexAccess","src":"2499:24:1"}],"id":333,"name":"UnaryOperation","src":"2499:26:1"}],"id":334,"name":"ExpressionStatement","src":"2499:26:1"}],"id":335,"name":"Block","src":"2185:347:1"}],"id":336,"name":"FunctionDefinition","src":"2087:445:1"},{"attributes":{"constant":false,"implemented":true,"isConstructor":false,"name":"removeNote","payable":false,"scope":620,"stateMutability":"nonpayable","superFunction":null,"visibility":"external"},"children":[{"children":[{"attributes":{"constant":false,"name":"_pitch","scope":408,"stateVariable":false,"storageLocation":"default","type":"uint256","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":337,"name":"ElementaryTypeName","src":"2600:4:1"}],"id":338,"name":"VariableDeclaration","src":"2600:11:1"},{"attributes":{"constant":false,"name":"_place","scope":408,"stateVariable":false,"storageLocation":"default","type":"uint256","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":339,"name":"ElementaryTypeName","src":"2613:4:1"}],"id":340,"name":"VariableDeclaration","src":"2613:11:1"}],"id":341,"name":"ParameterList","src":"2599:26:1"},{"attributes":{"parameters":[null]},"children":[],"id":348,"name":"ParameterList","src":"2679:0:1"},{"attributes":{"arguments":[null]},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":105,"type":"modifier ()","value":"beforeEndTime"},"id":342,"name":"Identifier","src":"2626:13:1"}],"id":343,"name":"ModifierInvocation","src":"2626:15:1"},{"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":143,"type":"modifier (uint256,uint256)","value":"isValidNote"},"id":344,"name":"Identifier","src":"2642:11:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":338,"type":"uint256","value":"_pitch"},"id":345,"name":"Identifier","src":"2654:6:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":340,"type":"uint256","value":"_place"},"id":346,"name":"Identifier","src":"2662:6:1"}],"id":347,"name":"ModifierInvocation","src":"2642:27:1"},{"children":[{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"isStructConstructorCall":false,"lValueRequested":false,"names":[null],"type":"tuple()","type_conversion":false},"children":[{"attributes":{"argumentTypes":[{"typeIdentifier":"t_bool","typeString":"bool"}],"overloadedDeclarations":[null],"referencedDeclaration":635,"type":"function (bool) pure","value":"require"},"id":349,"name":"Identifier","src":"2689:7:1"},{"attributes":{"argumentTypes":null,"commonType":{"typeIdentifier":"t_bool","typeString":"bool"},"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"&&","type":"bool"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"bool"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"bool[100] storage ref"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":69,"type":"bool[100] storage ref[128] storage ref","value":"composition"},"id":350,"name":"Identifier","src":"2697:11:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":338,"type":"uint256","value":"_pitch"},"id":351,"name":"Identifier","src":"2709:6:1"}],"id":352,"name":"IndexAccess","src":"2697:19:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":340,"type":"uint256","value":"_place"},"id":353,"name":"Identifier","src":"2717:6:1"}],"id":354,"name":"IndexAccess","src":"2697:27:1"},{"attributes":{"argumentTypes":null,"commonType":{"typeIdentifier":"t_address","typeString":"address"},"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"==","type":"bool"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"address"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"address[100] storage ref"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":75,"type":"address[100] storage ref[128] storage ref","value":"composers"},"id":355,"name":"Identifier","src":"2728:9:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":338,"type":"uint256","value":"_pitch"},"id":356,"name":"Identifier","src":"2738:6:1"}],"id":357,"name":"IndexAccess","src":"2728:17:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":340,"type":"uint256","value":"_place"},"id":358,"name":"Identifier","src":"2746:6:1"}],"id":359,"name":"IndexAccess","src":"2728:25:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"member_name":"sender","referencedDeclaration":null,"type":"address"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":632,"type":"msg","value":"msg"},"id":360,"name":"Identifier","src":"2757:3:1"}],"id":361,"name":"MemberAccess","src":"2757:10:1"}],"id":362,"name":"BinaryOperation","src":"2728:39:1"}],"id":363,"name":"BinaryOperation","src":"2697:70:1"}],"id":364,"name":"FunctionCall","src":"2689:79:1"}],"id":365,"name":"ExpressionStatement","src":"2689:79:1"},{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"=","type":"bool"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":true,"type":"bool"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"bool[100] storage ref"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":69,"type":"bool[100] storage ref[128] storage ref","value":"composition"},"id":366,"name":"Identifier","src":"2779:11:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":338,"type":"uint256","value":"_pitch"},"id":367,"name":"Identifier","src":"2791:6:1"}],"id":369,"name":"IndexAccess","src":"2779:19:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":340,"type":"uint256","value":"_place"},"id":368,"name":"Identifier","src":"2799:6:1"}],"id":370,"name":"IndexAccess","src":"2779:27:1"},{"attributes":{"argumentTypes":null,"hexvalue":"66616c7365","isConstant":false,"isLValue":false,"isPure":true,"lValueRequested":false,"subdenomination":null,"token":"bool","type":"bool","value":"false"},"id":371,"name":"Literal","src":"2809:5:1"}],"id":372,"name":"Assignment","src":"2779:35:1"}],"id":373,"name":"ExpressionStatement","src":"2779:35:1"},{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"=","type":"address"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":true,"type":"address"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"address[100] storage ref"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":75,"type":"address[100] storage ref[128] storage ref","value":"composers"},"id":374,"name":"Identifier","src":"2824:9:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":338,"type":"uint256","value":"_pitch"},"id":375,"name":"Identifier","src":"2834:6:1"}],"id":377,"name":"IndexAccess","src":"2824:17:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":340,"type":"uint256","value":"_place"},"id":376,"name":"Identifier","src":"2842:6:1"}],"id":378,"name":"IndexAccess","src":"2824:25:1"},{"attributes":{"argumentTypes":null,"hexvalue":"307830","isConstant":false,"isLValue":false,"isPure":true,"lValueRequested":false,"subdenomination":null,"token":"number","type":"int_const 0","value":"0x0"},"id":379,"name":"Literal","src":"2852:3:1"}],"id":380,"name":"Assignment","src":"2824:31:1"}],"id":381,"name":"ExpressionStatement","src":"2824:31:1"},{"attributes":{"assignments":[383]},"children":[{"attributes":{"constant":false,"name":"noteIndex","scope":408,"stateVariable":false,"storageLocation":"default","type":"uint256","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":382,"name":"ElementaryTypeName","src":"2866:4:1"}],"id":383,"name":"VariableDeclaration","src":"2866:14:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"isStructConstructorCall":false,"lValueRequested":false,"names":[null],"type":"uint256","type_conversion":false},"children":[{"attributes":{"argumentTypes":[{"typeIdentifier":"t_uint256","typeString":"uint256"},{"typeIdentifier":"t_uint256","typeString":"uint256"},{"typeIdentifier":"t_address","typeString":"address"}],"overloadedDeclarations":[null],"referencedDeclaration":457,"type":"function (uint256,uint256,address) view returns (uint256)","value":"getOwnedNoteIndex"},"id":384,"name":"Identifier","src":"2883:17:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":338,"type":"uint256","value":"_pitch"},"id":385,"name":"Identifier","src":"2901:6:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":340,"type":"uint256","value":"_place"},"id":386,"name":"Identifier","src":"2909:6:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"member_name":"sender","referencedDeclaration":null,"type":"address"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":632,"type":"msg","value":"msg"},"id":387,"name":"Identifier","src":"2917:3:1"}],"id":388,"name":"MemberAccess","src":"2917:10:1"}],"id":389,"name":"FunctionCall","src":"2883:45:1"}],"id":390,"name":"VariableDeclarationStatement","src":"2866:62:1"},{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"=","type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":true,"member_name":"pitch","referencedDeclaration":60,"type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"struct Opus.noteId storage ref"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"struct Opus.noteId storage ref[] storage ref"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":91,"type":"mapping(address => struct Opus.noteId storage ref[] storage ref)","value":"ownedNotes"},"id":391,"name":"Identifier","src":"2939:10:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"member_name":"sender","referencedDeclaration":null,"type":"address"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":632,"type":"msg","value":"msg"},"id":392,"name":"Identifier","src":"2950:3:1"}],"id":393,"name":"MemberAccess","src":"2950:10:1"}],"id":395,"name":"IndexAccess","src":"2939:22:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":383,"type":"uint256","value":"noteIndex"},"id":394,"name":"Identifier","src":"2962:9:1"}],"id":396,"name":"IndexAccess","src":"2939:33:1"}],"id":397,"name":"MemberAccess","src":"2939:39:1"},{"attributes":{"argumentTypes":null,"hexvalue":"313239","isConstant":false,"isLValue":false,"isPure":true,"lValueRequested":false,"subdenomination":null,"token":"number","type":"int_const 129","value":"129"},"id":398,"name":"Literal","src":"2981:3:1"}],"id":399,"name":"Assignment","src":"2939:45:1"}],"id":400,"name":"ExpressionStatement","src":"2939:45:1"},{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"++","prefix":false,"type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":true,"type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":95,"type":"mapping(address => uint256)","value":"noteBalances"},"id":401,"name":"Identifier","src":"2994:12:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"member_name":"sender","referencedDeclaration":null,"type":"address"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":632,"type":"msg","value":"msg"},"id":402,"name":"Identifier","src":"3007:3:1"}],"id":403,"name":"MemberAccess","src":"3007:10:1"}],"id":404,"name":"IndexAccess","src":"2994:24:1"}],"id":405,"name":"UnaryOperation","src":"2994:26:1"}],"id":406,"name":"ExpressionStatement","src":"2994:26:1"}],"id":407,"name":"Block","src":"2679:348:1"}],"id":408,"name":"FunctionDefinition","src":"2580:447:1"},{"attributes":{"constant":true,"implemented":true,"isConstructor":false,"modifiers":[null],"name":"getOwnedNoteIndex","payable":false,"scope":620,"stateMutability":"view","superFunction":null,"visibility":"internal"},"children":[{"children":[{"attributes":{"constant":false,"name":"_pitch","scope":457,"stateVariable":false,"storageLocation":"default","type":"uint256","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":409,"name":"ElementaryTypeName","src":"3060:4:1"}],"id":410,"name":"VariableDeclaration","src":"3060:11:1"},{"attributes":{"constant":false,"name":"_place","scope":457,"stateVariable":false,"storageLocation":"default","type":"uint256","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":411,"name":"ElementaryTypeName","src":"3073:4:1"}],"id":412,"name":"VariableDeclaration","src":"3073:11:1"},{"attributes":{"constant":false,"name":"sender","scope":457,"stateVariable":false,"storageLocation":"default","type":"address","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"address","type":"address"},"id":413,"name":"ElementaryTypeName","src":"3086:7:1"}],"id":414,"name":"VariableDeclaration","src":"3086:14:1"}],"id":415,"name":"ParameterList","src":"3059:42:1"},{"children":[{"attributes":{"constant":false,"name":"","scope":457,"stateVariable":false,"storageLocation":"default","type":"uint256","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":416,"name":"ElementaryTypeName","src":"3125:4:1"}],"id":417,"name":"VariableDeclaration","src":"3125:4:1"}],"id":418,"name":"ParameterList","src":"3124:6:1"},{"children":[{"children":[{"attributes":{"assignments":[420]},"children":[{"attributes":{"constant":false,"name":"i","scope":457,"stateVariable":false,"storageLocation":"default","type":"uint256","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":419,"name":"ElementaryTypeName","src":"3146:4:1"}],"id":420,"name":"VariableDeclaration","src":"3146:6:1"},{"attributes":{"argumentTypes":null,"hexvalue":"30","isConstant":false,"isLValue":false,"isPure":true,"lValueRequested":false,"subdenomination":null,"token":"number","type":"int_const 0","value":"0"},"id":421,"name":"Literal","src":"3155:1:1"}],"id":422,"name":"VariableDeclarationStatement","src":"3146:10:1"},{"attributes":{"argumentTypes":null,"commonType":{"typeIdentifier":"t_uint256","typeString":"uint256"},"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"<","type":"bool"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":420,"type":"uint256","value":"i"},"id":423,"name":"Identifier","src":"3158:1:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"member_name":"length","referencedDeclaration":null,"type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"struct Opus.noteId storage ref[] storage ref"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":91,"type":"mapping(address => struct Opus.noteId storage ref[] storage ref)","value":"ownedNotes"},"id":424,"name":"Identifier","src":"3162:10:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"member_name":"sender","referencedDeclaration":null,"type":"address"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":632,"type":"msg","value":"msg"},"id":425,"name":"Identifier","src":"3173:3:1"}],"id":426,"name":"MemberAccess","src":"3173:10:1"}],"id":427,"name":"IndexAccess","src":"3162:22:1"}],"id":428,"name":"MemberAccess","src":"3162:29:1"}],"id":429,"name":"BinaryOperation","src":"3158:33:1"},{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"++","prefix":false,"type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":420,"type":"uint256","value":"i"},"id":430,"name":"Identifier","src":"3193:1:1"}],"id":431,"name":"UnaryOperation","src":"3193:3:1"}],"id":432,"name":"ExpressionStatement","src":"3193:3:1"},{"children":[{"attributes":{"falseBody":null},"children":[{"attributes":{"argumentTypes":null,"commonType":{"typeIdentifier":"t_bool","typeString":"bool"},"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"&&","type":"bool"},"children":[{"attributes":{"argumentTypes":null,"commonType":{"typeIdentifier":"t_uint256","typeString":"uint256"},"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"==","type":"bool"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"member_name":"pitch","referencedDeclaration":60,"type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"struct Opus.noteId storage ref"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"struct Opus.noteId storage ref[] storage ref"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":91,"type":"mapping(address => struct Opus.noteId storage ref[] storage ref)","value":"ownedNotes"},"id":433,"name":"Identifier","src":"3216:10:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":414,"type":"address","value":"sender"},"id":434,"name":"Identifier","src":"3227:6:1"}],"id":435,"name":"IndexAccess","src":"3216:18:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":420,"type":"uint256","value":"i"},"id":436,"name":"Identifier","src":"3235:1:1"}],"id":437,"name":"IndexAccess","src":"3216:21:1"}],"id":438,"name":"MemberAccess","src":"3216:27:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":410,"type":"uint256","value":"_pitch"},"id":439,"name":"Identifier","src":"3247:6:1"}],"id":440,"name":"BinaryOperation","src":"3216:37:1"},{"attributes":{"argumentTypes":null,"commonType":{"typeIdentifier":"t_uint256","typeString":"uint256"},"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"==","type":"bool"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"member_name":"place","referencedDeclaration":62,"type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"struct Opus.noteId storage ref"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"struct Opus.noteId storage ref[] storage ref"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":91,"type":"mapping(address => struct Opus.noteId storage ref[] storage ref)","value":"ownedNotes"},"id":441,"name":"Identifier","src":"3257:10:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":414,"type":"address","value":"sender"},"id":442,"name":"Identifier","src":"3268:6:1"}],"id":443,"name":"IndexAccess","src":"3257:18:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":420,"type":"uint256","value":"i"},"id":444,"name":"Identifier","src":"3276:1:1"}],"id":445,"name":"IndexAccess","src":"3257:21:1"}],"id":446,"name":"MemberAccess","src":"3257:27:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":412,"type":"uint256","value":"_place"},"id":447,"name":"Identifier","src":"3288:6:1"}],"id":448,"name":"BinaryOperation","src":"3257:37:1"}],"id":449,"name":"BinaryOperation","src":"3216:78:1"},{"children":[{"attributes":{"functionReturnParameters":418},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":420,"type":"uint256","value":"i"},"id":450,"name":"Identifier","src":"3321:1:1"}],"id":451,"name":"Return","src":"3314:8:1"}],"id":452,"name":"Block","src":"3296:41:1"}],"id":453,"name":"IfStatement","src":"3212:125:1"}],"id":454,"name":"Block","src":"3198:149:1"}],"id":455,"name":"ForStatement","src":"3141:206:1"}],"id":456,"name":"Block","src":"3131:222:1"}],"id":457,"name":"FunctionDefinition","src":"3033:320:1"},{"attributes":{"constant":true,"implemented":true,"isConstructor":false,"modifiers":[null],"name":"getNoteLine","payable":false,"scope":620,"stateMutability":"view","superFunction":null,"visibility":"external"},"children":[{"children":[{"attributes":{"constant":false,"name":"_pitch","scope":478,"stateVariable":false,"storageLocation":"default","type":"uint256","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":458,"name":"ElementaryTypeName","src":"3497:4:1"}],"id":459,"name":"VariableDeclaration","src":"3497:11:1"}],"id":460,"name":"ParameterList","src":"3496:13:1"},{"children":[{"attributes":{"constant":false,"name":"","scope":478,"stateVariable":false,"storageLocation":"default","type":"bool[100] memory","value":null,"visibility":"internal"},"children":[{"attributes":{"type":"bool[100] storage pointer"},"children":[{"attributes":{"name":"bool","type":"bool"},"id":461,"name":"ElementaryTypeName","src":"3533:4:1"},{"attributes":{"argumentTypes":null,"hexvalue":"313030","isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"subdenomination":null,"token":"number","type":"int_const 100","value":"100"},"id":462,"name":"Literal","src":"3538:3:1"}],"id":463,"name":"ArrayTypeName","src":"3533:9:1"}],"id":464,"name":"VariableDeclaration","src":"3533:9:1"}],"id":465,"name":"ParameterList","src":"3532:11:1"},{"children":[{"attributes":{"assignments":[470]},"children":[{"attributes":{"constant":false,"name":"line","scope":478,"stateVariable":false,"storageLocation":"memory","type":"bool[100] memory","value":null,"visibility":"internal"},"children":[{"attributes":{"type":"bool[100] storage pointer"},"children":[{"attributes":{"name":"bool","type":"bool"},"id":468,"name":"ElementaryTypeName","src":"3554:4:1"},{"attributes":{"argumentTypes":null,"hexvalue":"313030","isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"subdenomination":null,"token":"number","type":"int_const 100","value":"100"},"id":467,"name":"Literal","src":"3559:3:1"}],"id":469,"name":"ArrayTypeName","src":"3554:9:1"}],"id":470,"name":"VariableDeclaration","src":"3554:21:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"bool[100] storage ref"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":69,"type":"bool[100] storage ref[128] storage ref","value":"composition"},"id":471,"name":"Identifier","src":"3578:11:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":459,"type":"uint256","value":"_pitch"},"id":472,"name":"Identifier","src":"3590:6:1"}],"id":473,"name":"IndexAccess","src":"3578:19:1"}],"id":474,"name":"VariableDeclarationStatement","src":"3554:43:1"},{"attributes":{"functionReturnParameters":465},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":470,"type":"bool[100] memory","value":"line"},"id":475,"name":"Identifier","src":"3614:4:1"}],"id":476,"name":"Return","src":"3607:11:1"}],"id":477,"name":"Block","src":"3544:81:1"}],"id":478,"name":"FunctionDefinition","src":"3476:149:1"},{"attributes":{"constant":true,"implemented":true,"isConstructor":false,"modifiers":[null],"name":"getOwnedNotes","payable":false,"scope":620,"stateMutability":"view","superFunction":null,"visibility":"external"},"children":[{"attributes":{"parameters":[null]},"children":[],"id":479,"name":"ParameterList","src":"3686:2:1"},{"children":[{"attributes":{"constant":false,"name":"_notes","scope":493,"stateVariable":false,"storageLocation":"default","type":"uint256","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":480,"name":"ElementaryTypeName","src":"3712:4:1"}],"id":481,"name":"VariableDeclaration","src":"3712:11:1"}],"id":482,"name":"ParameterList","src":"3711:13:1"},{"children":[{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"=","type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":481,"type":"uint256","value":"_notes"},"id":483,"name":"Identifier","src":"3735:6:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":95,"type":"mapping(address => uint256)","value":"noteBalances"},"id":484,"name":"Identifier","src":"3744:12:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"member_name":"sender","referencedDeclaration":null,"type":"address"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":632,"type":"msg","value":"msg"},"id":485,"name":"Identifier","src":"3757:3:1"}],"id":486,"name":"MemberAccess","src":"3757:10:1"}],"id":487,"name":"IndexAccess","src":"3744:24:1"}],"id":488,"name":"Assignment","src":"3735:33:1"}],"id":489,"name":"ExpressionStatement","src":"3735:33:1"},{"attributes":{"functionReturnParameters":482},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":481,"type":"uint256","value":"_notes"},"id":490,"name":"Identifier","src":"3785:6:1"}],"id":491,"name":"Return","src":"3778:13:1"}],"id":492,"name":"Block","src":"3725:73:1"}],"id":493,"name":"FunctionDefinition","src":"3664:134:1"},{"attributes":{"constant":true,"implemented":true,"isConstructor":false,"modifiers":[null],"name":"getNote","payable":false,"scope":620,"stateMutability":"view","superFunction":null,"visibility":"external"},"children":[{"children":[{"attributes":{"constant":false,"name":"_pitch","scope":513,"stateVariable":false,"storageLocation":"default","type":"uint256","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":494,"name":"ElementaryTypeName","src":"3886:4:1"}],"id":495,"name":"VariableDeclaration","src":"3886:11:1"},{"attributes":{"constant":false,"name":"_place","scope":513,"stateVariable":false,"storageLocation":"default","type":"uint256","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":496,"name":"ElementaryTypeName","src":"3899:4:1"}],"id":497,"name":"VariableDeclaration","src":"3899:11:1"}],"id":498,"name":"ParameterList","src":"3885:26:1"},{"children":[{"attributes":{"constant":false,"name":"","scope":513,"stateVariable":false,"storageLocation":"default","type":"bool","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"bool","type":"bool"},"id":499,"name":"ElementaryTypeName","src":"3935:4:1"}],"id":500,"name":"VariableDeclaration","src":"3935:4:1"}],"id":501,"name":"ParameterList","src":"3934:6:1"},{"children":[{"attributes":{"assignments":[503]},"children":[{"attributes":{"constant":false,"name":"_note","scope":513,"stateVariable":false,"storageLocation":"default","type":"bool","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"bool","type":"bool"},"id":502,"name":"ElementaryTypeName","src":"3951:4:1"}],"id":503,"name":"VariableDeclaration","src":"3951:10:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"bool"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"bool[100] storage ref"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":69,"type":"bool[100] storage ref[128] storage ref","value":"composition"},"id":504,"name":"Identifier","src":"3964:11:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":495,"type":"uint256","value":"_pitch"},"id":505,"name":"Identifier","src":"3976:6:1"}],"id":506,"name":"IndexAccess","src":"3964:19:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":497,"type":"uint256","value":"_place"},"id":507,"name":"Identifier","src":"3984:6:1"}],"id":508,"name":"IndexAccess","src":"3964:27:1"}],"id":509,"name":"VariableDeclarationStatement","src":"3951:40:1"},{"attributes":{"functionReturnParameters":501},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":503,"type":"bool","value":"_note"},"id":510,"name":"Identifier","src":"4008:5:1"}],"id":511,"name":"Return","src":"4001:12:1"}],"id":512,"name":"Block","src":"3941:80:1"}],"id":513,"name":"FunctionDefinition","src":"3869:152:1"},{"attributes":{"constant":true,"implemented":true,"isConstructor":false,"modifiers":[null],"name":"getPlacedNotes","payable":false,"scope":620,"stateMutability":"view","superFunction":null,"visibility":"external"},"children":[{"attributes":{"parameters":[null]},"children":[],"id":514,"name":"ParameterList","src":"4087:2:1"},{"children":[{"attributes":{"constant":false,"name":"","scope":595,"stateVariable":false,"storageLocation":"default","type":"uint256[] memory","value":null,"visibility":"internal"},"children":[{"attributes":{"length":null,"type":"uint256[] storage pointer"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":515,"name":"ElementaryTypeName","src":"4113:4:1"}],"id":516,"name":"ArrayTypeName","src":"4113:6:1"}],"id":517,"name":"VariableDeclaration","src":"4113:6:1"},{"attributes":{"constant":false,"name":"","scope":595,"stateVariable":false,"storageLocation":"default","type":"uint256[] memory","value":null,"visibility":"internal"},"children":[{"attributes":{"length":null,"type":"uint256[] storage pointer"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":518,"name":"ElementaryTypeName","src":"4121:4:1"}],"id":519,"name":"ArrayTypeName","src":"4121:6:1"}],"id":520,"name":"VariableDeclaration","src":"4121:6:1"}],"id":521,"name":"ParameterList","src":"4112:16:1"},{"children":[{"attributes":{"assignments":[523]},"children":[{"attributes":{"constant":false,"name":"length","scope":595,"stateVariable":false,"storageLocation":"default","type":"uint256","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":522,"name":"ElementaryTypeName","src":"4139:4:1"}],"id":523,"name":"VariableDeclaration","src":"4139:11:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"member_name":"length","referencedDeclaration":null,"type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"struct Opus.noteId storage ref[] storage ref"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":91,"type":"mapping(address => struct Opus.noteId storage ref[] storage ref)","value":"ownedNotes"},"id":524,"name":"Identifier","src":"4153:10:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"member_name":"sender","referencedDeclaration":null,"type":"address"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":632,"type":"msg","value":"msg"},"id":525,"name":"Identifier","src":"4164:3:1"}],"id":526,"name":"MemberAccess","src":"4164:10:1"}],"id":527,"name":"IndexAccess","src":"4153:22:1"}],"id":528,"name":"MemberAccess","src":"4153:29:1"}],"id":529,"name":"VariableDeclarationStatement","src":"4139:43:1"},{"attributes":{"assignments":[533]},"children":[{"attributes":{"constant":false,"name":"pitches","scope":595,"stateVariable":false,"storageLocation":"memory","type":"uint256[] memory","value":null,"visibility":"internal"},"children":[{"attributes":{"length":null,"type":"uint256[] storage pointer"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":531,"name":"ElementaryTypeName","src":"4193:4:1"}],"id":532,"name":"ArrayTypeName","src":"4193:6:1"}],"id":533,"name":"VariableDeclaration","src":"4193:21:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"isStructConstructorCall":false,"lValueRequested":false,"names":[null],"type":"uint256[] memory","type_conversion":false},"children":[{"attributes":{"argumentTypes":[{"typeIdentifier":"t_uint256","typeString":"uint256"}],"isConstant":false,"isLValue":false,"isPure":true,"lValueRequested":false,"type":"function (uint256) pure returns (uint256[] memory)"},"children":[{"attributes":{"length":null,"type":"uint256[] storage pointer"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":534,"name":"ElementaryTypeName","src":"4221:4:1"}],"id":535,"name":"ArrayTypeName","src":"4221:6:1"}],"id":536,"name":"NewExpression","src":"4217:10:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":523,"type":"uint256","value":"length"},"id":537,"name":"Identifier","src":"4228:6:1"}],"id":538,"name":"FunctionCall","src":"4217:18:1"}],"id":539,"name":"VariableDeclarationStatement","src":"4193:42:1"},{"attributes":{"assignments":[543]},"children":[{"attributes":{"constant":false,"name":"places","scope":595,"stateVariable":false,"storageLocation":"memory","type":"uint256[] memory","value":null,"visibility":"internal"},"children":[{"attributes":{"length":null,"type":"uint256[] storage pointer"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":541,"name":"ElementaryTypeName","src":"4245:4:1"}],"id":542,"name":"ArrayTypeName","src":"4245:6:1"}],"id":543,"name":"VariableDeclaration","src":"4245:20:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"isStructConstructorCall":false,"lValueRequested":false,"names":[null],"type":"uint256[] memory","type_conversion":false},"children":[{"attributes":{"argumentTypes":[{"typeIdentifier":"t_uint256","typeString":"uint256"}],"isConstant":false,"isLValue":false,"isPure":true,"lValueRequested":false,"type":"function (uint256) pure returns (uint256[] memory)"},"children":[{"attributes":{"length":null,"type":"uint256[] storage pointer"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":544,"name":"ElementaryTypeName","src":"4272:4:1"}],"id":545,"name":"ArrayTypeName","src":"4272:6:1"}],"id":546,"name":"NewExpression","src":"4268:10:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":523,"type":"uint256","value":"length"},"id":547,"name":"Identifier","src":"4279:6:1"}],"id":548,"name":"FunctionCall","src":"4268:18:1"}],"id":549,"name":"VariableDeclarationStatement","src":"4245:41:1"},{"children":[{"attributes":{"assignments":[551]},"children":[{"attributes":{"constant":false,"name":"i","scope":595,"stateVariable":false,"storageLocation":"default","type":"uint256","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":550,"name":"ElementaryTypeName","src":"4310:4:1"}],"id":551,"name":"VariableDeclaration","src":"4310:6:1"},{"attributes":{"argumentTypes":null,"hexvalue":"30","isConstant":false,"isLValue":false,"isPure":true,"lValueRequested":false,"subdenomination":null,"token":"number","type":"int_const 0","value":"0"},"id":552,"name":"Literal","src":"4319:1:1"}],"id":553,"name":"VariableDeclarationStatement","src":"4310:10:1"},{"attributes":{"argumentTypes":null,"commonType":{"typeIdentifier":"t_uint256","typeString":"uint256"},"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"<","type":"bool"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":551,"type":"uint256","value":"i"},"id":554,"name":"Identifier","src":"4322:1:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"member_name":"length","referencedDeclaration":null,"type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"struct Opus.noteId storage ref[] storage ref"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":91,"type":"mapping(address => struct Opus.noteId storage ref[] storage ref)","value":"ownedNotes"},"id":555,"name":"Identifier","src":"4326:10:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"member_name":"sender","referencedDeclaration":null,"type":"address"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":632,"type":"msg","value":"msg"},"id":556,"name":"Identifier","src":"4337:3:1"}],"id":557,"name":"MemberAccess","src":"4337:10:1"}],"id":558,"name":"IndexAccess","src":"4326:22:1"}],"id":559,"name":"MemberAccess","src":"4326:29:1"}],"id":560,"name":"BinaryOperation","src":"4322:33:1"},{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"++","prefix":false,"type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":551,"type":"uint256","value":"i"},"id":561,"name":"Identifier","src":"4357:1:1"}],"id":562,"name":"UnaryOperation","src":"4357:3:1"}],"id":563,"name":"ExpressionStatement","src":"4357:3:1"},{"children":[{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"=","type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":true,"type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":533,"type":"uint256[] memory","value":"pitches"},"id":564,"name":"Identifier","src":"4376:7:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":551,"type":"uint256","value":"i"},"id":565,"name":"Identifier","src":"4384:1:1"}],"id":566,"name":"IndexAccess","src":"4376:10:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"member_name":"pitch","referencedDeclaration":60,"type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"struct Opus.noteId storage ref"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"struct Opus.noteId storage ref[] storage ref"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":91,"type":"mapping(address => struct Opus.noteId storage ref[] storage ref)","value":"ownedNotes"},"id":567,"name":"Identifier","src":"4389:10:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"member_name":"sender","referencedDeclaration":null,"type":"address"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":632,"type":"msg","value":"msg"},"id":568,"name":"Identifier","src":"4400:3:1"}],"id":569,"name":"MemberAccess","src":"4400:10:1"}],"id":570,"name":"IndexAccess","src":"4389:22:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":551,"type":"uint256","value":"i"},"id":571,"name":"Identifier","src":"4412:1:1"}],"id":572,"name":"IndexAccess","src":"4389:25:1"}],"id":573,"name":"MemberAccess","src":"4389:31:1"}],"id":574,"name":"Assignment","src":"4376:44:1"}],"id":575,"name":"ExpressionStatement","src":"4376:44:1"},{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"=","type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":true,"type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":543,"type":"uint256[] memory","value":"places"},"id":576,"name":"Identifier","src":"4434:6:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":551,"type":"uint256","value":"i"},"id":577,"name":"Identifier","src":"4441:1:1"}],"id":578,"name":"IndexAccess","src":"4434:9:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"member_name":"place","referencedDeclaration":62,"type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"struct Opus.noteId storage ref"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":true,"isPure":false,"lValueRequested":false,"type":"struct Opus.noteId storage ref[] storage ref"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":91,"type":"mapping(address => struct Opus.noteId storage ref[] storage ref)","value":"ownedNotes"},"id":579,"name":"Identifier","src":"4446:10:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"member_name":"sender","referencedDeclaration":null,"type":"address"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":632,"type":"msg","value":"msg"},"id":580,"name":"Identifier","src":"4457:3:1"}],"id":581,"name":"MemberAccess","src":"4457:10:1"}],"id":582,"name":"IndexAccess","src":"4446:22:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":551,"type":"uint256","value":"i"},"id":583,"name":"Identifier","src":"4469:1:1"}],"id":584,"name":"IndexAccess","src":"4446:25:1"}],"id":585,"name":"MemberAccess","src":"4446:31:1"}],"id":586,"name":"Assignment","src":"4434:43:1"}],"id":587,"name":"ExpressionStatement","src":"4434:43:1"}],"id":588,"name":"Block","src":"4362:126:1"}],"id":589,"name":"ForStatement","src":"4305:183:1"},{"attributes":{"functionReturnParameters":521},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isInlineArray":false,"isLValue":false,"isPure":false,"lValueRequested":false,"type":"tuple(uint256[] memory,uint256[] memory)"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":533,"type":"uint256[] memory","value":"pitches"},"id":590,"name":"Identifier","src":"4506:7:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":543,"type":"uint256[] memory","value":"places"},"id":591,"name":"Identifier","src":"4514:6:1"}],"id":592,"name":"TupleExpression","src":"4505:16:1"}],"id":593,"name":"Return","src":"4498:23:1"}],"id":594,"name":"Block","src":"4129:399:1"}],"id":595,"name":"FunctionDefinition","src":"4064:464:1"},{"attributes":{"constant":false,"implemented":true,"isConstructor":false,"name":"withdraw","payable":false,"scope":620,"stateMutability":"nonpayable","superFunction":null,"visibility":"external"},"children":[{"attributes":{"parameters":[null]},"children":[],"id":596,"name":"ParameterList","src":"4598:2:1"},{"attributes":{"parameters":[null]},"children":[],"id":599,"name":"ParameterList","src":"4625:0:1"},{"attributes":{"arguments":[null]},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":115,"type":"modifier ()","value":"afterEndTime"},"id":597,"name":"Identifier","src":"4601:12:1"}],"id":598,"name":"ModifierInvocation","src":"4601:14:1"},{"children":[{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"isStructConstructorCall":false,"lValueRequested":false,"names":[null],"type":"tuple()","type_conversion":false},"children":[{"attributes":{"argumentTypes":[{"typeIdentifier":"t_bool","typeString":"bool"}],"overloadedDeclarations":[null],"referencedDeclaration":635,"type":"function (bool) pure","value":"require"},"id":600,"name":"Identifier","src":"4635:7:1"},{"attributes":{"argumentTypes":null,"commonType":{"typeIdentifier":"t_address","typeString":"address"},"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"operator":"==","type":"bool"},"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"member_name":"sender","referencedDeclaration":null,"type":"address"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":632,"type":"msg","value":"msg"},"id":601,"name":"Identifier","src":"4643:3:1"}],"id":602,"name":"MemberAccess","src":"4643:10:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":84,"type":"address","value":"owner"},"id":603,"name":"Identifier","src":"4657:5:1"}],"id":604,"name":"BinaryOperation","src":"4643:19:1"}],"id":605,"name":"FunctionCall","src":"4635:28:1"}],"id":606,"name":"ExpressionStatement","src":"4635:28:1"},{"attributes":{"assignments":[608]},"children":[{"attributes":{"constant":false,"name":"amount","scope":619,"stateVariable":false,"storageLocation":"default","type":"uint256","value":null,"visibility":"internal"},"children":[{"attributes":{"name":"uint","type":"uint256"},"id":607,"name":"ElementaryTypeName","src":"4674:4:1"}],"id":608,"name":"VariableDeclaration","src":"4674:11:1"},{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"member_name":"balance","referencedDeclaration":null,"type":"uint256"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":645,"type":"contract Opus","value":"this"},"id":609,"name":"Identifier","src":"4688:4:1"}],"id":610,"name":"MemberAccess","src":"4688:12:1"}],"id":611,"name":"VariableDeclarationStatement","src":"4674:26:1"},{"children":[{"attributes":{"argumentTypes":null,"isConstant":false,"isLValue":false,"isPure":false,"isStructConstructorCall":false,"lValueRequested":false,"names":[null],"type":"tuple()","type_conversion":false},"children":[{"attributes":{"argumentTypes":[{"typeIdentifier":"t_uint256","typeString":"uint256"}],"isConstant":false,"isLValue":false,"isPure":false,"lValueRequested":false,"member_name":"transfer","referencedDeclaration":null,"type":"function (uint256)"},"children":[{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":84,"type":"address","value":"owner"},"id":612,"name":"Identifier","src":"4711:5:1"}],"id":614,"name":"MemberAccess","src":"4711:14:1"},{"attributes":{"argumentTypes":null,"overloadedDeclarations":[null],"referencedDeclaration":608,"type":"uint256","value":"amount"},"id":615,"name":"Identifier","src":"4726:6:1"}],"id":616,"name":"FunctionCall","src":"4711:22:1"}],"id":617,"name":"ExpressionStatement","src":"4711:22:1"}],"id":618,"name":"Block","src":"4625:115:1"}],"id":619,"name":"FunctionDefinition","src":"4581:159:1"}],"id":620,"name":"ContractDefinition","src":"26:4716:1"}],"id":621,"name":"SourceUnit","src":"0:4742:1"},"compiler":{"name":"solc","version":"0.4.18+commit.9cf6e910.Emscripten.clang"},"networks":{"4":{"events":{},"links":{},"address":"0xadf7305bf5791e651fe534c4d8e43847e91ba667"}},"schemaVersion":"1.0.1","updatedAt":"2017-12-12T22:08:17.250Z"}
 
 /***/ }),
-/* 71 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(98);
+var content = __webpack_require__(99);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // add the styles to the DOM
-var update = __webpack_require__(109)(content, {});
+var update = __webpack_require__(110)(content, {});
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
@@ -27966,11 +28502,11 @@ if(false) {
 }
 
 /***/ }),
-/* 72 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Schema = __webpack_require__(145);
-var Contract = __webpack_require__(149);
+var Schema = __webpack_require__(146);
+var Contract = __webpack_require__(150);
 
 var contract = function(options) {
   options = Schema.normalizeOptions(options);
@@ -28036,10 +28572,10 @@ if (typeof window !== "undefined") {
 
 
 /***/ }),
-/* 73 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Web3 = __webpack_require__(197);
+var Web3 = __webpack_require__(198);
 
 // dont override global variable
 if (typeof window !== 'undefined' && typeof window.Web3 === 'undefined') {
@@ -28050,19 +28586,20 @@ module.exports = Web3;
 
 
 /***/ }),
-/* 74 */
+/* 75 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stylesheets_app_css__ = __webpack_require__(71);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stylesheets_app_css__ = __webpack_require__(72);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stylesheets_app_css___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__stylesheets_app_css__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_web3__ = __webpack_require__(73);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_web3__ = __webpack_require__(74);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_web3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_web3__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_truffle_contract__ = __webpack_require__(72);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_truffle_contract__ = __webpack_require__(73);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_truffle_contract___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_truffle_contract__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__build_contracts_Opus_json__ = __webpack_require__(70);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__build_contracts_Opus_json__ = __webpack_require__(71);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__build_contracts_Opus_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__build_contracts_Opus_json__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__notes_js__ = __webpack_require__(70);
 // Import the page's CSS. Webpack will know what to do with it.
 
 
@@ -28070,19 +28607,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
-var BigNumber = __webpack_require__(16);
-
 // Import our contract artifacts and turn them into usable abstractions.
 
 
 // MetaCoin is our usable abstraction, which we'll use through the code below.
 var Opus = __WEBPACK_IMPORTED_MODULE_2_truffle_contract___default()(__WEBPACK_IMPORTED_MODULE_3__build_contracts_Opus_json___default.a);
 
-// The following code is simple to show off interacting with your contracts.
-// As your needs grow you will likely need to change its form and structure.
-// For application bootstrapping, check out window.addEventListener below.
-var accounts;
-var account;
+
 
 window.App = {
   start: function() {
@@ -28115,7 +28646,16 @@ window.App = {
     let line = "";
     
     for(let i = 0; i < 128; i++) {
-      line = line + "<tr><td>" + (127- i) + "</td>";
+      let name = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__notes_js__["a" /* getNoteName */])(i);
+      let color;
+      if(name.color) {
+        color = "white";
+      }
+      else {
+        color = "grey";
+      }
+
+      line = line + "<tr><td style='background-color: " + color + "'>" + name.name + "</td>";
       for(let x = 0; x < 100; x++) {
        line = line + "<td id='" + i.toString() + "note" + x.toString() + "'onclick='toggleNote(this)'>   </td>";
       }
@@ -28235,8 +28775,9 @@ window.addEventListener('load', function() {
   App.start();
 });
 
+
 /***/ }),
-/* 75 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28357,13 +28898,13 @@ function fromByteArray (uint8) {
 
 
 /***/ }),
-/* 76 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory, undef) {
 	if (true) {
 		// CommonJS
-		module.exports = exports = factory(__webpack_require__(0), __webpack_require__(17), __webpack_require__(19), __webpack_require__(18), __webpack_require__(1));
+		module.exports = exports = factory(__webpack_require__(0), __webpack_require__(16), __webpack_require__(18), __webpack_require__(17), __webpack_require__(1));
 	}
 	else if (typeof define === "function" && define.amd) {
 		// AMD
@@ -28594,7 +29135,7 @@ function fromByteArray (uint8) {
 }));
 
 /***/ }),
-/* 77 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory) {
@@ -28748,7 +29289,7 @@ function fromByteArray (uint8) {
 }));
 
 /***/ }),
-/* 78 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory, undef) {
@@ -28819,7 +29360,7 @@ function fromByteArray (uint8) {
 }));
 
 /***/ }),
-/* 79 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory) {
@@ -28900,7 +29441,7 @@ function fromByteArray (uint8) {
 }));
 
 /***/ }),
-/* 80 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory, undef) {
@@ -28983,7 +29524,7 @@ function fromByteArray (uint8) {
 }));
 
 /***/ }),
-/* 81 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory, undef) {
@@ -29104,7 +29645,7 @@ function fromByteArray (uint8) {
 }));
 
 /***/ }),
-/* 82 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory, undef) {
@@ -29167,7 +29708,7 @@ function fromByteArray (uint8) {
 }));
 
 /***/ }),
-/* 83 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory, undef) {
@@ -29212,7 +29753,7 @@ function fromByteArray (uint8) {
 }));
 
 /***/ }),
-/* 84 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory, undef) {
@@ -29271,7 +29812,7 @@ function fromByteArray (uint8) {
 }));
 
 /***/ }),
-/* 85 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory, undef) {
@@ -29325,7 +29866,7 @@ function fromByteArray (uint8) {
 }));
 
 /***/ }),
-/* 86 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory, undef) {
@@ -29374,7 +29915,7 @@ function fromByteArray (uint8) {
 }));
 
 /***/ }),
-/* 87 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory, undef) {
@@ -29419,7 +29960,7 @@ function fromByteArray (uint8) {
 }));
 
 /***/ }),
-/* 88 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory, undef) {
@@ -29454,7 +29995,7 @@ function fromByteArray (uint8) {
 }));
 
 /***/ }),
-/* 89 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory, undef) {
@@ -29504,7 +30045,7 @@ function fromByteArray (uint8) {
 }));
 
 /***/ }),
-/* 90 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory, undef) {
@@ -29654,13 +30195,13 @@ function fromByteArray (uint8) {
 }));
 
 /***/ }),
-/* 91 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory, undef) {
 	if (true) {
 		// CommonJS
-		module.exports = exports = factory(__webpack_require__(0), __webpack_require__(17), __webpack_require__(19), __webpack_require__(18), __webpack_require__(1));
+		module.exports = exports = factory(__webpack_require__(0), __webpack_require__(16), __webpack_require__(18), __webpack_require__(17), __webpack_require__(1));
 	}
 	else if (typeof define === "function" && define.amd) {
 		// AMD
@@ -29849,13 +30390,13 @@ function fromByteArray (uint8) {
 }));
 
 /***/ }),
-/* 92 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory, undef) {
 	if (true) {
 		// CommonJS
-		module.exports = exports = factory(__webpack_require__(0), __webpack_require__(17), __webpack_require__(19), __webpack_require__(18), __webpack_require__(1));
+		module.exports = exports = factory(__webpack_require__(0), __webpack_require__(16), __webpack_require__(18), __webpack_require__(17), __webpack_require__(1));
 	}
 	else if (typeof define === "function" && define.amd) {
 		// AMD
@@ -30046,13 +30587,13 @@ function fromByteArray (uint8) {
 }));
 
 /***/ }),
-/* 93 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory, undef) {
 	if (true) {
 		// CommonJS
-		module.exports = exports = factory(__webpack_require__(0), __webpack_require__(17), __webpack_require__(19), __webpack_require__(18), __webpack_require__(1));
+		module.exports = exports = factory(__webpack_require__(0), __webpack_require__(16), __webpack_require__(18), __webpack_require__(17), __webpack_require__(1));
 	}
 	else if (typeof define === "function" && define.amd) {
 		// AMD
@@ -30190,7 +30731,7 @@ function fromByteArray (uint8) {
 }));
 
 /***/ }),
-/* 94 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory) {
@@ -30462,7 +31003,7 @@ function fromByteArray (uint8) {
 }));
 
 /***/ }),
-/* 95 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory, undef) {
@@ -30547,7 +31088,7 @@ function fromByteArray (uint8) {
 }));
 
 /***/ }),
-/* 96 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory, undef) {
@@ -30635,13 +31176,13 @@ function fromByteArray (uint8) {
 }));
 
 /***/ }),
-/* 97 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory, undef) {
 	if (true) {
 		// CommonJS
-		module.exports = exports = factory(__webpack_require__(0), __webpack_require__(17), __webpack_require__(19), __webpack_require__(18), __webpack_require__(1));
+		module.exports = exports = factory(__webpack_require__(0), __webpack_require__(16), __webpack_require__(18), __webpack_require__(17), __webpack_require__(1));
 	}
 	else if (typeof define === "function" && define.amd) {
 		// AMD
@@ -31410,10 +31951,10 @@ function fromByteArray (uint8) {
 }));
 
 /***/ }),
-/* 98 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(99)();
+exports = module.exports = __webpack_require__(100)();
 // imports
 
 
@@ -31424,7 +31965,7 @@ exports.push([module.i, "body {\n  font-family: \"Open Sans\", sans-serif;\n}\n\
 
 
 /***/ }),
-/* 99 */
+/* 100 */
 /***/ (function(module, exports) {
 
 /*
@@ -31480,7 +32021,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 100 */
+/* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -31488,7 +32029,7 @@ module.exports = function() {
 
 /* eslint-disable */
 
-var utils = __webpack_require__(101);
+var utils = __webpack_require__(102);
 var uint256Coder = utils.uint256Coder;
 var coderBoolean = utils.coderBoolean;
 var coderFixedBytes = utils.coderFixedBytes;
@@ -31620,15 +32161,15 @@ module.exports = {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(31).Buffer))
 
 /***/ }),
-/* 101 */
+/* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(Buffer) {
 
 var BN = __webpack_require__(56);
-var numberToBN = __webpack_require__(106);
-var keccak256 = __webpack_require__(105).keccak_256;
+var numberToBN = __webpack_require__(107);
+var keccak256 = __webpack_require__(106).keccak_256;
 
 // from ethereumjs-util
 function stripZeros(aInput) {
@@ -32044,7 +32585,7 @@ module.exports = {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(31).Buffer))
 
 /***/ }),
-/* 102 */
+/* 103 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -32134,7 +32675,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 103 */
+/* 104 */
 /***/ (function(module, exports) {
 
 /**
@@ -32153,7 +32694,7 @@ module.exports = function isHexPrefixed(str) {
 
 
 /***/ }),
-/* 104 */
+/* 105 */
 /***/ (function(module, exports) {
 
 var toString = {}.toString;
@@ -32164,7 +32705,7 @@ module.exports = Array.isArray || function (arr) {
 
 
 /***/ }),
-/* 105 */
+/* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process, global) {/**
@@ -32639,14 +33180,14 @@ module.exports = Array.isArray || function (arr) {
   }
 }(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(107), __webpack_require__(47)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(108), __webpack_require__(47)))
 
 /***/ }),
-/* 106 */
+/* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var BN = __webpack_require__(56);
-var stripHexPrefix = __webpack_require__(108);
+var stripHexPrefix = __webpack_require__(109);
 
 /**
  * Returns a BN object, converts a number value to a BN
@@ -32686,7 +33227,7 @@ module.exports = function numberToBN(arg) {
 
 
 /***/ }),
-/* 107 */
+/* 108 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -32876,10 +33417,10 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 108 */
+/* 109 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isHexPrefixed = __webpack_require__(103);
+var isHexPrefixed = __webpack_require__(104);
 
 /**
  * Removes '0x' from a given `String` is present
@@ -32896,7 +33437,7 @@ module.exports = function stripHexPrefix(str) {
 
 
 /***/ }),
-/* 109 */
+/* 110 */
 /***/ (function(module, exports) {
 
 /*
@@ -33148,12 +33689,12 @@ function updateLink(linkElement, obj) {
 
 
 /***/ }),
-/* 110 */
+/* 111 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // TODO: remove web3 requirement
 // Call functions directly on the provider.
-var Web3 = __webpack_require__(111);
+var Web3 = __webpack_require__(112);
 
 var Blockchain = {
   parse: function(uri) {
@@ -33215,10 +33756,10 @@ module.exports = Blockchain;
 
 
 /***/ }),
-/* 111 */
+/* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Web3 = __webpack_require__(126);
+var Web3 = __webpack_require__(127);
 
 // dont override global variable
 if (typeof window !== 'undefined' && typeof window.Web3 === 'undefined') {
@@ -33229,25 +33770,25 @@ module.exports = Web3;
 
 
 /***/ }),
-/* 112 */
+/* 113 */
 /***/ (function(module, exports) {
 
 module.exports = [{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"name","outputs":[{"name":"o_name","type":"bytes32"}],"type":"function"},{"constant":true,"inputs":[{"name":"_name","type":"bytes32"}],"name":"owner","outputs":[{"name":"","type":"address"}],"type":"function"},{"constant":true,"inputs":[{"name":"_name","type":"bytes32"}],"name":"content","outputs":[{"name":"","type":"bytes32"}],"type":"function"},{"constant":true,"inputs":[{"name":"_name","type":"bytes32"}],"name":"addr","outputs":[{"name":"","type":"address"}],"type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"bytes32"}],"name":"reserve","outputs":[],"type":"function"},{"constant":true,"inputs":[{"name":"_name","type":"bytes32"}],"name":"subRegistrar","outputs":[{"name":"","type":"address"}],"type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"bytes32"},{"name":"_newOwner","type":"address"}],"name":"transfer","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"bytes32"},{"name":"_registrar","type":"address"}],"name":"setSubRegistrar","outputs":[],"type":"function"},{"constant":false,"inputs":[],"name":"Registrar","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"bytes32"},{"name":"_a","type":"address"},{"name":"_primary","type":"bool"}],"name":"setAddress","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"bytes32"},{"name":"_content","type":"bytes32"}],"name":"setContent","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"bytes32"}],"name":"disown","outputs":[],"type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_name","type":"bytes32"},{"indexed":false,"name":"_winner","type":"address"}],"name":"AuctionEnded","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_name","type":"bytes32"},{"indexed":false,"name":"_bidder","type":"address"},{"indexed":false,"name":"_value","type":"uint256"}],"name":"NewBid","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"name","type":"bytes32"}],"name":"Changed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"name","type":"bytes32"},{"indexed":true,"name":"addr","type":"address"}],"name":"PrimaryChanged","type":"event"}]
 
 /***/ }),
-/* 113 */
+/* 114 */
 /***/ (function(module, exports) {
 
 module.exports = [{"constant":true,"inputs":[{"name":"_name","type":"bytes32"}],"name":"owner","outputs":[{"name":"","type":"address"}],"type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"bytes32"},{"name":"_refund","type":"address"}],"name":"disown","outputs":[],"type":"function"},{"constant":true,"inputs":[{"name":"_name","type":"bytes32"}],"name":"addr","outputs":[{"name":"","type":"address"}],"type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"bytes32"}],"name":"reserve","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"bytes32"},{"name":"_newOwner","type":"address"}],"name":"transfer","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"bytes32"},{"name":"_a","type":"address"}],"name":"setAddr","outputs":[],"type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"name":"name","type":"bytes32"}],"name":"Changed","type":"event"}]
 
 /***/ }),
-/* 114 */
+/* 115 */
 /***/ (function(module, exports) {
 
 module.exports = [{"constant":false,"inputs":[{"name":"from","type":"bytes32"},{"name":"to","type":"address"},{"name":"value","type":"uint256"}],"name":"transfer","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"from","type":"bytes32"},{"name":"to","type":"address"},{"name":"indirectId","type":"bytes32"},{"name":"value","type":"uint256"}],"name":"icapTransfer","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"to","type":"bytes32"}],"name":"deposit","outputs":[],"payable":true,"type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"AnonymousDeposit","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":true,"name":"to","type":"bytes32"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Deposit","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"bytes32"},{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"bytes32"},{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"indirectId","type":"bytes32"},{"indexed":false,"name":"value","type":"uint256"}],"name":"IcapTransfer","type":"event"}]
 
 /***/ }),
-/* 115 */
+/* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var f = __webpack_require__(5);
@@ -33279,7 +33820,7 @@ module.exports = SolidityTypeAddress;
 
 
 /***/ }),
-/* 116 */
+/* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var f = __webpack_require__(5);
@@ -33311,7 +33852,7 @@ module.exports = SolidityTypeBool;
 
 
 /***/ }),
-/* 117 */
+/* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var f = __webpack_require__(5);
@@ -33346,7 +33887,7 @@ module.exports = SolidityTypeBytes;
 
 
 /***/ }),
-/* 118 */
+/* 119 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var f = __webpack_require__(5);
@@ -33372,7 +33913,7 @@ module.exports = SolidityTypeDynamicBytes;
 
 
 /***/ }),
-/* 119 */
+/* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var f = __webpack_require__(5);
@@ -33410,7 +33951,7 @@ module.exports = SolidityTypeInt;
 
 
 /***/ }),
-/* 120 */
+/* 121 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var f = __webpack_require__(5);
@@ -33448,7 +33989,7 @@ module.exports = SolidityTypeReal;
 
 
 /***/ }),
-/* 121 */
+/* 122 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var f = __webpack_require__(5);
@@ -33474,7 +34015,7 @@ module.exports = SolidityTypeString;
 
 
 /***/ }),
-/* 122 */
+/* 123 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var f = __webpack_require__(5);
@@ -33512,7 +34053,7 @@ module.exports = SolidityTypeUInt;
 
 
 /***/ }),
-/* 123 */
+/* 124 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var f = __webpack_require__(5);
@@ -33550,7 +34091,7 @@ module.exports = SolidityTypeUReal;
 
 
 /***/ }),
-/* 124 */
+/* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33566,13 +34107,13 @@ if (typeof XMLHttpRequest === 'undefined') {
 
 
 /***/ }),
-/* 125 */
+/* 126 */
 /***/ (function(module, exports) {
 
 module.exports = {"version":"0.18.4"}
 
 /***/ }),
-/* 126 */
+/* 127 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -33602,24 +34143,24 @@ module.exports = {"version":"0.18.4"}
  * @date 2014
  */
 
-var RequestManager = __webpack_require__(141);
+var RequestManager = __webpack_require__(142);
 var Iban = __webpack_require__(36);
-var Eth = __webpack_require__(135);
-var DB = __webpack_require__(134);
-var Shh = __webpack_require__(138);
-var Net = __webpack_require__(136);
-var Personal = __webpack_require__(137);
-var Swarm = __webpack_require__(139);
-var Settings = __webpack_require__(142);
-var version = __webpack_require__(125);
+var Eth = __webpack_require__(136);
+var DB = __webpack_require__(135);
+var Shh = __webpack_require__(139);
+var Net = __webpack_require__(137);
+var Personal = __webpack_require__(138);
+var Swarm = __webpack_require__(140);
+var Settings = __webpack_require__(143);
+var version = __webpack_require__(126);
 var utils = __webpack_require__(2);
 var sha3 = __webpack_require__(24);
-var extend = __webpack_require__(130);
-var Batch = __webpack_require__(128);
-var Property = __webpack_require__(20);
-var HttpProvider = __webpack_require__(132);
-var IpcProvider = __webpack_require__(133);
-var BigNumber = __webpack_require__(16);
+var extend = __webpack_require__(131);
+var Batch = __webpack_require__(129);
+var Property = __webpack_require__(19);
+var HttpProvider = __webpack_require__(133);
+var IpcProvider = __webpack_require__(134);
+var BigNumber = __webpack_require__(23);
 
 
 
@@ -33728,7 +34269,7 @@ module.exports = Web3;
 
 
 /***/ }),
-/* 127 */
+/* 128 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -33822,7 +34363,7 @@ module.exports = AllSolidityEvents;
 
 
 /***/ }),
-/* 128 */
+/* 129 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -33894,7 +34435,7 @@ module.exports = Batch;
 
 
 /***/ }),
-/* 129 */
+/* 130 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -33922,8 +34463,8 @@ module.exports = Batch;
 var utils = __webpack_require__(2);
 var coder = __webpack_require__(51);
 var SolidityEvent = __webpack_require__(60);
-var SolidityFunction = __webpack_require__(131);
-var AllEvents = __webpack_require__(127);
+var SolidityFunction = __webpack_require__(132);
+var AllEvents = __webpack_require__(128);
 
 /**
  * Should be called to encode constructor params
@@ -34210,13 +34751,13 @@ module.exports = ContractFactory;
 
 
 /***/ }),
-/* 130 */
+/* 131 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var formatters = __webpack_require__(9);
 var utils = __webpack_require__(2);
 var Method = __webpack_require__(14);
-var Property = __webpack_require__(20);
+var Property = __webpack_require__(19);
 
 // TODO: refactor, so the input params are not altered.
 // it's necessary to make same 'extension' work with multiple providers
@@ -34264,7 +34805,7 @@ module.exports = extend;
 
 
 /***/ }),
-/* 131 */
+/* 132 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -34532,7 +35073,7 @@ module.exports = SolidityFunction;
 
 
 /***/ }),
-/* 132 */
+/* 133 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -34569,7 +35110,7 @@ if (typeof window !== 'undefined' && window.XMLHttpRequest) {
     XMLHttpRequest = window.XMLHttpRequest; // jshint ignore: line
 // node
 } else {
-    XMLHttpRequest = __webpack_require__(124).XMLHttpRequest; // jshint ignore: line
+    XMLHttpRequest = __webpack_require__(125).XMLHttpRequest; // jshint ignore: line
 }
 
 var XHR2 = __webpack_require__(69); // jshint ignore: line
@@ -34691,7 +35232,7 @@ module.exports = HttpProvider;
 
 
 /***/ }),
-/* 133 */
+/* 134 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34905,7 +35446,7 @@ module.exports = IpcProvider;
 
 
 /***/ }),
-/* 134 */
+/* 135 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -34977,7 +35518,7 @@ module.exports = DB;
 
 
 /***/ }),
-/* 135 */
+/* 136 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -35009,15 +35550,15 @@ module.exports = DB;
 var formatters = __webpack_require__(9);
 var utils = __webpack_require__(2);
 var Method = __webpack_require__(14);
-var Property = __webpack_require__(20);
+var Property = __webpack_require__(19);
 var c = __webpack_require__(34);
-var Contract = __webpack_require__(129);
+var Contract = __webpack_require__(130);
 var watches = __webpack_require__(37);
 var Filter = __webpack_require__(35);
-var IsSyncing = __webpack_require__(143);
-var namereg = __webpack_require__(140);
+var IsSyncing = __webpack_require__(144);
+var namereg = __webpack_require__(141);
 var Iban = __webpack_require__(36);
-var transfer = __webpack_require__(144);
+var transfer = __webpack_require__(145);
 
 var blockCall = function (args) {
     return (utils.isString(args[0]) && args[0].indexOf('0x') === 0) ? "eth_getBlockByHash" : "eth_getBlockByNumber";
@@ -35338,7 +35879,7 @@ module.exports = Eth;
 
 
 /***/ }),
-/* 136 */
+/* 137 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -35364,7 +35905,7 @@ module.exports = Eth;
  */
 
 var utils = __webpack_require__(2);
-var Property = __webpack_require__(20);
+var Property = __webpack_require__(19);
 
 var Net = function (web3) {
     this._requestManager = web3._requestManager;
@@ -35396,7 +35937,7 @@ module.exports = Net;
 
 
 /***/ }),
-/* 137 */
+/* 138 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -35426,7 +35967,7 @@ module.exports = Net;
 
 
 var Method = __webpack_require__(14);
-var Property = __webpack_require__(20);
+var Property = __webpack_require__(19);
 var formatters = __webpack_require__(9);
 
 function Personal(web3) {
@@ -35496,7 +36037,7 @@ module.exports = Personal;
 
 
 /***/ }),
-/* 138 */
+/* 139 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -35588,7 +36129,7 @@ module.exports = Shh;
 
 
 /***/ }),
-/* 139 */
+/* 140 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -35619,7 +36160,7 @@ module.exports = Shh;
 
 
 var Method = __webpack_require__(14);
-var Property = __webpack_require__(20);
+var Property = __webpack_require__(19);
 
 function Swarm(web3) {
     this._requestManager = web3._requestManager;
@@ -35740,7 +36281,7 @@ module.exports = Swarm;
 
 
 /***/ }),
-/* 140 */
+/* 141 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -35765,8 +36306,8 @@ module.exports = Swarm;
  * @date 2015
  */
 
-var globalRegistrarAbi = __webpack_require__(112);
-var icapRegistrarAbi= __webpack_require__(113);
+var globalRegistrarAbi = __webpack_require__(113);
+var icapRegistrarAbi= __webpack_require__(114);
 
 var globalNameregAddress = '0xc6d9d2cd449a754c494264e1809c50e34d64562b';
 var icapNameregAddress = '0xa1a111bc074c9cfa781f0c38e63bd51c91b8af00';
@@ -35785,7 +36326,7 @@ module.exports = {
 
 
 /***/ }),
-/* 141 */
+/* 142 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -36056,7 +36597,7 @@ module.exports = RequestManager;
 
 
 /***/ }),
-/* 142 */
+/* 143 */
 /***/ (function(module, exports) {
 
 
@@ -36071,7 +36612,7 @@ module.exports = Settings;
 
 
 /***/ }),
-/* 143 */
+/* 144 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -36170,7 +36711,7 @@ module.exports = IsSyncing;
 
 
 /***/ }),
-/* 144 */
+/* 145 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -36196,7 +36737,7 @@ module.exports = IsSyncing;
  */
 
 var Iban = __webpack_require__(36);
-var exchangeAbi = __webpack_require__(114);
+var exchangeAbi = __webpack_require__(115);
 
 /**
  * Should be used to make Iban transfer
@@ -36268,11 +36809,11 @@ module.exports = transfer;
 
 
 /***/ }),
-/* 145 */
+/* 146 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var sha3 = __webpack_require__(146);
-var schema_version = __webpack_require__(148).version;
+var sha3 = __webpack_require__(147);
+var schema_version = __webpack_require__(149).version;
 
 var TruffleSchema = {
   // Normalize options passed in to be the exact options required
@@ -36455,13 +36996,13 @@ module.exports = TruffleSchema;
 
 
 /***/ }),
-/* 146 */
+/* 147 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory, undef) {
 	if (true) {
 		// CommonJS
-		module.exports = exports = factory(__webpack_require__(62), __webpack_require__(147));
+		module.exports = exports = factory(__webpack_require__(62), __webpack_require__(148));
 	}
 	else if (typeof define === "function" && define.amd) {
 		// AMD
@@ -36783,7 +37324,7 @@ module.exports = TruffleSchema;
 }));
 
 /***/ }),
-/* 147 */
+/* 148 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory) {
@@ -37092,18 +37633,18 @@ module.exports = TruffleSchema;
 }));
 
 /***/ }),
-/* 148 */
+/* 149 */
 /***/ (function(module, exports) {
 
 module.exports = {"_args":[[{"raw":"truffle-contract-schema@0.0.5","scope":null,"escapedName":"truffle-contract-schema","name":"truffle-contract-schema","rawSpec":"0.0.5","spec":"0.0.5","type":"version"},"/Users/nathanieloden/Documents/ethereum/comptest2/node_modules/truffle-contract"]],"_from":"truffle-contract-schema@0.0.5","_id":"truffle-contract-schema@0.0.5","_inCache":true,"_location":"/truffle-contract-schema","_nodeVersion":"6.9.1","_npmOperationalInternal":{"host":"packages-12-west.internal.npmjs.com","tmp":"tmp/truffle-contract-schema-0.0.5.tgz_1485557985137_0.46875762194395065"},"_npmUser":{"name":"tcoulter","email":"tim@timothyjcoulter.com"},"_npmVersion":"3.10.8","_phantomChildren":{},"_requested":{"raw":"truffle-contract-schema@0.0.5","scope":null,"escapedName":"truffle-contract-schema","name":"truffle-contract-schema","rawSpec":"0.0.5","spec":"0.0.5","type":"version"},"_requiredBy":["/truffle-contract"],"_resolved":"https://registry.npmjs.org/truffle-contract-schema/-/truffle-contract-schema-0.0.5.tgz","_shasum":"5e9d20bd0bf2a27fe94310748249d484eee49961","_shrinkwrap":null,"_spec":"truffle-contract-schema@0.0.5","_where":"/Users/nathanieloden/Documents/ethereum/comptest2/node_modules/truffle-contract","author":{"name":"Tim Coulter","email":"tim.coulter@consensys.net"},"bugs":{"url":"https://github.com/trufflesuite/truffle-schema/issues"},"dependencies":{"crypto-js":"^3.1.9-1"},"description":"JSON schema for contract artifacts","devDependencies":{"mocha":"^3.2.0"},"directories":{},"dist":{"shasum":"5e9d20bd0bf2a27fe94310748249d484eee49961","tarball":"https://registry.npmjs.org/truffle-contract-schema/-/truffle-contract-schema-0.0.5.tgz"},"gitHead":"cfa4313bd4bb95bf5b94f85185203ead418f9ee6","homepage":"https://github.com/trufflesuite/truffle-schema#readme","keywords":["ethereum","json","schema","contract","artifacts"],"license":"MIT","main":"index.js","maintainers":[{"name":"tcoulter","email":"tim@timothyjcoulter.com"}],"name":"truffle-contract-schema","optionalDependencies":{},"readme":"ERROR: No README data found!","repository":{"type":"git","url":"git+https://github.com/trufflesuite/truffle-schema.git"},"scripts":{"test":"mocha"},"version":"0.0.5"}
 
 /***/ }),
-/* 149 */
+/* 150 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(global, module) {var ethJSABI = __webpack_require__(100);
-var BlockchainUtils = __webpack_require__(110);
-var Web3 = __webpack_require__(150);
+/* WEBPACK VAR INJECTION */(function(global, module) {var ethJSABI = __webpack_require__(101);
+var BlockchainUtils = __webpack_require__(111);
+var Web3 = __webpack_require__(151);
 
 // For browserified version. If browserify gave us an empty version,
 // look for the one provided by the user.
@@ -37900,10 +38441,10 @@ var contract = (function(module) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(47), __webpack_require__(55)(module)))
 
 /***/ }),
-/* 150 */
+/* 151 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Web3 = __webpack_require__(165);
+var Web3 = __webpack_require__(166);
 
 // dont override global variable
 if (typeof window !== 'undefined' && typeof window.Web3 === 'undefined') {
@@ -37914,25 +38455,25 @@ module.exports = Web3;
 
 
 /***/ }),
-/* 151 */
+/* 152 */
 /***/ (function(module, exports) {
 
 module.exports = [{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"name","outputs":[{"name":"o_name","type":"bytes32"}],"type":"function"},{"constant":true,"inputs":[{"name":"_name","type":"bytes32"}],"name":"owner","outputs":[{"name":"","type":"address"}],"type":"function"},{"constant":true,"inputs":[{"name":"_name","type":"bytes32"}],"name":"content","outputs":[{"name":"","type":"bytes32"}],"type":"function"},{"constant":true,"inputs":[{"name":"_name","type":"bytes32"}],"name":"addr","outputs":[{"name":"","type":"address"}],"type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"bytes32"}],"name":"reserve","outputs":[],"type":"function"},{"constant":true,"inputs":[{"name":"_name","type":"bytes32"}],"name":"subRegistrar","outputs":[{"name":"","type":"address"}],"type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"bytes32"},{"name":"_newOwner","type":"address"}],"name":"transfer","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"bytes32"},{"name":"_registrar","type":"address"}],"name":"setSubRegistrar","outputs":[],"type":"function"},{"constant":false,"inputs":[],"name":"Registrar","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"bytes32"},{"name":"_a","type":"address"},{"name":"_primary","type":"bool"}],"name":"setAddress","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"bytes32"},{"name":"_content","type":"bytes32"}],"name":"setContent","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"bytes32"}],"name":"disown","outputs":[],"type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_name","type":"bytes32"},{"indexed":false,"name":"_winner","type":"address"}],"name":"AuctionEnded","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_name","type":"bytes32"},{"indexed":false,"name":"_bidder","type":"address"},{"indexed":false,"name":"_value","type":"uint256"}],"name":"NewBid","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"name","type":"bytes32"}],"name":"Changed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"name","type":"bytes32"},{"indexed":true,"name":"addr","type":"address"}],"name":"PrimaryChanged","type":"event"}]
 
 /***/ }),
-/* 152 */
+/* 153 */
 /***/ (function(module, exports) {
 
 module.exports = [{"constant":true,"inputs":[{"name":"_name","type":"bytes32"}],"name":"owner","outputs":[{"name":"","type":"address"}],"type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"bytes32"},{"name":"_refund","type":"address"}],"name":"disown","outputs":[],"type":"function"},{"constant":true,"inputs":[{"name":"_name","type":"bytes32"}],"name":"addr","outputs":[{"name":"","type":"address"}],"type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"bytes32"}],"name":"reserve","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"bytes32"},{"name":"_newOwner","type":"address"}],"name":"transfer","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"bytes32"},{"name":"_a","type":"address"}],"name":"setAddr","outputs":[],"type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"name":"name","type":"bytes32"}],"name":"Changed","type":"event"}]
 
 /***/ }),
-/* 153 */
+/* 154 */
 /***/ (function(module, exports) {
 
 module.exports = [{"constant":false,"inputs":[{"name":"from","type":"bytes32"},{"name":"to","type":"address"},{"name":"value","type":"uint256"}],"name":"transfer","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"from","type":"bytes32"},{"name":"to","type":"address"},{"name":"indirectId","type":"bytes32"},{"name":"value","type":"uint256"}],"name":"icapTransfer","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"to","type":"bytes32"}],"name":"deposit","outputs":[],"type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"AnonymousDeposit","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":true,"name":"to","type":"bytes32"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Deposit","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"bytes32"},{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"bytes32"},{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"indirectId","type":"bytes32"},{"indexed":false,"name":"value","type":"uint256"}],"name":"IcapTransfer","type":"event"}]
 
 /***/ }),
-/* 154 */
+/* 155 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var f = __webpack_require__(6);
@@ -37969,7 +38510,7 @@ module.exports = SolidityTypeAddress;
 
 
 /***/ }),
-/* 155 */
+/* 156 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var f = __webpack_require__(6);
@@ -38005,7 +38546,7 @@ module.exports = SolidityTypeBool;
 
 
 /***/ }),
-/* 156 */
+/* 157 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var f = __webpack_require__(6);
@@ -38049,7 +38590,7 @@ module.exports = SolidityTypeBytes;
 
 
 /***/ }),
-/* 157 */
+/* 158 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var f = __webpack_require__(6);
@@ -38080,7 +38621,7 @@ module.exports = SolidityTypeDynamicBytes;
 
 
 /***/ }),
-/* 158 */
+/* 159 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var f = __webpack_require__(6);
@@ -38122,7 +38663,7 @@ module.exports = SolidityTypeInt;
 
 
 /***/ }),
-/* 159 */
+/* 160 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var f = __webpack_require__(6);
@@ -38164,7 +38705,7 @@ module.exports = SolidityTypeReal;
 
 
 /***/ }),
-/* 160 */
+/* 161 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var f = __webpack_require__(6);
@@ -38195,7 +38736,7 @@ module.exports = SolidityTypeString;
 
 
 /***/ }),
-/* 161 */
+/* 162 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var f = __webpack_require__(6);
@@ -38237,7 +38778,7 @@ module.exports = SolidityTypeUInt;
 
 
 /***/ }),
-/* 162 */
+/* 163 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var f = __webpack_require__(6);
@@ -38279,7 +38820,7 @@ module.exports = SolidityTypeUReal;
 
 
 /***/ }),
-/* 163 */
+/* 164 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38295,13 +38836,13 @@ if (typeof XMLHttpRequest === 'undefined') {
 
 
 /***/ }),
-/* 164 */
+/* 165 */
 /***/ (function(module, exports) {
 
 module.exports = {"version":"0.16.0"}
 
 /***/ }),
-/* 165 */
+/* 166 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -38331,22 +38872,22 @@ module.exports = {"version":"0.16.0"}
  * @date 2014
  */
 
-var RequestManager = __webpack_require__(179);
+var RequestManager = __webpack_require__(180);
 var Iban = __webpack_require__(41);
-var Eth = __webpack_require__(174);
-var DB = __webpack_require__(173);
-var Shh = __webpack_require__(177);
-var Net = __webpack_require__(175);
-var Personal = __webpack_require__(176);
-var Settings = __webpack_require__(180);
-var version = __webpack_require__(164);
+var Eth = __webpack_require__(175);
+var DB = __webpack_require__(174);
+var Shh = __webpack_require__(178);
+var Net = __webpack_require__(176);
+var Personal = __webpack_require__(177);
+var Settings = __webpack_require__(181);
+var version = __webpack_require__(165);
 var utils = __webpack_require__(3);
 var sha3 = __webpack_require__(26);
-var extend = __webpack_require__(169);
-var Batch = __webpack_require__(167);
+var extend = __webpack_require__(170);
+var Batch = __webpack_require__(168);
 var Property = __webpack_require__(28);
-var HttpProvider = __webpack_require__(171);
-var IpcProvider = __webpack_require__(172);
+var HttpProvider = __webpack_require__(172);
+var IpcProvider = __webpack_require__(173);
 
 
 
@@ -38453,7 +38994,7 @@ module.exports = Web3;
 
 
 /***/ }),
-/* 166 */
+/* 167 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -38547,7 +39088,7 @@ module.exports = AllSolidityEvents;
 
 
 /***/ }),
-/* 167 */
+/* 168 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -38619,7 +39160,7 @@ module.exports = Batch;
 
 
 /***/ }),
-/* 168 */
+/* 169 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -38647,8 +39188,8 @@ module.exports = Batch;
 var utils = __webpack_require__(3);
 var coder = __webpack_require__(52);
 var SolidityEvent = __webpack_require__(64);
-var SolidityFunction = __webpack_require__(170);
-var AllEvents = __webpack_require__(166);
+var SolidityFunction = __webpack_require__(171);
+var AllEvents = __webpack_require__(167);
 
 /**
  * Should be called to encode constructor params
@@ -38923,12 +39464,12 @@ module.exports = ContractFactory;
 
 
 /***/ }),
-/* 169 */
+/* 170 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var formatters = __webpack_require__(11);
 var utils = __webpack_require__(3);
-var Method = __webpack_require__(21);
+var Method = __webpack_require__(20);
 var Property = __webpack_require__(28);
 
 // TODO: refactor, so the input params are not altered.
@@ -38977,7 +39518,7 @@ module.exports = extend;
 
 
 /***/ }),
-/* 170 */
+/* 171 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -39230,7 +39771,7 @@ module.exports = SolidityFunction;
 
 
 /***/ }),
-/* 171 */
+/* 172 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39275,7 +39816,7 @@ if (typeof Meteor !== 'undefined' && Meteor.isServer) { // jshint ignore: line
 
 // node
 } else {
-    XMLHttpRequest = __webpack_require__(163).XMLHttpRequest; // jshint ignore: line
+    XMLHttpRequest = __webpack_require__(164).XMLHttpRequest; // jshint ignore: line
 }
 
 /**
@@ -39383,7 +39924,7 @@ module.exports = HttpProvider;
 
 
 /***/ }),
-/* 172 */
+/* 173 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39597,7 +40138,7 @@ module.exports = IpcProvider;
 
 
 /***/ }),
-/* 173 */
+/* 174 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -39622,7 +40163,7 @@ module.exports = IpcProvider;
  * @date 2015
  */
 
-var Method = __webpack_require__(21);
+var Method = __webpack_require__(20);
 
 var DB = function (web3) {
     this._requestManager = web3._requestManager;
@@ -39669,7 +40210,7 @@ module.exports = DB;
 
 
 /***/ }),
-/* 174 */
+/* 175 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39700,16 +40241,16 @@ module.exports = DB;
 
 var formatters = __webpack_require__(11);
 var utils = __webpack_require__(3);
-var Method = __webpack_require__(21);
+var Method = __webpack_require__(20);
 var Property = __webpack_require__(28);
 var c = __webpack_require__(39);
-var Contract = __webpack_require__(168);
+var Contract = __webpack_require__(169);
 var watches = __webpack_require__(42);
 var Filter = __webpack_require__(40);
-var IsSyncing = __webpack_require__(181);
-var namereg = __webpack_require__(178);
+var IsSyncing = __webpack_require__(182);
+var namereg = __webpack_require__(179);
 var Iban = __webpack_require__(41);
-var transfer = __webpack_require__(182);
+var transfer = __webpack_require__(183);
 
 var blockCall = function (args) {
     return (utils.isString(args[0]) && args[0].indexOf('0x') === 0) ? "eth_getBlockByHash" : "eth_getBlockByNumber";
@@ -40019,7 +40560,7 @@ module.exports = Eth;
 
 
 /***/ }),
-/* 175 */
+/* 176 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -40077,7 +40618,7 @@ module.exports = Net;
 
 
 /***/ }),
-/* 176 */
+/* 177 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40106,7 +40647,7 @@ module.exports = Net;
 
 
 
-var Method = __webpack_require__(21);
+var Method = __webpack_require__(20);
 var Property = __webpack_require__(28);
 var formatters = __webpack_require__(11);
 
@@ -40169,7 +40710,7 @@ module.exports = Personal;
 
 
 /***/ }),
-/* 177 */
+/* 178 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -40194,7 +40735,7 @@ module.exports = Personal;
  * @date 2015
  */
 
-var Method = __webpack_require__(21);
+var Method = __webpack_require__(20);
 var formatters = __webpack_require__(11);
 var Filter = __webpack_require__(40);
 var watches = __webpack_require__(42);
@@ -40261,7 +40802,7 @@ module.exports = Shh;
 
 
 /***/ }),
-/* 178 */
+/* 179 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -40286,8 +40827,8 @@ module.exports = Shh;
  * @date 2015
  */
 
-var globalRegistrarAbi = __webpack_require__(151);
-var icapRegistrarAbi= __webpack_require__(152);
+var globalRegistrarAbi = __webpack_require__(152);
+var icapRegistrarAbi= __webpack_require__(153);
 
 var globalNameregAddress = '0xc6d9d2cd449a754c494264e1809c50e34d64562b';
 var icapNameregAddress = '0xa1a111bc074c9cfa781f0c38e63bd51c91b8af00';
@@ -40306,7 +40847,7 @@ module.exports = {
 
 
 /***/ }),
-/* 179 */
+/* 180 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -40577,7 +41118,7 @@ module.exports = RequestManager;
 
 
 /***/ }),
-/* 180 */
+/* 181 */
 /***/ (function(module, exports) {
 
 
@@ -40592,7 +41133,7 @@ module.exports = Settings;
 
 
 /***/ }),
-/* 181 */
+/* 182 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -40691,7 +41232,7 @@ module.exports = IsSyncing;
 
 
 /***/ }),
-/* 182 */
+/* 183 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -40717,7 +41258,7 @@ module.exports = IsSyncing;
  */
 
 var Iban = __webpack_require__(41);
-var exchangeAbi = __webpack_require__(153);
+var exchangeAbi = __webpack_require__(154);
 
 /**
  * Should be used to make Iban transfer
@@ -40789,25 +41330,25 @@ module.exports = transfer;
 
 
 /***/ }),
-/* 183 */
+/* 184 */
 /***/ (function(module, exports) {
 
 module.exports = [{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"name","outputs":[{"name":"o_name","type":"bytes32"}],"type":"function"},{"constant":true,"inputs":[{"name":"_name","type":"bytes32"}],"name":"owner","outputs":[{"name":"","type":"address"}],"type":"function"},{"constant":true,"inputs":[{"name":"_name","type":"bytes32"}],"name":"content","outputs":[{"name":"","type":"bytes32"}],"type":"function"},{"constant":true,"inputs":[{"name":"_name","type":"bytes32"}],"name":"addr","outputs":[{"name":"","type":"address"}],"type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"bytes32"}],"name":"reserve","outputs":[],"type":"function"},{"constant":true,"inputs":[{"name":"_name","type":"bytes32"}],"name":"subRegistrar","outputs":[{"name":"","type":"address"}],"type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"bytes32"},{"name":"_newOwner","type":"address"}],"name":"transfer","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"bytes32"},{"name":"_registrar","type":"address"}],"name":"setSubRegistrar","outputs":[],"type":"function"},{"constant":false,"inputs":[],"name":"Registrar","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"bytes32"},{"name":"_a","type":"address"},{"name":"_primary","type":"bool"}],"name":"setAddress","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"bytes32"},{"name":"_content","type":"bytes32"}],"name":"setContent","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"bytes32"}],"name":"disown","outputs":[],"type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_name","type":"bytes32"},{"indexed":false,"name":"_winner","type":"address"}],"name":"AuctionEnded","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_name","type":"bytes32"},{"indexed":false,"name":"_bidder","type":"address"},{"indexed":false,"name":"_value","type":"uint256"}],"name":"NewBid","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"name","type":"bytes32"}],"name":"Changed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"name","type":"bytes32"},{"indexed":true,"name":"addr","type":"address"}],"name":"PrimaryChanged","type":"event"}]
 
 /***/ }),
-/* 184 */
+/* 185 */
 /***/ (function(module, exports) {
 
 module.exports = [{"constant":true,"inputs":[{"name":"_name","type":"bytes32"}],"name":"owner","outputs":[{"name":"","type":"address"}],"type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"bytes32"},{"name":"_refund","type":"address"}],"name":"disown","outputs":[],"type":"function"},{"constant":true,"inputs":[{"name":"_name","type":"bytes32"}],"name":"addr","outputs":[{"name":"","type":"address"}],"type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"bytes32"}],"name":"reserve","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"bytes32"},{"name":"_newOwner","type":"address"}],"name":"transfer","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"bytes32"},{"name":"_a","type":"address"}],"name":"setAddr","outputs":[],"type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"name":"name","type":"bytes32"}],"name":"Changed","type":"event"}]
 
 /***/ }),
-/* 185 */
+/* 186 */
 /***/ (function(module, exports) {
 
 module.exports = [{"constant":false,"inputs":[{"name":"from","type":"bytes32"},{"name":"to","type":"address"},{"name":"value","type":"uint256"}],"name":"transfer","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"from","type":"bytes32"},{"name":"to","type":"address"},{"name":"indirectId","type":"bytes32"},{"name":"value","type":"uint256"}],"name":"icapTransfer","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"to","type":"bytes32"}],"name":"deposit","outputs":[],"payable":true,"type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"AnonymousDeposit","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":true,"name":"to","type":"bytes32"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Deposit","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"bytes32"},{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"bytes32"},{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"indirectId","type":"bytes32"},{"indexed":false,"name":"value","type":"uint256"}],"name":"IcapTransfer","type":"event"}]
 
 /***/ }),
-/* 186 */
+/* 187 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var f = __webpack_require__(7);
@@ -40839,7 +41380,7 @@ module.exports = SolidityTypeAddress;
 
 
 /***/ }),
-/* 187 */
+/* 188 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var f = __webpack_require__(7);
@@ -40871,7 +41412,7 @@ module.exports = SolidityTypeBool;
 
 
 /***/ }),
-/* 188 */
+/* 189 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var f = __webpack_require__(7);
@@ -40906,7 +41447,7 @@ module.exports = SolidityTypeBytes;
 
 
 /***/ }),
-/* 189 */
+/* 190 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var f = __webpack_require__(7);
@@ -40932,7 +41473,7 @@ module.exports = SolidityTypeDynamicBytes;
 
 
 /***/ }),
-/* 190 */
+/* 191 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var f = __webpack_require__(7);
@@ -40970,7 +41511,7 @@ module.exports = SolidityTypeInt;
 
 
 /***/ }),
-/* 191 */
+/* 192 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var f = __webpack_require__(7);
@@ -41008,7 +41549,7 @@ module.exports = SolidityTypeReal;
 
 
 /***/ }),
-/* 192 */
+/* 193 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var f = __webpack_require__(7);
@@ -41034,7 +41575,7 @@ module.exports = SolidityTypeString;
 
 
 /***/ }),
-/* 193 */
+/* 194 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var f = __webpack_require__(7);
@@ -41072,7 +41613,7 @@ module.exports = SolidityTypeUInt;
 
 
 /***/ }),
-/* 194 */
+/* 195 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var f = __webpack_require__(7);
@@ -41110,7 +41651,7 @@ module.exports = SolidityTypeUReal;
 
 
 /***/ }),
-/* 195 */
+/* 196 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41126,13 +41667,13 @@ if (typeof XMLHttpRequest === 'undefined') {
 
 
 /***/ }),
-/* 196 */
+/* 197 */
 /***/ (function(module, exports) {
 
 module.exports = {"version":"0.20.2"}
 
 /***/ }),
-/* 197 */
+/* 198 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -41162,23 +41703,23 @@ module.exports = {"version":"0.20.2"}
  * @date 2014
  */
 
-var RequestManager = __webpack_require__(212);
+var RequestManager = __webpack_require__(213);
 var Iban = __webpack_require__(45);
-var Eth = __webpack_require__(206);
-var DB = __webpack_require__(205);
-var Shh = __webpack_require__(209);
-var Net = __webpack_require__(207);
-var Personal = __webpack_require__(208);
-var Swarm = __webpack_require__(210);
-var Settings = __webpack_require__(213);
-var version = __webpack_require__(196);
+var Eth = __webpack_require__(207);
+var DB = __webpack_require__(206);
+var Shh = __webpack_require__(210);
+var Net = __webpack_require__(208);
+var Personal = __webpack_require__(209);
+var Swarm = __webpack_require__(211);
+var Settings = __webpack_require__(214);
+var version = __webpack_require__(197);
 var utils = __webpack_require__(4);
 var sha3 = __webpack_require__(29);
-var extend = __webpack_require__(201);
-var Batch = __webpack_require__(199);
-var Property = __webpack_require__(23);
-var HttpProvider = __webpack_require__(203);
-var IpcProvider = __webpack_require__(204);
+var extend = __webpack_require__(202);
+var Batch = __webpack_require__(200);
+var Property = __webpack_require__(22);
+var HttpProvider = __webpack_require__(204);
+var IpcProvider = __webpack_require__(205);
 var BigNumber = __webpack_require__(30);
 
 
@@ -41290,7 +41831,7 @@ module.exports = Web3;
 
 
 /***/ }),
-/* 198 */
+/* 199 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -41384,7 +41925,7 @@ module.exports = AllSolidityEvents;
 
 
 /***/ }),
-/* 199 */
+/* 200 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -41410,7 +41951,7 @@ module.exports = AllSolidityEvents;
  */
 
 var Jsonrpc = __webpack_require__(68);
-var errors = __webpack_require__(22);
+var errors = __webpack_require__(21);
 
 var Batch = function (web3) {
     this.requestManager = web3._requestManager;
@@ -41456,7 +41997,7 @@ module.exports = Batch;
 
 
 /***/ }),
-/* 200 */
+/* 201 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -41484,8 +42025,8 @@ module.exports = Batch;
 var utils = __webpack_require__(4);
 var coder = __webpack_require__(54);
 var SolidityEvent = __webpack_require__(67);
-var SolidityFunction = __webpack_require__(202);
-var AllEvents = __webpack_require__(198);
+var SolidityFunction = __webpack_require__(203);
+var AllEvents = __webpack_require__(199);
 
 /**
  * Should be called to encode constructor params
@@ -41772,13 +42313,13 @@ module.exports = ContractFactory;
 
 
 /***/ }),
-/* 201 */
+/* 202 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var formatters = __webpack_require__(13);
 var utils = __webpack_require__(4);
 var Method = __webpack_require__(15);
-var Property = __webpack_require__(23);
+var Property = __webpack_require__(22);
 
 // TODO: refactor, so the input params are not altered.
 // it's necessary to make same 'extension' work with multiple providers
@@ -41826,7 +42367,7 @@ module.exports = extend;
 
 
 /***/ }),
-/* 202 */
+/* 203 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -41853,7 +42394,7 @@ module.exports = extend;
 
 var coder = __webpack_require__(54);
 var utils = __webpack_require__(4);
-var errors = __webpack_require__(22);
+var errors = __webpack_require__(21);
 var formatters = __webpack_require__(13);
 var sha3 = __webpack_require__(29);
 
@@ -42115,7 +42656,7 @@ module.exports = SolidityFunction;
 
 
 /***/ }),
-/* 203 */
+/* 204 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {/*
@@ -42142,7 +42683,7 @@ module.exports = SolidityFunction;
  * @date 2015
  */
 
-var errors = __webpack_require__(22);
+var errors = __webpack_require__(21);
 
 // workaround to use httpprovider in different envs
 
@@ -42151,7 +42692,7 @@ if (typeof window !== 'undefined' && window.XMLHttpRequest) {
   XMLHttpRequest = window.XMLHttpRequest; // jshint ignore: line
 // node
 } else {
-  XMLHttpRequest = __webpack_require__(195).XMLHttpRequest; // jshint ignore: line
+  XMLHttpRequest = __webpack_require__(196).XMLHttpRequest; // jshint ignore: line
 }
 
 var XHR2 = __webpack_require__(69); // jshint ignore: line
@@ -42279,7 +42820,7 @@ module.exports = HttpProvider;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(31).Buffer))
 
 /***/ }),
-/* 204 */
+/* 205 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42308,7 +42849,7 @@ module.exports = HttpProvider;
 
 
 var utils = __webpack_require__(4);
-var errors = __webpack_require__(22);
+var errors = __webpack_require__(21);
 
 
 var IpcProvider = function (path, net) {
@@ -42493,7 +43034,7 @@ module.exports = IpcProvider;
 
 
 /***/ }),
-/* 205 */
+/* 206 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -42565,7 +43106,7 @@ module.exports = DB;
 
 
 /***/ }),
-/* 206 */
+/* 207 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42597,15 +43138,15 @@ module.exports = DB;
 var formatters = __webpack_require__(13);
 var utils = __webpack_require__(4);
 var Method = __webpack_require__(15);
-var Property = __webpack_require__(23);
+var Property = __webpack_require__(22);
 var c = __webpack_require__(43);
-var Contract = __webpack_require__(200);
+var Contract = __webpack_require__(201);
 var watches = __webpack_require__(46);
 var Filter = __webpack_require__(44);
-var IsSyncing = __webpack_require__(214);
-var namereg = __webpack_require__(211);
+var IsSyncing = __webpack_require__(215);
+var namereg = __webpack_require__(212);
 var Iban = __webpack_require__(45);
-var transfer = __webpack_require__(215);
+var transfer = __webpack_require__(216);
 
 var blockCall = function (args) {
     return (utils.isString(args[0]) && args[0].indexOf('0x') === 0) ? "eth_getBlockByHash" : "eth_getBlockByNumber";
@@ -42926,7 +43467,7 @@ module.exports = Eth;
 
 
 /***/ }),
-/* 207 */
+/* 208 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -42952,7 +43493,7 @@ module.exports = Eth;
  */
 
 var utils = __webpack_require__(4);
-var Property = __webpack_require__(23);
+var Property = __webpack_require__(22);
 
 var Net = function (web3) {
     this._requestManager = web3._requestManager;
@@ -42984,7 +43525,7 @@ module.exports = Net;
 
 
 /***/ }),
-/* 208 */
+/* 209 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43014,7 +43555,7 @@ module.exports = Net;
 
 
 var Method = __webpack_require__(15);
-var Property = __webpack_require__(23);
+var Property = __webpack_require__(22);
 var formatters = __webpack_require__(13);
 
 function Personal(web3) {
@@ -43106,7 +43647,7 @@ module.exports = Personal;
 
 
 /***/ }),
-/* 209 */
+/* 210 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -43256,7 +43797,7 @@ module.exports = Shh;
 
 
 /***/ }),
-/* 210 */
+/* 211 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43287,7 +43828,7 @@ module.exports = Shh;
 
 
 var Method = __webpack_require__(15);
-var Property = __webpack_require__(23);
+var Property = __webpack_require__(22);
 
 function Swarm(web3) {
     this._requestManager = web3._requestManager;
@@ -43408,7 +43949,7 @@ module.exports = Swarm;
 
 
 /***/ }),
-/* 211 */
+/* 212 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -43433,8 +43974,8 @@ module.exports = Swarm;
  * @date 2015
  */
 
-var globalRegistrarAbi = __webpack_require__(183);
-var icapRegistrarAbi= __webpack_require__(184);
+var globalRegistrarAbi = __webpack_require__(184);
+var icapRegistrarAbi= __webpack_require__(185);
 
 var globalNameregAddress = '0xc6d9d2cd449a754c494264e1809c50e34d64562b';
 var icapNameregAddress = '0xa1a111bc074c9cfa781f0c38e63bd51c91b8af00';
@@ -43453,7 +43994,7 @@ module.exports = {
 
 
 /***/ }),
-/* 212 */
+/* 213 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -43485,7 +44026,7 @@ module.exports = {
 var Jsonrpc = __webpack_require__(68);
 var utils = __webpack_require__(4);
 var c = __webpack_require__(43);
-var errors = __webpack_require__(22);
+var errors = __webpack_require__(21);
 
 /**
  * It's responsible for passing messages to providers
@@ -43724,7 +44265,7 @@ module.exports = RequestManager;
 
 
 /***/ }),
-/* 213 */
+/* 214 */
 /***/ (function(module, exports) {
 
 
@@ -43739,7 +44280,7 @@ module.exports = Settings;
 
 
 /***/ }),
-/* 214 */
+/* 215 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -43838,7 +44379,7 @@ module.exports = IsSyncing;
 
 
 /***/ }),
-/* 215 */
+/* 216 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -43864,7 +44405,7 @@ module.exports = IsSyncing;
  */
 
 var Iban = __webpack_require__(45);
-var exchangeAbi = __webpack_require__(185);
+var exchangeAbi = __webpack_require__(186);
 
 /**
  * Should be used to make Iban transfer
