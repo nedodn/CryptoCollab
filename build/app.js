@@ -28610,7 +28610,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 // Import our contract artifacts and turn them into usable abstractions.
 
 
-// MetaCoin is our usable abstraction, which we'll use through the code below.
+// Opus is our usable abstraction, which we'll use through the code below.
 var Opus = __WEBPACK_IMPORTED_MODULE_2_truffle_contract___default()(__WEBPACK_IMPORTED_MODULE_3__build_contracts_Opus_json___default.a);
 
 
@@ -28626,11 +28626,6 @@ window.App = {
     self.getComp();
     self.getNotes();
     self.getPlacedNotes();
-  },
-
-  setStatus: function(message) {
-    var status = document.getElementById("status");
-    status.innerHTML = message;
   },
 
   buildTable: function() {
