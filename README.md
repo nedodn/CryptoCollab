@@ -3,7 +3,7 @@ Repository for the EthDev hackathon. Decentralized MIDI Composition Project
 
 Hosted at https://nedodn.github.io/CryptoCollab/ and on the Rinkeby Test Network
 
-Contract located at https://rinkeby.etherscan.io/address/0xadf7305bf5791e651fe534c4d8e43847e91ba667
+Current Contract located at https://rinkeby.etherscan.io/address/0xadf7305bf5791e651fe534c4d8e43847e91ba667
 
 To run (must have some Ethereum network running):
 
