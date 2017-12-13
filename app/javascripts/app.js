@@ -121,7 +121,7 @@ window.returnNotes = function() {
   let num = $("#return").val();
 
   Opus.deployed().then(function(instance) {
-    instance.returnNotes(num, {gas: 75000, from: web3.eth.accounts[0]}).then(function() {
+    instance.returnNotes(num, {gas: 100000, from: web3.eth.accounts[0]}).then(function() {
     })
   })
 }
@@ -149,7 +149,7 @@ window.toggleNote = function(el) {
         })
       }
       else {
-        instance.removeNote(_pitch, _place, {gas: 75000, from: web3.eth.accounts[0]}).then(function(x) {
+        instance.removeNote(_pitch, _place, {gas: 100000, from: web3.eth.accounts[0]}).then(function(x) {
           location.reload();
         })
       }
