@@ -19,7 +19,7 @@ To run (must have some Ethereum network running):
 
 # How To Use
 
- 1. Have a Metamask enable browser with an account on the Rinkeby Test Network
+ 1. Have a Metamask enabled browser with an account on the Rinkeby Test Network
  
  2. Purchase notes (Current Price of 0.01 ETH)
  
