@@ -8,7 +8,7 @@ import { default as contract } from 'truffle-contract';
 // Import our contract artifacts and turn them into usable abstractions.
 import opus_artifacts from '../../build/contracts/Opus.json'
 
-// MetaCoin is our usable abstraction, which we'll use through the code below.
+// Opus is our usable abstraction, which we'll use through the code below.
 var Opus = contract(opus_artifacts);
 
 import {getNoteName} from './notes.js';
@@ -24,11 +24,6 @@ window.App = {
     self.getComp();
     self.getNotes();
     self.getPlacedNotes();
-  },
-
-  setStatus: function(message) {
-    var status = document.getElementById("status");
-    status.innerHTML = message;
   },
 
   buildTable: function() {
