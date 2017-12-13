@@ -149,7 +149,6 @@ window.toggleNote = function(el) {
         })
       }
       else {
-        console.log("here");
         instance.removeNote(_pitch, _place, {gas: 75000, from: web3.eth.accounts[0]}).then(function(x) {
           location.reload();
         })
