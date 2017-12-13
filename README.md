@@ -36,5 +36,5 @@ To run (must have some Ethereum network running):
  ## Other Info
   1. The y-axis of the grid represents MIDI values 0-127, x-axis represents the note's place in the piece
 
-### Tools Used
+## Tools Used
  Truffle Framework, Ganache, Infura, Ethereum, Webpack, JQuery, Bootstrap
