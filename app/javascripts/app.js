@@ -5,8 +5,6 @@ import "../stylesheets/app.css";
 import { default as Web3} from 'web3';
 import { default as contract } from 'truffle-contract';
 
-var BigNumber = require('bignumber.js');
-
 // Import our contract artifacts and turn them into usable abstractions.
 import opus_artifacts from '../../build/contracts/Opus.json'
 
