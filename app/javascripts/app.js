@@ -5,19 +5,13 @@ import "../stylesheets/app.css";
 import { default as Web3} from 'web3';
 import { default as contract } from 'truffle-contract';
 
-var BigNumber = require('bignumber.js');
-
 // Import our contract artifacts and turn them into usable abstractions.
 import opus_artifacts from '../../build/contracts/Opus.json'
 
 // MetaCoin is our usable abstraction, which we'll use through the code below.
 var Opus = contract(opus_artifacts);
 
-// The following code is simple to show off interacting with your contracts.
-// As your needs grow you will likely need to change its form and structure.
-// For application bootstrapping, check out window.addEventListener below.
-var accounts;
-var account;
+import {getNoteName} from './notes.js';
 
 window.App = {
   start: function() {
@@ -50,7 +44,16 @@ window.App = {
     let line = "";
     
     for(let i = 0; i < 128; i++) {
-      line = line + "<tr><td>" + (127- i) + "</td>";
+      let name = getNoteName(i);
+      let color;
+      if(name.color) {
+        color = "white";
+      }
+      else {
+        color = "grey";
+      }
+
+      line = line + "<tr><td style='background-color: " + color + "'>" + name.name + "</td>";
       for(let x = 0; x < 100; x++) {
        line = line + "<td id='" + i.toString() + "note" + x.toString() + "'onclick='toggleNote(this)'>   </td>";
       }
