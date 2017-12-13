@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CryptoCollab</title>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+  <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet' type='text/css'>  
+</head>
+<body>
+  <h1>CryptoCollab</h1><br>
+
+  <input type="number" placeholder="Number of Notes to Purchase, Price: 0.01 ETH" id="purchase"><br>
+  <a href="#" onclick="purchaseNotes()" class="btn btn-danger">Purchase</a><br>
+  <input type="number" placeholder="Number of Notes to Return" id="return"><br>
+  <a href="#" onclick="returnNotes()" class="btn btn-danger">Return</a><br>
+  <h2 id="owned"></h2>
+
+  <table class="table table-bordered" id="compTable">
+    <thead id="tableLabel">
+    </thead>
+
+    <tbody id="comp">
+      
+    </tbody>
+  
+  </table>
+
+  <span id="status"></span>
+  <br>
+  <span>Contract and Contract Code can be found at <a href="https://rinkeby.etherscan.io/address/0xadf7305bf5791e651fe534c4d8e43847e91ba667">0xadf7305bf5791e651fe534c4d8e43847e91ba667</a></span>
+</body>
+<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>
+<script src="./app.js"></script>
+</html>
