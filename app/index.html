@@ -3,24 +3,24 @@
 <head>
   <title>CryptoCollab</title>
   <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-  <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet' type='text/css'> 
+    <link href='/app/stylesheets/app.css' rel='stylesheet' type='text/css'>
   <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>
   <h1>CryptoCollab</h1><br>
 
   <input type="number" placeholder="Number of Notes to Purchase, Price: 0.01 ETH" id="purchase"><br>
-  <a href="#" onclick="purchaseNotes()" class="btn btn-danger">Purchase</a><br>
+  <button onclick="purchaseNotes()">Purchase</button><br>
   <input type="number" placeholder="Number of Notes to Return" id="return"><br>
-  <a href="#" onclick="returnNotes()" class="btn btn-danger">Return</a><br>
+  <button onclick="returnNotes()">Return</button><br>
   <h2 id="balance"></h2>
 
   <div id="comppart">
 
   </div>
   <br>
-  <a href="#" onclick="removeNotes()" class="btn btn-danger">Remove Selected Notes</a><br>
-  <a href="#" onclick="placeNotes()" class="btn">Add Selected Notes</a><br>
+  <button onclick="removeNotes()">Remove Selected Notes</button><br>
+  <button onclick="placeNotes()">Add Selected Notes</button><br>
   
 </body>
 <script src="./app.js"></script>
