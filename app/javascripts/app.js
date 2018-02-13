@@ -242,6 +242,9 @@ window.play = async function () {
     return new Promise(resolve => setTimeout(resolve, ms))
   }
 
+  var tempo = document.getElementById('tempo')
+  var tempoInMs = 60000 / tempo
+
   var notes = []
   for (let i = 0; i < 100; i++) {
     for (let x = 0; x < 128; x++) {
@@ -256,7 +259,7 @@ window.play = async function () {
     }
     synth.triggerAttackRelease(notes, 0.5)
     notes = []
-    await sleep(250)
+    await sleep(tempoInMs)
   }
 }
 
