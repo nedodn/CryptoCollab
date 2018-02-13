@@ -109,6 +109,9 @@ window.App = {
         if (noteArray[i][x] === true) {
           cell.style.backgroundColor = 'black'
         }
+        else {
+          cell.style.backgroundColor = 'white'
+        }
         cell.id = i + '#' + x
         cell.setAttribute('onclick', "toggleNote('" + cell.id + "')")
 
@@ -152,6 +155,7 @@ window.purchaseNotes = function () {
 
   NoteToken.deployed().then(function (instance) {
     instance.purchaseNotes(num, { value: web3.toWei(price, 'ether'), from: account, gas: 150000 }).then(function () {
+      location.reload()
     })
   })
 }
@@ -161,6 +165,7 @@ window.returnNotes = function () {
 
   NoteToken.deployed().then(function (instance) {
     instance.returnNotes(num, { gas: 100000, from: account }).then(function () {
+      location.reload()
     })
   })
 }
@@ -178,7 +183,21 @@ window.toggleNote = function (id) {
     let i = pitchStack.indexOf(_pitch)
     pitchStack.splice(i, 1)
     placeStack.splice(i, 1)
-    cell.style.backgroundColor = 'white'
+    if (noteArray[Number(_pitch)][Number(_place)]) {
+      CompositionPart.deployed().then(function (instance) {
+        instance.getNoteOwner(Number(_pitch), Number(_place), { from: account }).then(function (owner) {
+          if (owner === account) {
+            cell.style.backgroundColor = 'purple'
+          }
+          else {
+            cell.style.backgroundColor = 'black'
+          }
+        })
+      })
+    }
+    else {
+      cell.style.backgroundColor = 'white'
+    }
     return
   }
 
@@ -201,7 +220,7 @@ window.toggleNote = function (id) {
 
 window.removeNotes = function () {
   CompositionPart.deployed().then(function (instance) {
-    instance.removeNotes(pitchStack, placeStack, pitchStack.length, { from: account }).then(function () {
+    instance.removeNotes(pitchStack, placeStack, pitchStack.length, { from: account, gas: 1500000 }).then(function () {
     })
   })
 }
@@ -209,10 +228,37 @@ window.removeNotes = function () {
 window.placeNotes = function () {
   var numNotes = pitchStack.length
 
-  CompositionPart.deployed().then(function (instance) {
-    instance.placeNotes(pitchStack, placeStack, numNotes, { from: account, gas: 1500000 }).then(function () {
+  NoteToken.deployed().then(function (instance) {
+    CompositionPart.deployed().then(function (compInstance) {
+      instance.approve(compInstance.address, numNotes, { from: account }).then(function () {
+        compInstance.placeNotes(pitchStack, placeStack, numNotes, { from: account, gas: 1500000 }).then(function () {
+        })
+      })
     })
   })
+}
+
+window.play = async function () {
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  var notes = []
+  for (let i = 0; i < 100; i++) {
+    for (let x = 0; x < 128; x++) {
+      if (noteArray[x][i]) {
+        let note = getNoteName(x)
+        let pitch = note.name
+        if (pitch.indexOf('/') !== -1) {
+          pitch = pitch.substr(0, pitch.indexOf('/'))
+        }
+        notes.push(pitch)
+      }
+    }
+    synth.triggerAttackRelease(notes, 0.5)
+    notes = []
+    await sleep(250)
+  }
 }
 
 window.addEventListener('load', function () {
