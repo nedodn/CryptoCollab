@@ -257,7 +257,7 @@ window.play = async function () {
     }
     synth.triggerAttackRelease(notes, 0.5)
     notes = []
-    await sleep(250)
+    await sleep(150)
   }
 }
 
