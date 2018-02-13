@@ -19,7 +19,7 @@ To run:
 
 Purchase notes, current price of 0.001 ETH
 
-Select notes to place (up to 10 at a time
+Select notes to place (up to 10 at a time)
 
 Click the add notes button
 
