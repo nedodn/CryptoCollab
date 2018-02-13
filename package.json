@@ -1,13 +1,13 @@
 {
-  "name": "truffle-init-webpack",
+  "name": "CryptoCollab",
   "version": "0.0.2",
-  "description": "Frontend example using truffle v3",
+  "description": "Decentralized Music Composition",
   "scripts": {
     "lint": "eslint ./",
     "build": "webpack",
     "dev": "webpack-dev-server"
   },
-  "author": "Douglas von Kohorn",
+  "author": "Nate Dean Oden",
   "license": "MIT",
   "devDependencies": {
     "babel-cli": "^6.22.2",
@@ -35,7 +35,7 @@
     "webpack-dev-server": "^2.3.0"
   },
   "dependencies": {
-    "truffle-hdwallet-provider": "0.0.3",
-    "zeppelin-solidity": "^1.4.0"
+    "tone": "^0.11.11",
+    "truffle-hdwallet-provider": "0.0.3"
   }
 }
