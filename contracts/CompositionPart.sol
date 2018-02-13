@@ -127,6 +127,11 @@ contract CompositionPart {
         return _note; 
     }
 
+    //returns Note owner
+    function getNoteOwner(uint _pitch, uint _place) external view returns (address) {
+        return composers[_pitch][_place];
+    }
+
     //returns notes placed by sender
     function getPlacedNotes() external view returns (uint[], uint[]) {
         uint length = ownedNotes[msg.sender].length;
