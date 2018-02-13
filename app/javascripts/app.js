@@ -68,11 +68,42 @@ window.App = {
     var table = document.createElement('table')
     table.className = 'comptable'
     table.border = 1
+    var thead = document.createElement('thead')
     var tbody = document.createElement('tbody')
     var row, cell
 
-    for (let i = 0; i < 127; i++) {
+    row = document.createElement('tr')
+
+    cell = document.createElement('th')
+    cell.innerText = 'Note'
+    row.appendChild(cell)
+
+    for (let i = 0; i < 100; i++) {
+      cell = document.createElement('th')
+      cell.innerText = i + 1
+      row.appendChild(cell)
+    }
+
+    thead.appendChild(row)
+
+    for (let i = 0; i < 128; i++) {
       row = document.createElement('tr')
+      cell = document.createElement('td')
+      let noteName = getNoteName(i)
+      cell.innerText = noteName.name
+
+      let color
+
+      if (noteName.color) {
+        color = 'white'
+      }
+      else {
+        color = 'gray'
+      }
+
+      cell.style.backgroundColor = color
+      row.appendChild(cell)
+
       for (let x = 0; x < 100; x++) {
         cell = document.createElement('td')
         if (noteArray[i][x] === true) {
@@ -85,6 +116,7 @@ window.App = {
       }
       tbody.appendChild(row)
     }
+    table.appendChild(thead)
     table.appendChild(tbody)
     root.appendChild(table)
   },

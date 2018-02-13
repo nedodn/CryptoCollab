@@ -12,6 +12,10 @@ td {
   height: 10px;
 }
 
+th {
+  width: 30px;
+}
+
 input {
   width: 500px;
   padding: 5px;
