@@ -9,7 +9,7 @@ To run:
  
  3. Install project: $npm install
  
- 4. Start a local blockchain (Ganache or testrpc)
+ 4. Start a local blockchain running on port 8545 (Ganache or testrpc)
  
  5. Migrate Contracts: $truffle migrate
  
