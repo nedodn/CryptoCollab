@@ -13,22 +13,15 @@
   <a href="#" onclick="purchaseNotes()" class="btn btn-danger">Purchase</a><br>
   <input type="number" placeholder="Number of Notes to Return" id="return"><br>
   <a href="#" onclick="returnNotes()" class="btn btn-danger">Return</a><br>
-  <h2 id="owned"></h2>
+  <h2 id="balance"></h2>
 
-  <table class="table table-bordered" id="compTable">
-    <thead id="tableLabel">
-    </thead>
+  <div id="comppart">
 
-    <tbody id="comp">
-      
-    </tbody>
-  
-  </table>
-
+  </div>
   <br>
-  <span>Contract and Contract Code can be found at <a href="https://rinkeby.etherscan.io/address/0xadf7305bf5791e651fe534c4d8e43847e91ba667">0xadf7305bf5791e651fe534c4d8e43847e91ba667</a></span>
+  <a href="#" onclick="removeNotes()" class="btn btn-danger">Remove Selected Notes</a><br>
+  <a href="#" onclick="placeNotes()" class="btn">Add Selected Notes</a><br>
   
 </body>
-<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>
 <script src="./app.js"></script>
 </html>

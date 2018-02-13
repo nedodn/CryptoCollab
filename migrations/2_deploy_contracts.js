@@ -1,5 +1,8 @@
-var Opus= artifacts.require("./Opus.sol");
+var CompositionPart = artifacts.require("./CompositionPart.sol");
+var NoteToken = artifacts.require("./NoteToken.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(Opus, 1514678400);
+  deployer.deploy(NoteToken,1546224959)
+  .then(() => NoteToken.deployed())
+  .then(instance => deployer.deploy(CompositionPart,1546224959,instance.address))
 };

@@ -7,6 +7,11 @@ label {
   width: 100px;
 }
 
+td {
+  width: 15px;
+  height: 10px;
+}
+
 input {
   width: 500px;
   padding: 5px;
