@@ -15,7 +15,7 @@ var CompositionPart = contract(compositionpart_artifacts)
 
 var accounts, account
 
-var noteArray = [128]
+var noteArray = []
 var pitchStack = []
 var placeStack = []
 
@@ -52,11 +52,16 @@ window.App = {
 
   buildArray: function () {
     for (let i = 0; i < 128; i++) {
-      noteArray[i] = [100]
+      noteArray[i] = []
       CompositionPart.deployed().then((instance) => {
         instance.getNoteLine.call(i, { from: account }).then((line) => {
           for (let x = 0; x < 100; x++) {
             noteArray[i][x] = line[x]
+            if (noteArray[i][x]) {
+              let id = i + "#" + x
+              let cell = document.getElementById(id)
+              cell.style.backgroundColor = 'black'
+            }
           }
         })
       })
@@ -106,12 +111,6 @@ window.App = {
 
       for (let x = 0; x < 100; x++) {
         cell = document.createElement('td')
-        if (noteArray[i][x] === true) {
-          cell.style.backgroundColor = 'black'
-        }
-        else {
-          cell.style.backgroundColor = 'white'
-        }
         cell.id = i + '#' + x
         cell.setAttribute('onclick', "toggleNote('" + cell.id + "')")
 
@@ -240,7 +239,7 @@ window.placeNotes = function () {
 
 window.play = async function () {
   function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise(resolve => setTimeout(resolve, ms))
   }
 
   var notes = []
@@ -257,7 +256,7 @@ window.play = async function () {
     }
     synth.triggerAttackRelease(notes, 0.5)
     notes = []
-    await sleep(150)
+    await sleep(250)
   }
 }
 
