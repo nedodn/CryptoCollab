@@ -8,7 +8,7 @@ label {
 }
 
 td {
-  width: 15px;
+  width: 30px;
   height: 10px;
 }
 
@@ -55,4 +55,8 @@ h3 {
 
 .hint {
   color: #666;
+}
+
+.note {
+  width: 15px;
 }

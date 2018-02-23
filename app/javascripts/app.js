@@ -7,11 +7,9 @@ import { default as contract } from 'truffle-contract'
 import { default as Tone } from 'tone'
 import { getNoteName } from './notes.js'
 
-// Import our contract artifacts and turn them into usable abstractions.
 import notetoken_artifacts from '../../build/contracts/NoteToken.json'
 import compositionpart_artifacts from '../../build/contracts/CompositionPart.json'
 
-// Opus is our usable abstraction, which we'll use through the code below.
 var NoteToken = contract(notetoken_artifacts)
 var CompositionPart = contract(compositionpart_artifacts)
 
@@ -30,7 +28,6 @@ window.App = {
     NoteToken.setProvider(web3.currentProvider)
     CompositionPart.setProvider(web3.currentProvider)
 
-    // Get the initial account balance so it can be displayed.
     web3.eth.getAccounts(function (err, accs) {
       if (err != null) {
         alert('There was an error fetching your accounts.')
@@ -54,13 +51,12 @@ window.App = {
 
   buildArray: function () {
     for (let i = 0; i < 128; i++) {
-      noteArray[i] = []
       CompositionPart.deployed().then((instance) => {
         instance.getNoteLine.call(i, { from: account }).then((line) => {
+          noteArray[i] = line
           for (let x = 0; x < 100; x++) {
-            noteArray[i][x] = line[x]
             if (noteArray[i][x]) {
-              let id = i + "#" + x
+              let id = i + '#' + x
               let cell = document.getElementById(id)
               cell.style.backgroundColor = 'black'
             }
@@ -115,7 +111,7 @@ window.App = {
         cell = document.createElement('td')
         cell.id = i + '#' + x
         cell.setAttribute('onclick', "toggleNote('" + cell.id + "')")
-
+        cell.title = 'Pitch: ' + noteName.name + ' Place: ' + (x + 1)
         row.appendChild(cell)
       }
       tbody.appendChild(row)
@@ -172,6 +168,10 @@ window.returnNotes = function () {
 }
 
 window.toggleNote = function (id) {
+  if (cell.style.backgroundColor === 'black') {
+    return
+  }
+
   var split = id.indexOf('#')
 
   var _pitch = id.substr(0, split)
@@ -184,22 +184,26 @@ window.toggleNote = function (id) {
     let i = pitchStack.indexOf(_pitch)
     pitchStack.splice(i, 1)
     placeStack.splice(i, 1)
-    if (noteArray[Number(_pitch)][Number(_place)]) {
-      CompositionPart.deployed().then(function (instance) {
-        instance.getNoteOwner(Number(_pitch), Number(_place), { from: account }).then(function (owner) {
-          if (owner === account) {
-            cell.style.backgroundColor = 'purple'
-          }
-          else {
-            cell.style.backgroundColor = 'black'
-          }
-        })
+
+    CompositionPart.deployed().then(function (instance) {
+      instance.getNoteOwner(Number(_pitch), Number(_place), { from: account }).then(function (owner) {
+        if (owner === account) {
+          cell.style.backgroundColor = 'purple'
+        }
+        else {
+          instance.getNote(Number(_pitch), Number(_place), { from: account }).then(function (note) {
+            if (note) {
+              cell.style.backgroundColor = 'black'
+            }
+            else {
+              cell.style.backgroundColor = 'white'
+              noteArray[Number(_pitch)][Number(_place)] = false
+            }
+            return
+          })
+        }
       })
-    }
-    else {
-      cell.style.backgroundColor = 'white'
-    }
-    return
+    })
   }
 
   var noteName = getNoteName(Number(_pitch))
@@ -213,6 +217,8 @@ window.toggleNote = function (id) {
   if (pitchStack.length === 10) {
     return
   }
+
+  noteArray[Number(_pitch)][Number(_place)] = true
 
   cell.style.backgroundColor = 'blue'
   pitchStack.push(Number(_pitch))
@@ -244,11 +250,14 @@ window.play = async function () {
     return new Promise(resolve => setTimeout(resolve, ms))
   }
 
-  var tempo = document.getElementById('tempo')
+  var from = document.getElementById('from').value
+  var to = document.getElementById('to').value
+
+  var tempo = document.getElementById('tempo').value
   var tempoInMs = 60000 / tempo
 
   var notes = []
-  for (let i = 0; i < 100; i++) {
+  for (let i = from; i < to; i++) {
     for (let x = 0; x < 128; x++) {
       if (noteArray[x][i]) {
         let note = getNoteName(x)
