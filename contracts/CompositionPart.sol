@@ -56,7 +56,7 @@ contract CompositionPart {
         require(_pitches.length == _numNotes);
 
         for (uint256 i = 0; i < _pitches.length; i++) {
-            if (_pitches[i] > 128 || _places[i] > 100) {
+            if (_pitches[i] > 127 || _places[i] > 99) {
                 revert();
             } else if (composers[_pitches[i]][_places[i]] != msg.sender) {
                 revert();
