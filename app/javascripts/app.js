@@ -265,7 +265,7 @@ window.play = async function () {
   var tempoInMs = 60000 / tempo
 
   var notes = []
-  for (let i = from; i < to; i++) {
+  for (let i = (from - 1); i <= (to - 1); i++) {
     for (let x = 0; x < 128; x++) {
       if (noteArray[x][i]) {
         let note = getNoteName(x)
