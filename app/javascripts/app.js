@@ -168,61 +168,69 @@ window.returnNotes = function () {
 }
 
 window.toggleNote = function (id) {
+  var split = id.indexOf('#')
+
+  var _pitch = id.substr(0, split)
+  var _place = id.substr(split + 1)
+
+  _pitch = Number(_pitch)
+  _place = Number(_place)
+
+  var cell = document.getElementById(id)
+
   if (cell.style.backgroundColor === 'black') {
     return
   }
 
-  var split = id.indexOf('#')
-
-  var _pitch = id.substr(0, split)
-
-  let _place = id.substr(split + 1)
-
-  var cell = document.getElementById(id)
-
   if (cell.style.backgroundColor === 'blue') {
-    let i = pitchStack.indexOf(_pitch)
-    pitchStack.splice(i, 1)
-    placeStack.splice(i, 1)
+    let index
+
+    for (let i = 0; i < pitchStack.length; i++) {
+      if (pitchStack[i] === _pitch && placeStack[i] === _place) {
+        index = i
+        break
+      }
+    }
+
+    pitchStack.splice(index, 1)
+    placeStack.splice(index, 1)
 
     CompositionPart.deployed().then(function (instance) {
-      instance.getNoteOwner(Number(_pitch), Number(_place), { from: account }).then(function (owner) {
+      instance.getNoteOwner(_pitch, _place, { from: account }).then(function (owner) {
         if (owner === account) {
           cell.style.backgroundColor = 'purple'
         }
         else {
-          instance.getNote(Number(_pitch), Number(_place), { from: account }).then(function (note) {
-            if (note) {
-              cell.style.backgroundColor = 'black'
-            }
-            else {
-              cell.style.backgroundColor = 'white'
-              noteArray[Number(_pitch)][Number(_place)] = false
-            }
-            return
-          })
+          cell.style.backgroundColor = 'white'
         }
+        return
       })
     })
+    console.log(pitchStack)
+    console.log(placeStack)
   }
+  else {
+    var noteName = getNoteName(_pitch)
+    var note = noteName.name
+    if (note.indexOf('/') !== -1) {
+      note = note.substr(0, note.indexOf('/'))
+    }
 
-  var noteName = getNoteName(Number(_pitch))
-  var note = noteName.name
-  if (note.indexOf('/') !== -1) {
-    note = note.substr(0, note.indexOf('/'))
+    synth.triggerAttackRelease(note, 0.5)
+
+    if (pitchStack.length === 10) {
+      return
+    }
+
+    noteArray[_pitch][_place] = true
+
+    cell.style.backgroundColor = 'blue'
+    pitchStack.push(_pitch)
+    placeStack.push(_place)
+
+    console.log(pitchStack)
+    console.log(placeStack)
   }
-
-  synth.triggerAttackRelease(note, 0.5)
-
-  if (pitchStack.length === 10) {
-    return
-  }
-
-  noteArray[Number(_pitch)][Number(_place)] = true
-
-  cell.style.backgroundColor = 'blue'
-  pitchStack.push(Number(_pitch))
-  placeStack.push(Number(_place))
 }
 
 window.removeNotes = function () {
