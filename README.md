@@ -9,7 +9,7 @@ To run:
  
  3. Install project: $npm install
  
- 4. Start a local blockchain (Ganache or testrpc)
+ 4. Start a local blockchain running on port 8545 (Ganache or testrpc)
  
  5. Migrate Contracts: $truffle migrate
  
@@ -19,7 +19,7 @@ To run:
 
 Purchase notes, current price of 0.001 ETH
 
-Select notes to place (up to 10 at a time
+Select notes to place (up to 10 at a time)
 
 Click the add notes button
 
@@ -32,6 +32,3 @@ Press Play!
  
  ## Other Info
   1. The y-axis of the grid represents MIDI values 0-127, x-axis represents the note's place in the piece
-
-## Tools Used
- Truffle Framework, Ganache, Infura, Ethereum, Webpack, JQuery, Bootstrap
