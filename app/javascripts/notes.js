@@ -7,7 +7,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 126:
-            name = "C#0/Db0";
+            name = "C#/Db0";
             color = false;
             break;
         case 125:
@@ -15,7 +15,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 124:
-            name = "D#0/Eb0";
+            name = "D#/Eb0";
             color = false;
             break;
         case 123:
@@ -27,7 +27,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 121:
-            name = "F#0/Gb0"
+            name = "F#/Gb0"
             color = false;
             break;
         case 120:
@@ -35,7 +35,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 119:
-            name = "G#0/Ab0";
+            name = "G#/Ab0";
             color = false;
             break;
         case 118:
@@ -43,7 +43,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 117:
-            name = "A#0/Bb0";
+            name = "A#/Bb0";
             color = false;
             break;
         case 116:
@@ -55,7 +55,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 114:
-            name = "C#1/Db1";
+            name = "C#/Db1";
             color = false;
             break;
         case 113:
@@ -63,7 +63,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 112:
-            name = "D#1/Eb1";
+            name = "D#/Eb1";
             color = false;
             break;
         case 111:
@@ -75,7 +75,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 109:
-            name = "F#1/Gb1"
+            name = "F#/Gb1"
             color = false;
             break;
         case 108:
@@ -83,7 +83,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 107:
-            name = "G#1/Ab1";
+            name = "G#/Ab1";
             color = false;
             break;
         case 106:
@@ -91,7 +91,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 105:
-            name = "A#1/Bb1";
+            name = "A#/Bb1";
             color = false;
             break;
         case 104:
@@ -103,7 +103,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 102:
-            name = "C#2/Db2";
+            name = "C#/Db2";
             color = false;
             break;
         case 101:
@@ -111,7 +111,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 100:
-            name = "D#2/Eb2";
+            name = "D#/Eb2";
             color = false;
             break;
         case 99:
@@ -123,7 +123,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 97:
-            name = "F#2/Gb2"
+            name = "F#/Gb2"
             color = false;
             break;
         case 96:
@@ -131,7 +131,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 95:
-            name = "G#2/Ab2";
+            name = "G#/Ab2";
             color = false;
             break;
         case 94:
@@ -139,7 +139,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 93:
-            name = "A#2/Bb2";
+            name = "A#/Bb2";
             color = false;
             break;
         case 92:
@@ -151,7 +151,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 90:
-            name = "C#3/Db3";
+            name = "C#/Db3";
             color = false;
             break;
         case 89:
@@ -159,7 +159,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 88:
-            name = "D#3/Eb3";
+            name = "D#/Eb3";
             color = false;
             break;
         case 87:
@@ -171,7 +171,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 85:
-            name = "F#3/Gb3"
+            name = "F#/Gb3"
             color = false;
             break;
         case 84:
@@ -179,7 +179,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 83:
-            name = "G#3/Ab3";
+            name = "G#/Ab3";
             color = false;
             break;
         case 82:
@@ -187,7 +187,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 81:
-            name = "A#3/Bb3";
+            name = "A#/Bb3";
             color = false;
             break;
         case 80:
@@ -199,7 +199,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 78:
-            name = "C#4/Db4";
+            name = "C#/Db4";
             color = false;
             break;
         case 77:
@@ -207,7 +207,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 76:
-            name = "D#4/Eb4";
+            name = "D#/Eb4";
             color = false;
             break;
         case 75:
@@ -219,7 +219,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 73:
-            name = "F#4/Gb4"
+            name = "F#/Gb4"
             color = false;
             break;
         case 72:
@@ -227,7 +227,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 71:
-            name = "G#4/Ab4";
+            name = "G#/Ab4";
             color = false;
             break;
         case 70:
@@ -235,7 +235,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 69:
-            name = "A#4/Bb4";
+            name = "A#/Bb4";
             color = false;
             break;
         case 68:
@@ -247,7 +247,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 66:
-            name = "C#5/Db5";
+            name = "C#/Db5";
             color = false;
             break;
         case 65:
@@ -255,7 +255,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 64:
-            name = "D#5/Eb5";
+            name = "D#/Eb5";
             color = false;
             break;
         case 63:
@@ -267,7 +267,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 61:
-            name = "F#5/Gb5"
+            name = "F#/Gb5"
             color = false;
             break;
         case 60:
@@ -275,7 +275,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 59:
-            name = "G#5/Ab5";
+            name = "G#/Ab5";
             color = false;
             break;
         case 58:
@@ -283,7 +283,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 57:
-            name = "A#5/Bb5";
+            name = "A#/Bb5";
             color = false;
             break;
         case 56:
@@ -295,7 +295,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 54:
-            name = "C#6/Db6";
+            name = "C#/Db6";
             color = false;
             break;
         case 53:
@@ -303,7 +303,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 52:
-            name = "D#6/Eb6";
+            name = "D#/Eb6";
             color = false;
             break;
         case 51:
@@ -315,7 +315,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 49:
-            name = "F#6/Gb6"
+            name = "F#/Gb6"
             color = false;
             break;
         case 48:
@@ -323,7 +323,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 47:
-            name = "G#6/Ab6";
+            name = "G#/Ab6";
             color = false;
             break;
         case 46:
@@ -331,7 +331,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 45:
-            name = "A#6/Bb6";
+            name = "A#/Bb6";
             color = false;
             break;
         case 44:
@@ -343,7 +343,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 42:
-            name = "C#7/Db7";
+            name = "C#/Db7";
             color = false;
             break;
         case 41:
@@ -351,7 +351,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 40:
-            name = "D#7/Eb7";
+            name = "D#/Eb7";
             color = false;
             break;
         case 39:
@@ -363,7 +363,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 37:
-            name = "F#7/Gb7"
+            name = "F#/Gb7"
             color = false;
             break;
         case 36:
@@ -371,7 +371,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 35:
-            name = "G#7/Ab7";
+            name = "G#/Ab7";
             color = false;
             break;
         case 34:
@@ -379,7 +379,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 33:
-            name = "A#7/Bb7";
+            name = "A#/Bb7";
             color = false;
             break;
         case 32:
@@ -391,7 +391,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 30:
-            name = "C#8/Db8";
+            name = "C#/Db8";
             color = false;
             break;
         case 29:
@@ -399,7 +399,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 28:
-            name = "D#8/Eb8";
+            name = "D#/Eb8";
             color = false;
             break;
         case 27:
@@ -411,7 +411,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 25:
-            name = "F#8/Gb8"
+            name = "F#/Gb8"
             color = false;
             break;
         case 24:
@@ -419,7 +419,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 23:
-            name = "G#8/Ab8";
+            name = "G#/Ab8";
             color = false;
             break;
         case 22:
@@ -427,7 +427,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 21:
-            name = "A#8/Bb8";
+            name = "A#/Bb8";
             color = false;
             break;
         case 20:
@@ -439,7 +439,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 18:
-            name = "C#9/Db9";
+            name = "C#/Db9";
             color = false;
             break;
         case 17:
@@ -447,7 +447,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 16:
-            name = "D#9/Eb9";
+            name = "D#/Eb9";
             color = false;
             break;
         case 15:
@@ -459,7 +459,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 13:
-            name = "F#9/Gb9"
+            name = "F#/Gb9"
             color = false;
             break;
         case 12:
@@ -467,7 +467,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 11:
-            name = "G#9/Ab9";
+            name = "G#/Ab9";
             color = false;
             break;
         case 10:
@@ -475,7 +475,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 9:
-            name = "A#9/Bb9";
+            name = "A#/Bb9";
             color = false;
             break;
         case 8:
@@ -487,7 +487,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 6:
-            name = "C#10/Db10";
+            name = "C#/Db10";
             color = false;
             break;
         case 5:
@@ -495,7 +495,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 4:
-            name = "D#10/Eb10";
+            name = "D#/Eb10";
             color = false;
             break;
         case 3:
@@ -507,7 +507,7 @@ function getNoteName(note) {
             color = true;
             break;
         case 1:
-            name = "F#10/Gb10"
+            name = "F#/Gb10"
             color = false;
             break;
         case 0:
