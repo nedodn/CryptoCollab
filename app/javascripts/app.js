@@ -79,6 +79,7 @@ window.App = {
 
     cell = document.createElement('th')
     cell.id = 'first'
+    cell.class = 'note'
     cell.innerText = 'Note'
     row.appendChild(cell)
 
@@ -111,6 +112,7 @@ window.App = {
 
       for (let x = 0; x < 100; x++) {
         cell = document.createElement('td')
+        cell.className = 'note'
         cell.id = i + '#' + x
         cell.setAttribute('onclick', "toggleNote('" + cell.id + "')")
         cell.title = 'Pitch: ' + noteName.name + ' Place: ' + (x + 1)
@@ -118,7 +120,7 @@ window.App = {
       }
       tbody.appendChild(row)
     }
-    table.appendChild(thead)
+    //table.appendChild(thead)
     table.appendChild(tbody)
     root.appendChild(table)
   },
