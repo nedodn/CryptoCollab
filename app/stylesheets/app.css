@@ -53,10 +53,33 @@ table.comptable {
   width: 100%;
 }
 
+table.comptable thead{
+  float: left;
+  overflow: auto;
+  /* width: 100%; */
+}
+
+table.comptable tbody {
+  float: left;
+  width: 100%;
+  overflow-x: scroll;
+  overflow-y: scroll;
+  height: 500px;
+}
+
+/* table.comptable tr {
+  width: 100%;
+  display: table;
+  text-align: left;
+} */
+
 #first {
   width: 90px;
 }
 
+.note {
+  width: 1%;
+}
 
 .black {
   color: black;
@@ -74,8 +97,4 @@ table.comptable {
 
 .hint {
   color: #666;
-}
-
-.note {
-  width: 15px;
 }
