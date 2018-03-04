@@ -78,6 +78,7 @@ window.App = {
     row = document.createElement('tr')
 
     cell = document.createElement('th')
+    cell.id = 'first'
     cell.innerText = 'Note'
     row.appendChild(cell)
 
@@ -92,6 +93,7 @@ window.App = {
     for (let i = 0; i < 128; i++) {
       row = document.createElement('tr')
       cell = document.createElement('td')
+      cell.id = 'first'
       let noteName = getNoteName(i)
       cell.innerText = noteName.name
 
@@ -206,8 +208,6 @@ window.toggleNote = function (id) {
         return
       })
     })
-    console.log(pitchStack)
-    console.log(placeStack)
   }
   else {
     var noteName = getNoteName(_pitch)
@@ -227,9 +227,6 @@ window.toggleNote = function (id) {
     cell.style.backgroundColor = 'blue'
     pitchStack.push(_pitch)
     placeStack.push(_place)
-
-    console.log(pitchStack)
-    console.log(placeStack)
   }
 }
 

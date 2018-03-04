@@ -27,11 +27,13 @@ button {
   padding: 5px;
 }
 
-h1, h2 {
+h1 {
+  font-size: 50px;
   display: inline-block;
   vertical-align: middle;
   margin-top: 0px;
   margin-bottom: 10px;
+  font-family: Georgia, 'Times New Roman', Times, serif;
 }
 
 h2 {
@@ -45,12 +47,29 @@ h3 {
   font-size: 24px;
 }
 
+table.comptable {
+  table-layout: fixed;
+  display: table;
+  width: 100%;
+}
+
+#first {
+  width: 90px;
+}
+
+
 .black {
   color: black;
 }
 
 #balance {
   color: black;
+}
+
+#title {
+  width: 100%;
+  text-align: center;
+  padding: 5%;
 }
 
 .hint {
