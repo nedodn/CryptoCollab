@@ -71,25 +71,8 @@ window.App = {
     var table = document.createElement('table')
     table.className = 'comptable'
     table.border = 1
-    var thead = document.createElement('thead')
     var tbody = document.createElement('tbody')
     var row, cell
-
-    row = document.createElement('tr')
-
-    cell = document.createElement('th')
-    cell.id = 'first'
-    cell.class = 'note'
-    cell.innerText = 'Note'
-    row.appendChild(cell)
-
-    for (let i = 0; i < 100; i++) {
-      cell = document.createElement('th')
-      cell.innerText = i + 1
-      row.appendChild(cell)
-    }
-
-    thead.appendChild(row)
 
     for (let i = 0; i < 128; i++) {
       row = document.createElement('tr')
@@ -120,7 +103,6 @@ window.App = {
       }
       tbody.appendChild(row)
     }
-    //table.appendChild(thead)
     table.appendChild(tbody)
     root.appendChild(table)
   },
