@@ -46,24 +46,36 @@ window.App = {
     self.buildArray()
     self.buildTable()
     self.getNoteBalance()
-    self.getPlacedNotes()
   },
 
-  buildArray: function () {
+  buildArray: async function () {
+    let instance = await CompositionPart.deployed()
+
     for (let i = 0; i < 128; i++) {
-      CompositionPart.deployed().then((instance) => {
-        instance.getNoteLine.call(i, { from: account }).then((line) => {
-          noteArray[i] = line
-          for (let x = 0; x < 100; x++) {
-            if (noteArray[i][x]) {
-              let id = i + '#' + x
-              let cell = document.getElementById(id)
-              cell.style.backgroundColor = 'black'
-            }
-          }
-        })
-      })
+      let line = await instance.getNoteLine.call(i)
+      noteArray[i] = line
+
+      for (let x = 0; x < 100; x++) {
+        if (noteArray[i][x]) {
+          let id = i + '#' + x
+          let cell = document.getElementById(id)
+          cell.style.backgroundColor = 'black'
+        }
+      }
     }
+
+    let _notes = await instance.getPlacedNotes.call({ from: account })
+    let pitches = _notes[0]
+    let places = _notes[1]
+
+    for (let i = 0; i < pitches.length; i++) {
+      let id = pitches[i].toString() + '#' + places[i].toString()
+      let cell = document.getElementById(id)
+      cell.style.backgroundColor = 'purple'
+    }
+
+    let play = document.getElementById('play')
+    play.style.display = 'inline'
   },
 
   buildTable: function () {
@@ -71,25 +83,8 @@ window.App = {
     var table = document.createElement('table')
     table.className = 'comptable'
     table.border = 1
-    var thead = document.createElement('thead')
     var tbody = document.createElement('tbody')
     var row, cell
-
-    row = document.createElement('tr')
-
-    cell = document.createElement('th')
-    cell.id = 'first'
-    cell.class = 'note'
-    cell.innerText = 'Note'
-    row.appendChild(cell)
-
-    for (let i = 0; i < 100; i++) {
-      cell = document.createElement('th')
-      cell.innerText = i + 1
-      row.appendChild(cell)
-    }
-
-    thead.appendChild(row)
 
     for (let i = 0; i < 128; i++) {
       row = document.createElement('tr')
@@ -120,55 +115,34 @@ window.App = {
       }
       tbody.appendChild(row)
     }
-    //table.appendChild(thead)
+
     table.appendChild(tbody)
     root.appendChild(table)
   },
 
-  getNoteBalance: function () {
+  getNoteBalance: async function () {
     var balance = document.getElementById('balance')
-    NoteToken.deployed().then(function (instance) {
-      instance.balanceOf.call(account, { from: account }).then(function (_notes) {
-        balance.innerText = _notes.toNumber() + ' Notes Owned'
-      })
-    })
+    let instance = await NoteToken.deployed()
+    let _balance = await instance.balanceOf.call(account, { from: account })
+    balance.innerText = _balance.toNumber() + ' Notes Owned'
   },
-
-  getPlacedNotes: function () {
-    CompositionPart.deployed().then(function (instance) {
-      instance.getPlacedNotes.call({ from: account }).then(function (_notes) {
-        let pitches = _notes[0]
-        let places = _notes[1]
-        for (let i = 0; i < pitches.length; i++) {
-          let id = pitches[i].toString() + '#' + places[i].toString()
-          let cell = document.getElementById(id)
-          cell.style.backgroundColor = 'purple'
-        }
-      })
-    })
-  }
 }
 
-window.purchaseNotes = function () {
+window.purchaseNotes = async function () {
   var num = document.getElementById('purchase').value
-
   let price = num * 0.001
 
-  NoteToken.deployed().then(function (instance) {
-    instance.purchaseNotes(num, { value: web3.toWei(price, 'ether'), from: account, gas: 150000 }).then(function () {
-      location.reload()
-    })
-  })
+  let instance = await NoteToken.deployed()
+  let res = await instance.purchaseNotes(num, { value: web3.toWei(price, 'ether'), from: account, gas: 150000 })
+
+  console.log(res)
 }
 
-window.returnNotes = function () {
+window.returnNotes = async function () {
   var num = document.getElementById('return')
 
-  NoteToken.deployed().then(function (instance) {
-    instance.returnNotes(num, { gas: 100000, from: account }).then(function () {
-      location.reload()
-    })
-  })
+  let instance = await NoteToken.deployed()
+  let res = await instance.returnNotes(num, { gas: 100000, from: account })
 }
 
 window.toggleNote = function (id) {
@@ -215,8 +189,10 @@ window.toggleNote = function (id) {
     var noteName = getNoteName(_pitch)
     var note = noteName.name
     if (note.indexOf('/') !== -1) {
-      note = note.substr(0, note.indexOf('/'))
+      note = note.substr((note.indexOf('/') + 1))
     }
+
+    console.log(note)
 
     synth.triggerAttackRelease(note, 0.5)
 
@@ -232,24 +208,19 @@ window.toggleNote = function (id) {
   }
 }
 
-window.removeNotes = function () {
-  CompositionPart.deployed().then(function (instance) {
-    instance.removeNotes(pitchStack, placeStack, pitchStack.length, { from: account, gas: 1500000 }).then(function () {
-    })
-  })
+window.removeNotes = async function () {
+  let instance = CompositionPart.deployed()
+  let res = instance.removeNotes(pitchStack, placeStack, pitchStack.length, { from: account, gas: 1500000 })
 }
 
-window.placeNotes = function () {
+window.placeNotes = async function () {
   var numNotes = pitchStack.length
 
-  NoteToken.deployed().then(function (instance) {
-    CompositionPart.deployed().then(function (compInstance) {
-      instance.approve(compInstance.address, numNotes, { from: account }).then(function () {
-        compInstance.placeNotes(pitchStack, placeStack, numNotes, { from: account, gas: 1500000 }).then(function () {
-        })
-      })
-    })
-  })
+  let instance = await NoteToken.deployed()
+  let compInstance = await CompositionPart.deployed()
+
+  let res1 = await instance.approve(compInstance.address, numNotes, { from: account })
+  let res2 = await compInstance.placeNotes(pitchStack, placeStack, numNotes, { from: account, gas: 1500000 })
 }
 
 window.play = async function () {
@@ -270,7 +241,7 @@ window.play = async function () {
         let note = getNoteName(x)
         let pitch = note.name
         if (pitch.indexOf('/') !== -1) {
-          pitch = pitch.substr(0, pitch.indexOf('/'))
+          pitch = pitch.substr((pitch.indexOf('/') + 1))
         }
         notes.push(pitch)
       }
