@@ -115,10 +115,7 @@ window.App = {
       }
       tbody.appendChild(row)
     }
-<<<<<<< HEAD
 
-=======
->>>>>>> 63392f1e8444e99f3b6b4d84bbaede8cfd1768df
     table.appendChild(tbody)
     root.appendChild(table)
   },
