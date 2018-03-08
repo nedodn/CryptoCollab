@@ -21,7 +21,7 @@ Purchase notes, current price of 0.001 ETH
 
 Select notes to place (up to 10 at a time)
 
-Click the add notes button
+Click the add notes button (You'll have to confirm two transactions here, one to approve the token transfer and one to actually place the notes)
 
 Notes should be added, your notes show up as purple
 
