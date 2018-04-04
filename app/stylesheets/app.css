@@ -3,8 +3,7 @@ body {
 }
 
 input {
-  width: 500px;
-  padding: 5px;
+  width: 75%;
   font-size: 16px;
 }
 
@@ -13,10 +12,11 @@ button {
   padding: 5px;
 }
 
-h1 {
-  font-size: 50px;
-  display: inline-block;
-  vertical-align: middle;
+#title {
+  font-size: 25px;
+  display: inline;
+  position: relative;
+  float: left;
   margin-top: 0px;
   margin-bottom: 10px;
   font-family: Georgia, 'Times New Roman', Times, serif;
@@ -59,12 +59,49 @@ table.comptable tbody {
   width: 1%;
 }
 
-#balance {
-  color: black;
+#token {
+  position: relative;
+  bottom: 5px;
+  float: right;
 }
 
 #title {
   width: 100%;
   text-align: center;
   padding: 5%;
+}
+
+#rebuild {
+  position: relative;
+  float: right;
+  top: 5px;
+}
+
+#tempo {
+  width: 50px;
+}
+
+.tempo {
+  display: inline;
+}
+
+#play {
+  display: block;
+  margin-top: 10px;
+}
+
+#console {
+    display: inline-flex;
+}
+
+#p {
+  margin-bottom: 5%;
+}
+
+#purchase {
+  display: block;
+}
+
+.place {
+  width: 50px;
 }

@@ -13,9 +13,9 @@ contract CompositionPart {
     NoteToken notes;
 
     //2d graph of notes and places, represents midi values 0-127 and position,
-    bool[100][128] composition;
+    bool[500][128] composition;
     //2d graph representing who owns a placed note
-    address[100][128] composers;
+    address[500][128] composers;
     
     //time when composing freezes
     uint endTime;
@@ -41,7 +41,7 @@ contract CompositionPart {
         require(_pitches.length == _numNotes);
 
         for (uint256 i = 0; i < _pitches.length; i++) {
-            if (_pitches[i] > 127 || _places[i] > 99) {
+            if (_pitches[i] > 127 || _places[i] > 499) {
                 revert();
             } else if (composition[_pitches[i]][_places[i]]) {
                 revert();
@@ -56,7 +56,7 @@ contract CompositionPart {
         require(_pitches.length == _numNotes);
 
         for (uint256 i = 0; i < _pitches.length; i++) {
-            if (_pitches[i] > 127 || _places[i] > 99) {
+            if (_pitches[i] > 127 || _places[i] > 499) {
                 revert();
             } else if (composers[_pitches[i]][_places[i]] != msg.sender) {
                 revert();
@@ -64,7 +64,7 @@ contract CompositionPart {
         }
         _;
     }
-    
+
     //constructor
     function CompositionPart(uint _endTime, address _noteToken) public {
         endTime = _endTime;
@@ -73,7 +73,7 @@ contract CompositionPart {
 
     //places up to 10 valid notes in the composition
     function placeNotes(uint256[] _pitches, uint256[] _places, uint256 _numNotes) beforeEndTime() placeValidNotes(_pitches, _places, _numNotes) external {
-        require(notes.transferFrom(msg.sender, this, _numNotes));
+        require(notes.transferToComposition(msg.sender, _numNotes));
 
         for (uint256 i = 0; i < _pitches.length; i++) {
             noteId memory note;
@@ -116,8 +116,8 @@ contract CompositionPart {
     }
 
     //gets a line in the composition for viewing purposes and to prevent having to get the whole composition at once
-    function getNoteLine(uint _pitch) external view returns (bool[100]) {
-        bool[100] memory line = composition[_pitch];
+    function getNoteLine(uint _pitch) external view returns (bool[500]) {
+        bool[500] memory line = composition[_pitch];
         return line;
     }
 

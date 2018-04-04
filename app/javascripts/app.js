@@ -14,17 +14,45 @@ var NoteToken = contract(notetoken_artifacts)
 var CompositionPart = contract(compositionpart_artifacts)
 
 var accounts, account
+var infura;
 
 var noteArray = []
 var pitchStack = []
 var placeStack = []
 
-var synth = new Tone.PolySynth(128, Tone.MonoSynth).toMaster()
+var place = 0
+var start
+var end
+
+var synth = new Tone.PolySynth(128, Tone.FMSynth).toMaster()
+// Kalimba settings
+synth.set(
+  {
+    "harmonicity":8,
+    "modulationIndex": 2,
+    "oscillator" : {
+        "type": "sine"
+    },
+    "envelope": {
+        "attack": 0.001,
+        "decay": 2,
+        "sustain": 0.1,
+        "release": 2
+    },
+    "modulation" : {
+        "type" : "square"
+    },
+    "modulationEnvelope" : {
+        "attack": 0.002,
+        "decay": 0.2,
+        "sustain": 0,
+        "release": 0.2
+    }
+  }
+)
 
 window.App = {
   start: function () {
-    var self = this
-
     NoteToken.setProvider(web3.currentProvider)
     CompositionPart.setProvider(web3.currentProvider)
 
@@ -43,23 +71,27 @@ window.App = {
       account = accounts[0]
     })
 
-    self.build()
+    this.build()
   },
 
   build: function () {
-    self.buildArray()
-    self.buildTable()
-    self.getNoteBalance()
+
+    this.setStartAndEnd()
+    this.clearStacks()
+    this.buildArray()
+    this.buildTable()
+    this.getNoteBalance()
   },
 
-  buildArray: async function () {
+  movePlace: async function () {
+    this.setStartAndEnd()
+    this.clearStacks()
+    this.buildTable()
+
     let instance = await CompositionPart.deployed()
 
     for (let i = 0; i < 128; i++) {
-      let line = await instance.getNoteLine.call(i)
-      noteArray[i] = line
-
-      for (let x = 0; x < 100; x++) {
+      for (let x = start; x < end; x++) {
         if (noteArray[i][x]) {
           let id = i + '#' + x
           let cell = document.getElementById(id)
@@ -73,10 +105,77 @@ window.App = {
     let places = _notes[1]
 
     for (let i = 0; i < pitches.length; i++) {
-      let id = pitches[i].toString() + '#' + places[i].toString()
-      let cell = document.getElementById(id)
-      cell.style.backgroundColor = 'purple'
+      if (places[i] >= start && places[i] <= end) {
+        let id = pitches[i].toString() + '#' + places[i].toString()
+        let cell = document.getElementById(id)
+        cell.style.backgroundColor = 'purple'
+      }
     }
+
+    let placeText = document.getElementById('place')
+    placeText.innerText = (place + 1).toString()
+  },
+
+  setStartAndEnd: function () {
+    if (place === 0) {
+      start = 0
+      end = 100
+    }
+    else if (place === 1) {
+      start = 100
+      end = 200
+    }
+    else if (place === 2) {
+      start = 200
+      end = 300
+    }
+    else if (place === 3) {
+      start = 300
+      end = 400
+    }
+    else if (place === 4) {
+      start = 400
+      end = 500
+    }
+  },
+
+  clearStacks: function () {
+    pitchStack = []
+    placeStack = []
+  },
+
+  buildArray: async function () {
+    let progress = document.getElementById('progress')
+    let instance = await CompositionPart.deployed()
+
+    for (let i = 0; i < 128; i++) {
+      progress.innerText = 'Getting line ' + i.toString() + ' of 127'
+      let line = await instance.getNoteLine.call(i)
+      noteArray[i] = line
+
+      for (let x = start; x < end; x++) {
+        if (noteArray[i][x]) {
+          let id = i + '#' + x
+          let cell = document.getElementById(id)
+          cell.style.backgroundColor = 'black'
+        }
+      }
+    }
+
+    let _notes = await instance.getPlacedNotes.call({ from: account })
+    let pitches = _notes[0]
+    let places = _notes[1]
+
+    for (let i = 0; i < pitches.length; i++) {
+      if (places[i] >= start && places[i] <= end) {
+        let id = pitches[i].toString() + '#' + places[i].toString()
+        let cell = document.getElementById(id)
+        cell.style.backgroundColor = 'purple'
+      }
+    }
+
+    let placeText = document.getElementById('place')
+    placeText.innerText = (place + 1).toString()
 
     let play = document.getElementById('play')
     play.style.display = 'inline'
@@ -86,6 +185,7 @@ window.App = {
     var root = document.getElementById('comppart')
     var table = document.createElement('table')
     table.className = 'comptable'
+    table.id = 'table'
     table.border = 1
     var tbody = document.createElement('tbody')
     var row, cell
@@ -109,7 +209,7 @@ window.App = {
       cell.style.backgroundColor = color
       row.appendChild(cell)
 
-      for (let x = 0; x < 100; x++) {
+      for (let x = start; x < end; x++) {
         cell = document.createElement('td')
         cell.className = 'note'
         cell.id = i + '#' + x
@@ -126,9 +226,13 @@ window.App = {
 
   getNoteBalance: async function () {
     var balance = document.getElementById('balance')
+    var notesLeft = document.getElementById('notesLeft')
     let instance = await NoteToken.deployed()
     let _balance = await instance.balanceOf.call(account, { from: account })
-    balance.innerText = _balance.toNumber() + ' Notes Owned'
+    balance.innerText = 'You own ' + _balance.toNumber() + ' Notes'
+    
+    let _notesLeft = await instance.tokensLeft()
+    notesLeft.innerText = _notesLeft + ' Notes Left'
   },
 }
 
@@ -149,7 +253,11 @@ window.returnNotes = async function () {
   let res = await instance.returnNotes(num, { gas: 100000, from: account })
 }
 
-window.toggleNote = function (id) {
+window.toggleNote = async function (id) {
+  if (infura) {
+    return
+  }
+
   var split = id.indexOf('#')
 
   var _pitch = id.substr(0, split)
@@ -177,17 +285,18 @@ window.toggleNote = function (id) {
     pitchStack.splice(index, 1)
     placeStack.splice(index, 1)
 
-    CompositionPart.deployed().then(function (instance) {
-      instance.getNoteOwner(_pitch, _place, { from: account }).then(function (owner) {
-        if (owner === account) {
-          cell.style.backgroundColor = 'purple'
-        }
-        else {
-          cell.style.backgroundColor = 'white'
-        }
-        return
-      })
-    })
+    let instance = await CompositionPart.deployed()
+    let owner = await instance.getNoteOwner(_pitch, _place, { from: account })
+    
+    if (owner === account) {
+      cell.style.backgroundColor = 'purple'
+      noteArray[_pitch][_place] = true      
+    }
+    else {
+      cell.style.backgroundColor = 'white'
+      noteArray[_pitch][_place] = false
+    }
+    return
   }
   else {
     var noteName = getNoteName(_pitch)
@@ -204,7 +313,13 @@ window.toggleNote = function (id) {
       return
     }
 
-    noteArray[_pitch][_place] = true
+    if (cell.style.backgroundColor === 'purple') {
+      noteArray[_pitch][_place] = false
+    }
+    else {
+      noteArray[_pitch][_place] = true
+    }
+    
 
     cell.style.backgroundColor = 'blue'
     pitchStack.push(_pitch)
@@ -213,18 +328,16 @@ window.toggleNote = function (id) {
 }
 
 window.removeNotes = async function () {
-  let instance = CompositionPart.deployed()
+  let instance = await CompositionPart.deployed()
   let res = instance.removeNotes(pitchStack, placeStack, pitchStack.length, { from: account, gas: 1500000 })
 }
 
 window.placeNotes = async function () {
   var numNotes = pitchStack.length
 
-  let instance = await NoteToken.deployed()
-  let compInstance = await CompositionPart.deployed()
+  let instance = await CompositionPart.deployed()
 
-  let res1 = await instance.approve(compInstance.address, numNotes, { from: account })
-  let res2 = await compInstance.placeNotes(pitchStack, placeStack, numNotes, { from: account, gas: 1500000 })
+  let res = await instance.placeNotes(pitchStack, placeStack, numNotes, { from: account, gas: 1500000 })
 }
 
 window.play = async function () {
@@ -256,7 +369,34 @@ window.play = async function () {
   }
 }
 
-window.refreshComp = function () {
+window.back = async function () {
+  if (place === 0) {
+    return
+  }
+
+  let table = document.getElementById('table')
+  table.parentNode.removeChild(table)
+
+  place--
+  App.movePlace()
+}
+
+window.forward = function () {
+  if (place === 4) {
+    return
+  }
+
+  let table = document.getElementById('table')
+  table.parentNode.removeChild(table)
+
+  place++
+  App.movePlace()
+}
+
+window.rebuild = function () {
+  let table = document.getElementById('table')
+  table.parentNode.removeChild(table)
+  
   App.build()
 }
 
@@ -266,10 +406,12 @@ window.addEventListener('load', function () {
     console.warn('Using web3 detected from external source.')
     // Use Mist/MetaMask's provider
     window.web3 = new Web3(web3.currentProvider)
+    infura = false
   } else {
-    console.warn("No web3 detected. Falling back to http://127.0.0.1:8545. You should remove this fallback when you deploy live, as it's inherently insecure. Consider switching to Metamask for development. More info here: http://truffleframework.com/tutorials/truffle-and-metamask")
-    // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
-    window.web3 = new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:8545'))
+    console.warn("Using web3 provided by Infura")
+    // use Infura node for web3
+    window.web3 = new Web3(new Web3.providers.HttpProvider("https://rinkeby.infura.io/mXHEyD5OI3wXAnDE6uT4"))
+    infura = true
   }
   App.start()
 })

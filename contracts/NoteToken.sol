@@ -11,6 +11,7 @@ contract NoteToken is StandardToken, Ownable {
     string public constant SYMBOL = "NOTE";
     uint256 public tokensLeft;
     uint256 public endTime;
+    address compositionAddress;
 
     modifier beforeEndTime() {
         require(now < endTime);
@@ -23,7 +24,7 @@ contract NoteToken is StandardToken, Ownable {
     }
 
     function NoteToken(uint256 _endTime) public {
-        totalSupply = 10000;
+        totalSupply = 5000;
         tokensLeft = totalSupply;
 
         endTime = _endTime;
@@ -43,6 +44,22 @@ contract NoteToken is StandardToken, Ownable {
 
         balances[msg.sender] = balances[msg.sender].sub(_numNotes);
         tokensLeft = tokensLeft.add(_numNotes);
+    }
+
+    function setCompositionAddress(address _compositionAddress) onlyOwner() external {
+        require(compositionAddress == address(0));
+
+        compositionAddress = _compositionAddress;
+    }
+
+    function transferToComposition(address _from, uint256 _value) public returns (bool) {
+        require(msg.sender == compositionAddress);
+        require(_value <= balances[_from]);
+
+        balances[_from] = balances[_from].sub(_value);
+        balances[compositionAddress] = balances[compositionAddress].add(_value);
+        Transfer(_from, compositionAddress, _value);
+        return true;
     }
 
     function withdraw() afterEndTime() onlyOwner() external {
