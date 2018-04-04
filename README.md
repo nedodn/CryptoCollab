@@ -11,7 +11,7 @@ To run:
  
  4. Start a local blockchain running on port 8545 (Ganache or testrpc)
  
- 5. Migrate Contracts: $truffle migrate
+ 5. Migrate Contracts: $truffle migrate --reset
  
  6. Run dev server: $npm run dev
 
