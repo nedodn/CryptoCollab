@@ -43,6 +43,10 @@ window.App = {
       account = accounts[0]
     })
 
+    self.build()
+  },
+
+  build: function () {
     self.buildArray()
     self.buildTable()
     self.getNoteBalance()
@@ -250,6 +254,10 @@ window.play = async function () {
     notes = []
     await sleep(tempoInMs)
   }
+}
+
+window.refreshComp = function () {
+  App.build()
 }
 
 window.addEventListener('load', function () {
