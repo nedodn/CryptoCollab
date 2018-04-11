@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.21;
 
 import './NoteToken.sol';
 
@@ -65,6 +65,9 @@ contract CompositionPart {
         _;
     }
 
+    event NotePlaced(address composer, uint pitch, uint place);
+    event NoteRemoved(address composer, uint pitch, uint place);
+
     //constructor
     function CompositionPart(uint _endTime, address _noteToken) public {
         endTime = _endTime;
@@ -84,6 +87,8 @@ contract CompositionPart {
 
             composition[_pitches[i]][_places[i]] = true;
             composers[_pitches[i]][_places[i]] = msg.sender;
+
+            emit NotePlaced(msg.sender, _pitches[i], _places[i]);
         }
     }
 
@@ -96,6 +101,8 @@ contract CompositionPart {
             composers[pitch][place] = 0x0;
 
             removeOwnedNote(msg.sender, pitch, place);
+
+            emit NoteRemoved(msg.sender, pitch, place);
         }
 
         require(notes.transfer(msg.sender, _numNotes));
@@ -145,5 +152,9 @@ contract CompositionPart {
         }
 
         return (pitches,places);
+    }
+
+    function () external {
+        revert();
     }
 }

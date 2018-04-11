@@ -63,7 +63,7 @@ window.App = {
       }
     
       if (accs.length === 0) {
-        alert('Could not get any accounts! Make sure your Ethereum client is configured correctly.')
+        alert("It looks like you don't have an Ethereum client set up. You can still listen to the piece, thanks to Infura!")
         return
       }
     
@@ -146,6 +146,10 @@ window.App = {
 
   buildArray: async function () {
     let progress = document.getElementById('progress')
+
+    if (!infura) {
+      CompositionPart.setProvider(readWeb3.currentProvider)
+    }
     let instance = await CompositionPart.deployed()
 
     for (let i = 0; i < 128; i++) {
@@ -161,6 +165,12 @@ window.App = {
         }
       }
     }
+
+    if (!infura) {
+      CompositionPart.setProvider(web3.currentProvider)
+      instance = await CompositionPart.deployed()
+    }
+
 
     let _notes = await instance.getPlacedNotes.call({ from: account })
     let pitches = _notes[0]
@@ -227,9 +237,15 @@ window.App = {
   getNoteBalance: async function () {
     var balance = document.getElementById('balance')
     var notesLeft = document.getElementById('notesLeft')
-    let instance = await NoteToken.deployed()
-    let _balance = await instance.balanceOf.call(account, { from: account })
-    balance.innerText = 'You own ' + _balance.toNumber() + ' Notes'
+    let instance
+    if (!infura) {
+      instance = await NoteToken.deployed()
+      let _balance = await instance.balanceOf.call(account, { from: account })
+      balance.innerText = 'You own ' + _balance.toNumber() + ' Notes'
+    }
+    else {
+      instance = await NoteToken.deployed()
+    }
     
     let _notesLeft = await instance.tokensLeft()
     notesLeft.innerText = _notesLeft + ' Notes Left'
@@ -406,6 +422,7 @@ window.addEventListener('load', function () {
     console.warn('Using web3 detected from external source.')
     // Use Mist/MetaMask's provider
     window.web3 = new Web3(web3.currentProvider)
+    window.readWeb3 = new Web3(new Web3.providers.HttpProvider("https://rinkeby.infura.io/mXHEyD5OI3wXAnDE6uT4"))
     infura = false
   } else {
     console.warn("Using web3 provided by Infura")

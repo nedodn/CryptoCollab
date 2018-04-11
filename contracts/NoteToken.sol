@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.21;
 
 import './zeppelin/StandardToken.sol';
 import './zeppelin/SafeMath.sol';
@@ -62,7 +62,7 @@ contract NoteToken is StandardToken, Ownable {
         return true;
     }
 
-    function withdraw() afterEndTime() onlyOwner() external {
-        owner.transfer(this.balance);
+    function end() afterEndTime() external {
+        selfdestruct(compositionAddress);
     }
 }
