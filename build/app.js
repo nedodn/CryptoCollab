@@ -49167,7 +49167,7 @@ window.purchaseNotes = async function () {
 }
 
 window.returnNotes = async function () {
-  var num = document.getElementById('return')
+  var num = document.getElementById('return').value
 
   let instance = await NoteToken.deployed()
   let res = await instance.returnNotes(num, { gas: 100000, from: account })
