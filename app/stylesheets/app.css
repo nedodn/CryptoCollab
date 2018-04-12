@@ -48,7 +48,7 @@ table.comptable tbody {
   width: 100%;
   overflow-x: scroll;
   overflow-y: scroll;
-  height: 500px;
+  height: 550px;
 }
 
 #first {
@@ -68,7 +68,6 @@ table.comptable tbody {
 #title {
   width: 100%;
   text-align: center;
-  padding: 5%;
 }
 
 #rebuild {
