@@ -85,8 +85,12 @@ table.comptable tbody {
 }
 
 #play {
-  display: block;
+  display: inline;
   margin-top: 10px;
+}
+
+#stop {
+  display: inline;
 }
 
 #console {

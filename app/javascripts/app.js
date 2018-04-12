@@ -23,6 +23,7 @@ var placeStack = []
 var place = 0
 var start
 var end
+var stopped
 
 var synth = new Tone.PolySynth(128, Tone.FMSynth).toMaster()
 // Kalimba settings
@@ -186,9 +187,6 @@ window.App = {
 
     let placeText = document.getElementById('place')
     placeText.innerText = (place + 1).toString()
-
-    let play = document.getElementById('play')
-    play.style.display = 'inline'
   },
 
   buildTable: function () {
@@ -258,7 +256,8 @@ window.purchaseNotes = async function () {
 
   let instance = await NoteToken.deployed()
   let res = await instance.purchaseNotes(num, { value: web3.toWei(price, 'ether'), from: account, gas: 150000 })
-
+  
+  App.getNoteBalance()
   console.log(res)
 }
 
@@ -267,6 +266,9 @@ window.returnNotes = async function () {
 
   let instance = await NoteToken.deployed()
   let res = await instance.returnNotes(num, { gas: 100000, from: account })
+    
+  App.getNoteBalance()
+  console.log(res)
 }
 
 window.toggleNote = async function (id) {
@@ -345,7 +347,10 @@ window.toggleNote = async function (id) {
 
 window.removeNotes = async function () {
   let instance = await CompositionPart.deployed()
-  let res = instance.removeNotes(pitchStack, placeStack, pitchStack.length, { from: account, gas: 1500000 })
+  let res = await instance.removeNotes(pitchStack, placeStack, pitchStack.length, { from: account, gas: 1500000 })
+    
+  rebuild()
+  console.log(res)
 }
 
 window.placeNotes = async function () {
@@ -354,9 +359,13 @@ window.placeNotes = async function () {
   let instance = await CompositionPart.deployed()
 
   let res = await instance.placeNotes(pitchStack, placeStack, numNotes, { from: account, gas: 1500000 })
+  
+  rebuild()
+  console.log(res)
 }
 
 window.play = async function () {
+  stopped = false
   function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms))
   }
@@ -369,6 +378,9 @@ window.play = async function () {
 
   var notes = []
   for (let i = (from - 1); i <= (to - 1); i++) {
+    if (stopped) {
+      return
+    }
     for (let x = 0; x < 128; x++) {
       if (noteArray[x][i]) {
         let note = getNoteName(x)
@@ -383,6 +395,10 @@ window.play = async function () {
     notes = []
     await sleep(tempoInMs)
   }
+}
+
+window.stop = function () {
+  stopped = true
 }
 
 window.back = async function () {

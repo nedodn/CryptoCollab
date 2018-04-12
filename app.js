@@ -48928,6 +48928,7 @@ var placeStack = []
 var place = 0
 var start
 var end
+var stopped
 
 var synth = new __WEBPACK_IMPORTED_MODULE_3_tone___default.a.PolySynth(128, __WEBPACK_IMPORTED_MODULE_3_tone___default.a.FMSynth).toMaster()
 // Kalimba settings
@@ -49091,9 +49092,6 @@ window.App = {
 
     let placeText = document.getElementById('place')
     placeText.innerText = (place + 1).toString()
-
-    let play = document.getElementById('play')
-    play.style.display = 'inline'
   },
 
   buildTable: function () {
@@ -49163,7 +49161,8 @@ window.purchaseNotes = async function () {
 
   let instance = await NoteToken.deployed()
   let res = await instance.purchaseNotes(num, { value: web3.toWei(price, 'ether'), from: account, gas: 150000 })
-
+  
+  App.getNoteBalance()
   console.log(res)
 }
 
@@ -49172,6 +49171,9 @@ window.returnNotes = async function () {
 
   let instance = await NoteToken.deployed()
   let res = await instance.returnNotes(num, { gas: 100000, from: account })
+    
+  App.getNoteBalance()
+  console.log(res)
 }
 
 window.toggleNote = async function (id) {
@@ -49250,7 +49252,10 @@ window.toggleNote = async function (id) {
 
 window.removeNotes = async function () {
   let instance = await CompositionPart.deployed()
-  let res = instance.removeNotes(pitchStack, placeStack, pitchStack.length, { from: account, gas: 1500000 })
+  let res = await instance.removeNotes(pitchStack, placeStack, pitchStack.length, { from: account, gas: 1500000 })
+    
+  rebuild()
+  console.log(res)
 }
 
 window.placeNotes = async function () {
@@ -49259,9 +49264,13 @@ window.placeNotes = async function () {
   let instance = await CompositionPart.deployed()
 
   let res = await instance.placeNotes(pitchStack, placeStack, numNotes, { from: account, gas: 1500000 })
+  
+  rebuild()
+  console.log(res)
 }
 
 window.play = async function () {
+  stopped = false
   function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms))
   }
@@ -49274,6 +49283,9 @@ window.play = async function () {
 
   var notes = []
   for (let i = (from - 1); i <= (to - 1); i++) {
+    if (stopped) {
+      return
+    }
     for (let x = 0; x < 128; x++) {
       if (noteArray[x][i]) {
         let note = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__notes_js__["a" /* getNoteName */])(x)
@@ -49288,6 +49300,10 @@ window.play = async function () {
     notes = []
     await sleep(tempoInMs)
   }
+}
+
+window.stop = function () {
+  stopped = true
 }
 
 window.back = async function () {
@@ -52533,7 +52549,7 @@ exports = module.exports = __webpack_require__(102)();
 
 
 // module
-exports.push([module.i, "body {\n  font-family: \"Open Sans\", sans-serif;\n}\n\ninput {\n  width: 75%;\n  font-size: 16px;\n}\n\nbutton {\n  font-size: 16px;\n  padding: 5px;\n}\n\n#title {\n  font-size: 25px;\n  display: inline;\n  position: relative;\n  float: left;\n  margin-top: 0px;\n  margin-bottom: 10px;\n  font-family: Georgia, 'Times New Roman', Times, serif;\n}\n\nh2 {\n  color: #AAA;\n  font-size: 32px;\n}\n\n#comppart {\n  padding-top: 10px;\n  padding-bottom: 10px;\n}\n\ntable.comptable {\n  table-layout: fixed;\n  display: table;\n  width: 100%;\n}\n\ntable.comptable thead{\n  float: left;\n  overflow: auto;\n}\n\ntable.comptable tbody {\n  float: left;\n  width: 100%;\n  overflow-x: scroll;\n  overflow-y: scroll;\n  height: 500px;\n}\n\n#first {\n  width: 80px;\n}\n\n.note {\n  width: 1%;\n}\n\n#token {\n  position: relative;\n  bottom: 5px;\n  float: right;\n}\n\n#title {\n  width: 100%;\n  text-align: center;\n  padding: 5%;\n}\n\n#rebuild {\n  position: relative;\n  float: right;\n  top: 5px;\n}\n\n#tempo {\n  width: 50px;\n}\n\n.tempo {\n  display: inline;\n}\n\n#play {\n  display: block;\n  margin-top: 10px;\n}\n\n#console {\n    display: inline-flex;\n}\n\n#p {\n  margin-bottom: 5%;\n}\n\n#purchase {\n  display: block;\n}\n\n.place {\n  width: 50px;\n}", ""]);
+exports.push([module.i, "body {\n  font-family: \"Open Sans\", sans-serif;\n}\n\ninput {\n  width: 75%;\n  font-size: 16px;\n}\n\nbutton {\n  font-size: 16px;\n  padding: 5px;\n}\n\n#title {\n  font-size: 25px;\n  display: inline;\n  position: relative;\n  float: left;\n  margin-top: 0px;\n  margin-bottom: 10px;\n  font-family: Georgia, 'Times New Roman', Times, serif;\n}\n\nh2 {\n  color: #AAA;\n  font-size: 32px;\n}\n\n#comppart {\n  padding-top: 10px;\n  padding-bottom: 10px;\n}\n\ntable.comptable {\n  table-layout: fixed;\n  display: table;\n  width: 100%;\n}\n\ntable.comptable thead{\n  float: left;\n  overflow: auto;\n}\n\ntable.comptable tbody {\n  float: left;\n  width: 100%;\n  overflow-x: scroll;\n  overflow-y: scroll;\n  height: 550px;\n}\n\n#first {\n  width: 80px;\n}\n\n.note {\n  width: 1%;\n}\n\n#token {\n  position: relative;\n  bottom: 5px;\n  float: right;\n}\n\n#title {\n  width: 100%;\n  text-align: center;\n}\n\n#rebuild {\n  position: relative;\n  float: right;\n  top: 5px;\n}\n\n#tempo {\n  width: 50px;\n}\n\n.tempo {\n  display: inline;\n}\n\n#play {\n  display: inline;\n  margin-top: 10px;\n}\n\n#stop {\n  display: inline;\n}\n\n#console {\n    display: inline-flex;\n}\n\n#p {\n  margin-bottom: 5%;\n}\n\n#purchase {\n  display: block;\n}\n\n.place {\n  width: 50px;\n}", ""]);
 
 // exports
 
