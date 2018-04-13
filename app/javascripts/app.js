@@ -401,6 +401,153 @@ window.stop = function () {
   stopped = true
 }
 
+window.setInstrument = function () {
+  let instrument = document.getElementById('instrument').value
+  synth.dispose()
+
+  if (instrument === 'Kalimba') {
+    synth = new Tone.PolySynth(128, Tone.FMSynth).toMaster()
+
+    synth.set(
+      {
+        "harmonicity":8,
+        "modulationIndex": 2,
+        "oscillator" : {
+            "type": "sine"
+        },
+        "envelope": {
+            "attack": 0.001,
+            "decay": 2,
+            "sustain": 0.1,
+            "release": 2
+        },
+        "modulation" : {
+            "type" : "square"
+        },
+        "modulationEnvelope" : {
+            "attack": 0.002,
+            "decay": 0.2,
+            "sustain": 0,
+            "release": 0.2
+        }
+      }
+    )
+  }
+  else if (instrument === 'Electric Cello') {
+    synth = new Tone.PolySynth(128, Tone.FMSynth).toMaster()
+    synth.set(
+      {
+        "harmonicity": 3.01,
+        "modulationIndex": 14,
+        "oscillator": {
+            "type": "triangle"
+        },
+        "envelope": {
+            "attack": 0.2,
+            "decay": 0.3,
+            "sustain": 0.1,
+            "release": 1.2
+        },
+        "modulation" : {
+            "type": "square"
+        },
+        "modulationEnvelope" : {
+            "attack": 0.01,
+            "decay": 0.5,
+            "sustain": 0.5,
+            "release": 0.1
+        }
+      }
+    )
+  }
+  else if (instrument === 'Harmonics') {
+    synth = new Tone.PolySynth(128, Tone.AMSynth).toMaster()
+    synth.set(
+      {
+        "harmonicity": 3.999,
+        "oscillator": {
+            "type": "square"
+        },
+        "envelope": {
+            "attack": 0.03,
+            "decay": 0.3,
+            "sustain": 0.7,
+            "release": 0.8
+        },
+        "modulation" : {
+            "volume" : 12,
+            "type": "square6"
+        },
+        "modulationEnvelope" : {
+            "attack": 2,
+            "decay": 3,
+            "sustain": 0.8,
+            "release": 0.1
+        }
+      }
+    )
+  }
+  else if (instrument === 'Pizzicato') {
+    synth = new Tone.PolySynth(128, Tone.MonoSynth).toMaster()
+    synth.set(
+      {
+        "oscillator": {
+           "type": "sawtooth"
+       },
+       "filter": {
+           "Q": 3,
+           "type": "highpass",
+           "rolloff": -12
+       },
+       "envelope": {
+           "attack": 0.01,
+           "decay": 0.3,
+           "sustain": 0,
+           "release": 0.9
+       },
+       "filterEnvelope": {
+           "attack": 0.01,
+           "decay": 0.1,
+           "sustain": 0,
+           "release": 0.1,
+           "baseFrequency": 800,
+           "octaves": -1.2
+       }
+      }
+    )
+  }
+  else if (instrument ==='Wah') {
+    synth = new Tone.PolySynth(128, Tone.MonoSynth).toMaster()
+    synth.set(
+      {
+        "oscillator" : {
+            "type" : "pwm",
+            "modulationFrequency" : 1
+        },
+        "filter" : {
+            "Q" : 6,
+            "rolloff" : -24 
+        },
+        "envelope" : {
+            "attack" : 0.025,
+            "decay" : 0.3,
+            "sustain" : 0.9,
+            "release" : 2
+        },
+        "filterEnvelope" : {
+            "attack" : 0.245,
+            "decay" : 0.131,
+            "sustain" : 0.5,
+            "release" : 2,
+            "baseFrequency" : 20,
+            "octaves" : 7.2,
+            "exponent" : 2
+        }
+      }
+    )
+  }
+}
+
 window.back = async function () {
   if (place === 0) {
     return

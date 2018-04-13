@@ -7,7 +7,10 @@
   <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>
-  <div id="title"><h1>CryptoCollab</h1></div>
+  <div id="title">
+    <h1>CryptoCollab</h1>
+    <span><em>While you live, shine<br>Have no grief at all<br>life exists only for a short while<br>and time demands an end</em></span>
+  </div>
   <div id="token">
     <div id="balance"></div>
     <div id="notesLeft"></div>
@@ -27,6 +30,13 @@
       <input type="number" id="tempo" value="100" class="tempo"><br>
       <button onclick="play()" id="play">Play</button>
       <button onclick="stop()" id="stop">Stop</button>
+      <select id="instrument" onchange="setInstrument()">
+        <option value="Kalimba">Kalimba</option>
+        <option value="Electric Cello">Electric Cello</option>
+        <option value="Harmonics">Harmonics</option>
+        <option value="Pizzicato">Pizzicato</option>
+        <option value="Wah">Wah</option>
+      </select>
     </div>
   </div>  
 

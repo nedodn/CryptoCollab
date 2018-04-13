@@ -49306,6 +49306,153 @@ window.stop = function () {
   stopped = true
 }
 
+window.setInstrument = function () {
+  let instrument = document.getElementById('instrument').value
+  synth.dispose()
+
+  if (instrument === 'Kalimba') {
+    synth = new __WEBPACK_IMPORTED_MODULE_3_tone___default.a.PolySynth(128, __WEBPACK_IMPORTED_MODULE_3_tone___default.a.FMSynth).toMaster()
+
+    synth.set(
+      {
+        "harmonicity":8,
+        "modulationIndex": 2,
+        "oscillator" : {
+            "type": "sine"
+        },
+        "envelope": {
+            "attack": 0.001,
+            "decay": 2,
+            "sustain": 0.1,
+            "release": 2
+        },
+        "modulation" : {
+            "type" : "square"
+        },
+        "modulationEnvelope" : {
+            "attack": 0.002,
+            "decay": 0.2,
+            "sustain": 0,
+            "release": 0.2
+        }
+      }
+    )
+  }
+  else if (instrument === 'Electric Cello') {
+    synth = new __WEBPACK_IMPORTED_MODULE_3_tone___default.a.PolySynth(128, __WEBPACK_IMPORTED_MODULE_3_tone___default.a.FMSynth).toMaster()
+    synth.set(
+      {
+        "harmonicity": 3.01,
+        "modulationIndex": 14,
+        "oscillator": {
+            "type": "triangle"
+        },
+        "envelope": {
+            "attack": 0.2,
+            "decay": 0.3,
+            "sustain": 0.1,
+            "release": 1.2
+        },
+        "modulation" : {
+            "type": "square"
+        },
+        "modulationEnvelope" : {
+            "attack": 0.01,
+            "decay": 0.5,
+            "sustain": 0.5,
+            "release": 0.1
+        }
+      }
+    )
+  }
+  else if (instrument === 'Harmonics') {
+    synth = new __WEBPACK_IMPORTED_MODULE_3_tone___default.a.PolySynth(128, __WEBPACK_IMPORTED_MODULE_3_tone___default.a.AMSynth).toMaster()
+    synth.set(
+      {
+        "harmonicity": 3.999,
+        "oscillator": {
+            "type": "square"
+        },
+        "envelope": {
+            "attack": 0.03,
+            "decay": 0.3,
+            "sustain": 0.7,
+            "release": 0.8
+        },
+        "modulation" : {
+            "volume" : 12,
+            "type": "square6"
+        },
+        "modulationEnvelope" : {
+            "attack": 2,
+            "decay": 3,
+            "sustain": 0.8,
+            "release": 0.1
+        }
+      }
+    )
+  }
+  else if (instrument === 'Pizzicato') {
+    synth = new __WEBPACK_IMPORTED_MODULE_3_tone___default.a.PolySynth(128, __WEBPACK_IMPORTED_MODULE_3_tone___default.a.MonoSynth).toMaster()
+    synth.set(
+      {
+        "oscillator": {
+           "type": "sawtooth"
+       },
+       "filter": {
+           "Q": 3,
+           "type": "highpass",
+           "rolloff": -12
+       },
+       "envelope": {
+           "attack": 0.01,
+           "decay": 0.3,
+           "sustain": 0,
+           "release": 0.9
+       },
+       "filterEnvelope": {
+           "attack": 0.01,
+           "decay": 0.1,
+           "sustain": 0,
+           "release": 0.1,
+           "baseFrequency": 800,
+           "octaves": -1.2
+       }
+      }
+    )
+  }
+  else if (instrument ==='Wah') {
+    synth = new __WEBPACK_IMPORTED_MODULE_3_tone___default.a.PolySynth(128, __WEBPACK_IMPORTED_MODULE_3_tone___default.a.MonoSynth).toMaster()
+    synth.set(
+      {
+        "oscillator" : {
+            "type" : "pwm",
+            "modulationFrequency" : 1
+        },
+        "filter" : {
+            "Q" : 6,
+            "rolloff" : -24 
+        },
+        "envelope" : {
+            "attack" : 0.025,
+            "decay" : 0.3,
+            "sustain" : 0.9,
+            "release" : 2
+        },
+        "filterEnvelope" : {
+            "attack" : 0.245,
+            "decay" : 0.131,
+            "sustain" : 0.5,
+            "release" : 2,
+            "baseFrequency" : 20,
+            "octaves" : 7.2,
+            "exponent" : 2
+        }
+      }
+    )
+  }
+}
+
 window.back = async function () {
   if (place === 0) {
     return
@@ -52549,7 +52696,7 @@ exports = module.exports = __webpack_require__(102)();
 
 
 // module
-exports.push([module.i, "body {\n  font-family: \"Open Sans\", sans-serif;\n}\n\ninput {\n  width: 75%;\n  font-size: 16px;\n}\n\nbutton {\n  font-size: 16px;\n  padding: 5px;\n}\n\n#title {\n  font-size: 25px;\n  display: inline;\n  position: relative;\n  float: left;\n  margin-top: 0px;\n  margin-bottom: 10px;\n  font-family: Georgia, 'Times New Roman', Times, serif;\n}\n\nh2 {\n  color: #AAA;\n  font-size: 32px;\n}\n\n#comppart {\n  padding-top: 10px;\n  padding-bottom: 10px;\n}\n\ntable.comptable {\n  table-layout: fixed;\n  display: table;\n  width: 100%;\n}\n\ntable.comptable thead{\n  float: left;\n  overflow: auto;\n}\n\ntable.comptable tbody {\n  float: left;\n  width: 100%;\n  overflow-x: scroll;\n  overflow-y: scroll;\n  height: 550px;\n}\n\n#first {\n  width: 80px;\n}\n\n.note {\n  width: 1%;\n}\n\n#token {\n  position: relative;\n  bottom: 5px;\n  float: right;\n}\n\n#title {\n  width: 100%;\n  text-align: center;\n}\n\n#rebuild {\n  position: relative;\n  float: right;\n  top: 5px;\n}\n\n#tempo {\n  width: 50px;\n}\n\n.tempo {\n  display: inline;\n}\n\n#play {\n  display: inline;\n  margin-top: 10px;\n}\n\n#stop {\n  display: inline;\n}\n\n#console {\n    display: inline-flex;\n}\n\n#p {\n  margin-bottom: 5%;\n}\n\n#purchase {\n  display: block;\n}\n\n.place {\n  width: 50px;\n}", ""]);
+exports.push([module.i, "body {\n  font-family: \"Open Sans\", sans-serif;\n}\n\ninput {\n  width: 75%;\n  font-size: 16px;\n}\n\nbutton {\n  font-size: 16px;\n  padding: 5px;\n}\n\nh1 {\n  font-size: 25px;\n}\n\n#title {\n  display: inline;\n  position: relative;\n  float: left;\n  margin-top: 0px;\n  margin-bottom: 10px;\n  font-family: Georgia, 'Times New Roman', Times, serif;\n  width: 100%;\n  text-align: center;\n}\n\nh2 {\n  color: #AAA;\n  font-size: 32px;\n}\n\n#comppart {\n  padding-top: 10px;\n  padding-bottom: 10px;\n}\n\ntable.comptable {\n  table-layout: fixed;\n  display: table;\n  width: 100%;\n}\n\ntable.comptable thead{\n  float: left;\n  overflow: auto;\n}\n\ntable.comptable tbody {\n  float: left;\n  width: 100%;\n  overflow-x: scroll;\n  overflow-y: scroll;\n  height: 550px;\n}\n\n#first {\n  width: 80px;\n}\n\n.note {\n  width: 1%;\n}\n\n#token {\n  position: relative;\n  bottom: 5px;\n  float: right;\n}\n\n#rebuild {\n  position: relative;\n  float: right;\n  top: 5px;\n}\n\n#tempo {\n  width: 50px;\n}\n\n.tempo {\n  display: inline;\n}\n\n#play {\n  display: inline;\n  margin-top: 10px;\n}\n\n#stop {\n  display: inline;\n}\n\n#console {\n    display: inline-flex;\n}\n\n#p {\n  margin-bottom: 5%;\n}\n\n#purchase {\n  display: block;\n}\n\n.place {\n  width: 50px;\n}", ""]);
 
 // exports
 
