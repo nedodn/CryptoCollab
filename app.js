@@ -49002,6 +49002,8 @@ window.App = {
           let id = i + '#' + x
           let cell = document.getElementById(id)
           cell.style.backgroundColor = 'black'
+          let composer = await instance.getNoteOwner.call(i,x)
+          cell.title = cell.title + ' Composer: ' + composer
         }
       }
     }
@@ -49068,6 +49070,8 @@ window.App = {
           let id = i + '#' + x
           let cell = document.getElementById(id)
           cell.style.backgroundColor = 'black'
+          let composer = await instance.getNoteOwner.call(i,x)
+          cell.title = cell.title + ' Composer: ' + composer
         }
       }
     }
@@ -52696,7 +52700,7 @@ exports = module.exports = __webpack_require__(102)();
 
 
 // module
-exports.push([module.i, "body {\n  font-family: \"Open Sans\", sans-serif;\n}\n\ninput {\n  width: 75%;\n  font-size: 16px;\n}\n\nbutton {\n  font-size: 16px;\n  padding: 5px;\n}\n\nh1 {\n  font-size: 25px;\n}\n\n#title {\n  display: inline;\n  position: relative;\n  float: left;\n  margin-top: 0px;\n  margin-bottom: 10px;\n  font-family: Georgia, 'Times New Roman', Times, serif;\n  width: 100%;\n  text-align: center;\n}\n\nh2 {\n  color: #AAA;\n  font-size: 32px;\n}\n\n#comppart {\n  padding-top: 10px;\n  padding-bottom: 10px;\n}\n\ntable.comptable {\n  table-layout: fixed;\n  display: table;\n  width: 100%;\n}\n\ntable.comptable thead{\n  float: left;\n  overflow: auto;\n}\n\ntable.comptable tbody {\n  float: left;\n  width: 100%;\n  overflow-x: scroll;\n  overflow-y: scroll;\n  height: 550px;\n}\n\n#first {\n  width: 80px;\n}\n\n.note {\n  width: 1%;\n}\n\n#token {\n  position: relative;\n  bottom: 5px;\n  float: right;\n}\n\n#rebuild {\n  position: relative;\n  float: right;\n  top: 5px;\n}\n\n#tempo {\n  width: 50px;\n}\n\n.tempo {\n  display: inline;\n}\n\n#play {\n  display: inline;\n  margin-top: 10px;\n}\n\n#stop {\n  display: inline;\n}\n\n#console {\n    display: inline-flex;\n}\n\n#p {\n  margin-bottom: 5%;\n}\n\n#purchase {\n  display: block;\n}\n\n.place {\n  width: 50px;\n}", ""]);
+exports.push([module.i, "body {\n  font-family: \"Open Sans\", sans-serif;\n}\n\ninput {\n  width: 75%;\n  font-size: 16px;\n}\n\nbutton {\n  font-size: 16px;\n  padding: 5px;\n}\n\nh1 {\n  font-size: 25px;\n}\n\n#title {\n  display: inline;\n  position: relative;\n  float: left;\n  margin-top: 0px;\n  margin-bottom: 10px;\n  font-family: Georgia, 'Times New Roman', Times, serif;\n  width: 100%;\n  text-align: center;\n}\n\nh2 {\n  color: #AAA;\n  font-size: 32px;\n}\n\n#comppart {\n  padding-top: 10px;\n  padding-bottom: 10px;\n}\n\ntable.comptable {\n  table-layout: fixed;\n  display: table;\n  width: 100%;\n}\n\ntable.comptable thead{\n  float: left;\n  overflow: auto;\n}\n\ntable.comptable tbody {\n  float: left;\n  width: 100%;\n  overflow-x: scroll;\n  overflow-y: scroll;\n}\n\n#first {\n  width: 80px;\n}\n\n.note {\n  width: 1%;\n}\n\n#token {\n  position: relative;\n  bottom: 5px;\n  float: right;\n}\n\n#rebuild {\n  position: relative;\n  float: right;\n  top: 5px;\n}\n\n#tempo {\n  width: 50px;\n}\n\n.tempo {\n  display: inline;\n}\n\n#play {\n  display: inline;\n  margin-top: 10px;\n}\n\n#stop {\n  display: inline;\n}\n\n#console {\n    display: inline-flex;\n}\n\n#p {\n  margin-bottom: 5%;\n}\n\n#purchase {\n  display: block;\n}\n\n.place {\n  width: 50px;\n}", ""]);
 
 // exports
 

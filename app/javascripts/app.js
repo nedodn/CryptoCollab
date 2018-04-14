@@ -97,6 +97,8 @@ window.App = {
           let id = i + '#' + x
           let cell = document.getElementById(id)
           cell.style.backgroundColor = 'black'
+          let composer = await instance.getNoteOwner.call(i,x)
+          cell.title = cell.title + ' Composer: ' + composer
         }
       }
     }
@@ -163,6 +165,8 @@ window.App = {
           let id = i + '#' + x
           let cell = document.getElementById(id)
           cell.style.backgroundColor = 'black'
+          let composer = await instance.getNoteOwner.call(i,x)
+          cell.title = cell.title + ' Composer: ' + composer
         }
       }
     }
