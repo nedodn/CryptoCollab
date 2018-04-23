@@ -7,6 +7,8 @@ import { default as contract } from 'truffle-contract'
 import { default as Tone } from 'tone'
 import { getNoteName } from './notes.js'
 
+import { UI } from "./ui.js"
+
 import notetoken_artifacts from '../../build/contracts/NoteToken.json'
 import compositionpart_artifacts from '../../build/contracts/CompositionPart.json'
 
@@ -60,6 +62,9 @@ window.App = {
     CompositionPart.setProvider(web3.currentProvider)
 
     web3.eth.getAccounts(function (err, accs) {
+
+      UI.setupHeader( accs );
+
       if (err != null) {
         alert('There was an error fetching your accounts.')
         return
