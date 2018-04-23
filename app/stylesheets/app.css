@@ -51,16 +51,15 @@ table.comptable thead{
 table.comptable tbody {
   float: left;
   width: 100%;
-  overflow-x: scroll;
-  overflow-y: scroll;
 }
 
 #first {
-  width: 80px;
+  font-size: 14px;
+  width: 5%;
 }
 
 .note {
-  width: 1%;
+  width: 0.9%;
 }
 
 #token {
@@ -93,7 +92,7 @@ table.comptable tbody {
 }
 
 #console {
-    display: inline-flex;
+  display: inline-flex;
 }
 
 #p {

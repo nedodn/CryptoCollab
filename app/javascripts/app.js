@@ -14,16 +14,18 @@ var NoteToken = contract(notetoken_artifacts)
 var CompositionPart = contract(compositionpart_artifacts)
 
 var accounts, account
-var infura;
+var infura
+var PlacedEvents, RemovedEvents
 
 var noteArray = []
+var composerArray = []
 var pitchStack = []
 var placeStack = []
 
 var place = 0
 var start
 var end
-var stopped
+var stopped = true
 
 var synth = new Tone.PolySynth(128, Tone.FMSynth).toMaster()
 // Kalimba settings
@@ -72,6 +74,55 @@ window.App = {
       account = accounts[0]
     })
 
+    var EventsContract = web3.eth.contract(compositionpart_artifacts.abi)
+    var EventsInstance = EventsContract.at("0x5c4f09ef4d09ef43fc15014b4ca2790b82748a18")
+    PlacedEvents = EventsInstance.NotePlaced({fromBlock: "latest"})
+    RemovedEvents = EventsInstance.NoteRemoved({fromBlock: "latest"})
+
+    PlacedEvents.watch((error, event) => {
+      if(!error) {
+        let _composer = event.args.composer
+        let _pitch = event.args.pitch.toNumber()
+        let _place = event.args.place.toNumber()
+
+        noteArray[_pitch][_place] = true
+        composerArray[_pitch][_place] = _composer
+
+        if (_place >= start && _place <= end) {
+          let id = _pitch.toString() + "#" + _place.toString()
+          let cell = document.getElementById(id)
+          if (account === _composer) {
+            cell.style.backgroundColor = 'purple'
+          }
+          else {
+            cell.style.backgroundColor = 'black'
+          }
+          cell.title = cell.title + ' Composer: ' + _composer
+        }
+      }
+    })
+
+    RemovedEvents.watch((error, event) => {
+      if(!error) {
+        let _pitch = event.args.pitch.toNumber()
+        let _place = event.args.place.toNumber()
+
+        noteArray[_pitch][_place] = false
+        composerArray[_pitch][_place] = 0
+
+        if (_place >= start && _place <= end) {
+          let id = _pitch.toString() + "#" + _place.toString()
+          let cell = document.getElementById(id)
+
+          cell.style.backgroundColor = 'white'
+          
+          let x = cell.title.search('Composer')
+          let newTitle = cell.title.substr(0, (x-1))
+          cell.title = newTitle
+        }
+      }
+    })
+
     this.build()
   },
 
@@ -89,26 +140,25 @@ window.App = {
     this.clearStacks()
     this.buildTable()
 
-    let instance = await CompositionPart.deployed()
-
     for (let i = 0; i < 128; i++) {
       for (let x = start; x < end; x++) {
         if (noteArray[i][x]) {
           let id = i + '#' + x
           let cell = document.getElementById(id)
           cell.style.backgroundColor = 'black'
-          let composer = await instance.getNoteOwner.call(i,x)
-          cell.title = cell.title + ' Composer: ' + composer
+          cell.title = cell.title + ' Composer: ' + composerArray[i][x]
         }
       }
     }
 
+    let instance = await CompositionPart.deployed()
     let _notes = await instance.getPlacedNotes.call({ from: account })
+    
     let pitches = _notes[0]
     let places = _notes[1]
 
     for (let i = 0; i < pitches.length; i++) {
-      if (places[i] >= start && places[i] <= end) {
+      if (places[i] >= start && places[i] < end) {
         let id = pitches[i].toString() + '#' + places[i].toString()
         let cell = document.getElementById(id)
         cell.style.backgroundColor = 'purple'
@@ -120,26 +170,8 @@ window.App = {
   },
 
   setStartAndEnd: function () {
-    if (place === 0) {
-      start = 0
-      end = 100
-    }
-    else if (place === 1) {
-      start = 100
-      end = 200
-    }
-    else if (place === 2) {
-      start = 200
-      end = 300
-    }
-    else if (place === 3) {
-      start = 300
-      end = 400
-    }
-    else if (place === 4) {
-      start = 400
-      end = 500
-    }
+    start = place * 100
+    end = start + 100
   },
 
   clearStacks: function () {
@@ -158,15 +190,15 @@ window.App = {
     for (let i = 0; i < 128; i++) {
       progress.innerText = 'Getting line ' + i.toString() + ' of 127'
       let line = await instance.getNoteLine.call(i)
-      noteArray[i] = line
+      noteArray[i] = line[0]
+      composerArray[i] = line[1]
 
       for (let x = start; x < end; x++) {
         if (noteArray[i][x]) {
           let id = i + '#' + x
           let cell = document.getElementById(id)
           cell.style.backgroundColor = 'black'
-          let composer = await instance.getNoteOwner.call(i,x)
-          cell.title = cell.title + ' Composer: ' + composer
+          cell.title = cell.title + ' Composer: ' + line[1][x]
         }
       }
     }
@@ -182,9 +214,10 @@ window.App = {
     let places = _notes[1]
 
     for (let i = 0; i < pitches.length; i++) {
-      if (places[i] >= start && places[i] <= end) {
+      if (places[i] >= start && places[i] < end) {
         let id = pitches[i].toString() + '#' + places[i].toString()
         let cell = document.getElementById(id)
+        console.log(id)
         cell.style.backgroundColor = 'purple'
       }
     }
@@ -202,7 +235,16 @@ window.App = {
     var tbody = document.createElement('tbody')
     var row, cell
 
-    for (let i = 0; i < 128; i++) {
+    let col = document.createElement('col')
+    tbody.appendChild(col)
+
+    for (let i = 0; i < 100; i++) {
+      col = document.createElement('col')
+      col.id = start + i
+      tbody.appendChild(col)
+    }
+
+    for (let i = 127; i >= 0; i--) {
       row = document.createElement('tr')
       cell = document.createElement('td')
       cell.id = 'first'
@@ -226,7 +268,7 @@ window.App = {
         cell.className = 'note'
         cell.id = i + '#' + x
         cell.setAttribute('onclick', "toggleNote('" + cell.id + "')")
-        cell.title = 'Pitch: ' + noteName.name + ' Place: ' + (x + 1)
+        cell.title = 'Pitch: ' + noteName.name + ' Place: ' + (x)
         row.appendChild(cell)
       }
       tbody.appendChild(row)
@@ -259,7 +301,7 @@ window.purchaseNotes = async function () {
   let price = num * 0.001
 
   let instance = await NoteToken.deployed()
-  let res = await instance.purchaseNotes(num, { value: web3.toWei(price, 'ether'), from: account, gas: 150000 })
+  let res = await instance.purchaseNotes(num, { value: web3.toWei(price, 'ether'), from: account })
   
   App.getNoteBalance()
   console.log(res)
@@ -281,10 +323,8 @@ window.toggleNote = async function (id) {
   }
 
   var split = id.indexOf('#')
-
   var _pitch = id.substr(0, split)
   var _place = id.substr(split + 1)
-
   _pitch = Number(_pitch)
   _place = Number(_place)
 
@@ -327,8 +367,6 @@ window.toggleNote = async function (id) {
       note = note.substr((note.indexOf('/') + 1))
     }
 
-    console.log(note)
-
     synth.triggerAttackRelease(note, 0.5)
 
     if (pitchStack.length === 10) {
@@ -351,24 +389,23 @@ window.toggleNote = async function (id) {
 
 window.removeNotes = async function () {
   let instance = await CompositionPart.deployed()
-  let res = await instance.removeNotes(pitchStack, placeStack, pitchStack.length, { from: account, gas: 1500000 })
-    
-  rebuild()
-  console.log(res)
+  let res = await instance.removeNotes(pitchStack, placeStack, pitchStack.length, { from: account })
+
+  App.clearStacks()
 }
 
 window.placeNotes = async function () {
   var numNotes = pitchStack.length
-
   let instance = await CompositionPart.deployed()
+  let res = await instance.placeNotes(pitchStack, placeStack, numNotes, { from: account })
 
-  let res = await instance.placeNotes(pitchStack, placeStack, numNotes, { from: account, gas: 1500000 })
-  
-  rebuild()
-  console.log(res)
+  App.clearStacks()
 }
 
 window.play = async function () {
+  if (!stopped) {
+    return
+  }
   stopped = false
   function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms))
@@ -385,6 +422,12 @@ window.play = async function () {
     if (stopped) {
       return
     }
+
+    let element = document.getElementById((i).toString())
+    if (element) {
+      element.style.backgroundColor = 'lightgray'
+    }
+
     for (let x = 0; x < 128; x++) {
       if (noteArray[x][i]) {
         let note = getNoteName(x)
@@ -398,7 +441,58 @@ window.play = async function () {
     synth.triggerAttackRelease(notes, 0.5)
     notes = []
     await sleep(tempoInMs)
+
+    if (element) {
+      element.style.backgroundColor = 'white'
+    }
   }
+}
+
+window.loop = async function () {
+  if (!stopped) {
+    return
+  }
+  stopped = false
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+  }
+
+  var from = document.getElementById('from').value
+  var to = document.getElementById('to').value
+
+  var tempo = document.getElementById('tempo').value
+  var tempoInMs = 60000 / tempo
+
+  var notes = []
+  do {
+    for (let i = (from - 1); i <= (to - 1); i++) {
+      if (stopped) {
+        return
+      }
+
+      let element = document.getElementById((i).toString())
+      if (element) {
+        element.style.backgroundColor = 'lightgray'
+      }
+
+      for (let x = 0; x < 128; x++) {
+        if (noteArray[x][i]) {
+          let note = getNoteName(x)
+          let pitch = note.name
+          if (pitch.indexOf('/') !== -1) {
+          pitch = pitch.substr((pitch.indexOf('/') + 1))
+          }
+          notes.push(pitch)
+        }
+      }
+      synth.triggerAttackRelease(notes, 0.5)
+      notes = []
+      await sleep(tempoInMs)
+      if (element) {
+        element.style.backgroundColor = 'white'
+      }
+    }
+  } while (!stopped)
 }
 
 window.stop = function () {
@@ -565,7 +659,7 @@ window.back = async function () {
 }
 
 window.forward = function () {
-  if (place === 4) {
+  if (place === 9) {
     return
   }
 

@@ -13,17 +13,15 @@ contract CompositionPart {
     NoteToken notes;
 
     //2d graph of notes and places, represents midi values 0-127 and position,
-    bool[500][128] composition;
+    bool[1000][128] composition;
     //2d graph representing who owns a placed note
-    address[500][128] composers;
+    address[1000][128] composers;
     
     //time when composing freezes
     uint endTime;
 
     //keeps track of notes placed by an address
     mapping (address => noteId[]) ownedNotes;
-    //keeps track of an addresses remaing notes
-    mapping (address => uint) noteBalances;
 
     modifier beforeEndTime() {
         require(now < endTime);
@@ -41,7 +39,7 @@ contract CompositionPart {
         require(_pitches.length == _numNotes);
 
         for (uint256 i = 0; i < _pitches.length; i++) {
-            if (_pitches[i] > 127 || _places[i] > 499) {
+            if (_pitches[i] > 127 || _places[i] > 999) {
                 revert();
             } else if (composition[_pitches[i]][_places[i]]) {
                 revert();
@@ -56,7 +54,7 @@ contract CompositionPart {
         require(_pitches.length == _numNotes);
 
         for (uint256 i = 0; i < _pitches.length; i++) {
-            if (_pitches[i] > 127 || _places[i] > 499) {
+            if (_pitches[i] > 127 || _places[i] > 999) {
                 revert();
             } else if (composers[_pitches[i]][_places[i]] != msg.sender) {
                 revert();
@@ -123,9 +121,11 @@ contract CompositionPart {
     }
 
     //gets a line in the composition for viewing purposes and to prevent having to get the whole composition at once
-    function getNoteLine(uint _pitch) external view returns (bool[500]) {
-        bool[500] memory line = composition[_pitch];
-        return line;
+    function getNoteLine(uint _pitch) external view returns (bool[1000], address[1000]) {
+        bool[1000] memory _pitches = composition[_pitch];
+        address[1000] memory _composers = composers[_pitch];
+
+        return (_pitches, _composers);
     }
 
     //returns whether or note a note exists at a pitch and place
@@ -151,7 +151,7 @@ contract CompositionPart {
             places[i] = ownedNotes[msg.sender][i].place;
         }
 
-        return (pitches,places);
+        return (pitches, places);
     }
 
     function () external {
