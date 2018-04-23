@@ -16,6 +16,16 @@ h1 {
   font-size: 25px;
 }
 
+h2 {
+  color: #AAA;
+  font-size: 32px;
+}
+
+
+/**
+ * Header
+ */
+
 #title {
   display: inline;
   position: relative;
@@ -24,13 +34,24 @@ h1 {
   margin-bottom: 10px;
   font-family: Georgia, 'Times New Roman', Times, serif;
   width: 100%;
-  text-align: center;
 }
 
-h2 {
-  color: #AAA;
-  font-size: 32px;
+#title h1 {
+    margin: 0;
 }
+
+#title-eth {
+    float: right;
+}
+
+#title-eth p {
+    margin: 0;
+}
+
+
+/**
+ * Creator UI
+ */
 
 #comppart {
   padding-top: 10px;
@@ -98,6 +119,18 @@ table.comptable tbody {
 #p {
   margin-bottom: 5%;
 }
+
+.console-divider {
+    float: left;
+    padding: 5px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+.console-divider h4 {
+    margin: 0;
+}
+
 
 #purchase {
   display: block;
