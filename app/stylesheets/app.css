@@ -64,19 +64,14 @@ table.comptable {
   width: 100%;
 }
 
-table.comptable thead{
-  float: left;
-  overflow: auto;
-}
-
 table.comptable tbody {
   float: left;
   width: 100%;
 }
 
 #first {
-  font-size: 14px;
-  width: 5%;
+  font-size: 13px;
+  width: 3%;
 }
 
 .note {
