@@ -9,8 +9,14 @@
 <body>
   
   <div id="title">
-    <h1>CryptoCollab</h1>
-    <span><em>While you live, shine<br>Have no grief at all<br>life exists only for a short while<br>and time demands an end</em></span>
+      <div id="title-eth">
+          <p>Address : <b id="address-section"></b></p>
+          <p>Network : <b id="network-section"></b></p>
+      </div>
+      <div id="title-name">
+          <h1>CryptoCollab</h1>
+          <span><em>While you live, shine<br>Have no grief at all<br>life exists only for a short while<br>and time demands an end</em></span>
+      </div>
   </div>
 
   <div id="token">
@@ -20,13 +26,16 @@
   </div>
 
   <div id="console">
-    <div id="p">
+    <div id="p" class="console-divider">
+      <h4>Purchase NOTE(s)</h4>
       <input type="number" id="purchase">
       <button onclick="purchaseNotes()">Purchase Notes</button><br>
       <input type="number" id="return"><br>
       <button onclick="returnNotes()">Return Notes</button>
     </div>
-    <div id="settings">
+
+    <div id="settings" class="console-divider">
+      <h4>Settings</h4>
       <input type="number" id="from" value="1" class="place"><span> to </span> <input type="number" id="to" class="place" value="500">
       <h5 class="tempo">Tempo</h5>
       <input type="number" id="tempo" value="100" class="tempo"><br>
@@ -44,6 +53,8 @@
   </div>  
 
   <br>
+  <br>
+
   <div id="rebuild">
     <button onclick="back()" id="back"><</button>
     <span id="place"></span>
