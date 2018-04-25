@@ -21,6 +21,10 @@ h2 {
   font-size: 32px;
 }
 
+tr:hover {
+  background-color: gray;
+}
+
 
 /**
  * Header
