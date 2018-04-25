@@ -48,6 +48,20 @@ h2 {
     margin: 0;
 }
 
+#feed-div {
+  font-size: 12px;
+  display: inline-block;
+  position: relative;
+  float: right;
+  padding-right: 7%;
+}
+
+#feed-table {
+  table-layout: fixed;
+  display: block;
+  overflow-y: scroll;
+  height: 100px;
+}
 
 /**
  * Creator UI
