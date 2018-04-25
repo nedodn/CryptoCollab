@@ -104,11 +104,17 @@ window.App = {
           }
           cell.title = cell.title + ' Composer: ' + _composer
         }
+        let feed = document.getElementById('feed-body')
+        let elem = document.createElement('tr')
+        let note = getNoteName(_pitch)
+        elem.innerHTML = '<td>' + _composer + ' placed ' + note.name + ' at ' + _place.toString() + '</td>'
+        feed.appendChild(elem)
       }
     })
 
     RemovedEvents.watch((error, event) => {
       if(!error) {
+        let _composer = event.args.composer
         let _pitch = event.args.pitch.toNumber()
         let _place = event.args.place.toNumber()
 
@@ -125,6 +131,12 @@ window.App = {
           let newTitle = cell.title.substr(0, (x-1))
           cell.title = newTitle
         }
+
+        let feed = document.getElementById('feed-body')
+        let elem = document.createElement('tr')
+        let note = getNoteName(_pitch)
+        elem.innerHTML = '<td>' + _composer + ' removed ' + note.name + ' at ' + _place.toString() + '</td>'
+        feed.appendChild(elem)
       }
     })
 

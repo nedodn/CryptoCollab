@@ -49053,11 +49053,17 @@ window.App = {
           }
           cell.title = cell.title + ' Composer: ' + _composer
         }
+        let feed = document.getElementById('feed-body')
+        let elem = document.createElement('tr')
+        let note = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__notes_js__["a" /* getNoteName */])(_pitch)
+        elem.innerHTML = '<td>' + _composer + ' placed ' + note.name + ' at ' + _place.toString() + '</td>'
+        feed.appendChild(elem)
       }
     })
 
     RemovedEvents.watch((error, event) => {
       if(!error) {
+        let _composer = event.args.composer
         let _pitch = event.args.pitch.toNumber()
         let _place = event.args.place.toNumber()
 
@@ -49074,6 +49080,12 @@ window.App = {
           let newTitle = cell.title.substr(0, (x-1))
           cell.title = newTitle
         }
+
+        let feed = document.getElementById('feed-body')
+        let elem = document.createElement('tr')
+        let note = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__notes_js__["a" /* getNoteName */])(_pitch)
+        elem.innerHTML = '<td>' + _composer + ' removed ' + note.name + ' at ' + _place.toString() + '</td>'
+        feed.appendChild(elem)
       }
     })
 
@@ -52871,7 +52883,7 @@ exports = module.exports = __webpack_require__(104)();
 
 
 // module
-exports.push([module.i, "body {\n  font-family: \"Open Sans\", sans-serif;\n}\n\ninput {\n  width: 75%;\n  font-size: 16px;\n}\n\nbutton {\n  font-size: 16px;\n  padding: 5px;\n}\n\nh1 {\n  font-size: 25px;\n}\n\nh2 {\n  color: #AAA;\n  font-size: 32px;\n}\n\n\n/**\n * Header\n */\n\n#title {\n  display: inline;\n  position: relative;\n  float: left;\n  margin-top: 0px;\n  margin-bottom: 10px;\n  font-family: Georgia, 'Times New Roman', Times, serif;\n  width: 100%;\n}\n\n#title h1 {\n    margin: 0;\n}\n\n#title-eth {\n    float: right;\n}\n\n#title-eth p {\n    margin: 0;\n}\n\n\n/**\n * Creator UI\n */\n\n#comppart {\n  padding-top: 10px;\n  padding-bottom: 10px;\n}\n\ntable.comptable {\n  table-layout: fixed;\n  display: table;\n  width: 100%;\n}\n\ntable.comptable thead{\n  float: left;\n  overflow: auto;\n}\n\ntable.comptable tbody {\n  float: left;\n  width: 100%;\n}\n\n#first {\n  font-size: 14px;\n  width: 5%;\n}\n\n.note {\n  width: 0.9%;\n}\n\n#token {\n  position: relative;\n  bottom: 5px;\n  float: right;\n}\n\n#rebuild {\n  position: relative;\n  float: right;\n  top: 5px;\n}\n\n#tempo {\n  width: 50px;\n}\n\n.tempo {\n  display: inline;\n}\n\n#play {\n  display: inline;\n  margin-top: 10px;\n}\n\n#stop {\n  display: inline;\n}\n\n#console {\n  display: inline-flex;\n}\n\n#p {\n  margin-bottom: 5%;\n}\n\n.console-divider {\n    float: left;\n    padding: 5px;\n    margin-right: 5px;\n    margin-bottom: 5px;\n}\n\n.console-divider h4 {\n    margin: 0;\n}\n\n\n#purchase {\n  display: block;\n}\n\n.place {\n  width: 50px;\n}\n", ""]);
+exports.push([module.i, "body {\n  font-family: \"Open Sans\", sans-serif;\n}\n\ninput {\n  width: 75%;\n  font-size: 16px;\n}\n\nbutton {\n  font-size: 16px;\n  padding: 5px;\n}\n\nh1 {\n  font-size: 25px;\n}\n\nh2 {\n  color: #AAA;\n  font-size: 32px;\n}\n\n\n/**\n * Header\n */\n\n#title {\n  display: inline;\n  position: relative;\n  float: left;\n  margin-top: 0px;\n  margin-bottom: 10px;\n  font-family: Georgia, 'Times New Roman', Times, serif;\n  width: 100%;\n}\n\n#title h1 {\n    margin: 0;\n}\n\n#title-eth {\n    float: right;\n}\n\n#title-eth p {\n    margin: 0;\n}\n\n#feed-div {\n  font-size: 12px;\n  display: inline-block;\n  position: relative;\n  float: right;\n  padding-right: 7%;\n}\n\n#feed-table {\n  table-layout: fixed;\n  display: block;\n  overflow-y: scroll;\n  height: 100px;\n}\n\n/**\n * Creator UI\n */\n\n#comppart {\n  padding-top: 10px;\n  padding-bottom: 10px;\n}\n\ntable.comptable {\n  table-layout: fixed;\n  display: table;\n  width: 100%;\n}\n\ntable.comptable tbody {\n  float: left;\n  width: 100%;\n}\n\n#first {\n  font-size: 13px;\n  width: 3%;\n}\n\n.note {\n  width: 0.9%;\n}\n\n#token {\n  position: relative;\n  bottom: 5px;\n  float: right;\n}\n\n#rebuild {\n  position: relative;\n  float: right;\n  top: 5px;\n}\n\n#tempo {\n  width: 50px;\n}\n\n.tempo {\n  display: inline;\n}\n\n#play {\n  display: inline;\n  margin-top: 10px;\n}\n\n#stop {\n  display: inline;\n}\n\n#console {\n  display: inline-flex;\n}\n\n#p {\n  margin-bottom: 5%;\n}\n\n.console-divider {\n    float: left;\n    padding: 5px;\n    margin-right: 5px;\n    margin-bottom: 5px;\n}\n\n.console-divider h4 {\n    margin: 0;\n}\n\n\n#purchase {\n  display: block;\n}\n\n.place {\n  width: 50px;\n}\n", ""]);
 
 // exports
 
