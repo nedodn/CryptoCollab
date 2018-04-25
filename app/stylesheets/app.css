@@ -25,6 +25,10 @@ tr:hover {
   background-color: gray;
 }
 
+col:hover {
+  background-color: gray;
+}
+
 
 /**
  * Header
