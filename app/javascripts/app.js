@@ -359,7 +359,7 @@ window.toggleNote = async function (id) {
     return
   }
 
-  if (cell.style.backgroundColor === 'blue') {
+  if (cell.style.backgroundColor === 'blue' || cell.style.backgroundColor === 'red') {
     let index
 
     for (let i = 0; i < pitchStack.length; i++) {
@@ -400,13 +400,13 @@ window.toggleNote = async function (id) {
 
     if (cell.style.backgroundColor === 'purple') {
       noteArray[_pitch][_place] = false
+      cell.style.backgroundColor = 'red'
     }
     else {
       noteArray[_pitch][_place] = true
+      cell.style.backgroundColor = 'blue'
     }
     
-
-    cell.style.backgroundColor = 'blue'
     pitchStack.push(_pitch)
     placeStack.push(_place)
   }
