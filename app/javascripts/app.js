@@ -241,6 +241,7 @@ window.App = {
 
     let placeText = document.getElementById('place')
     placeText.innerText = (place + 1).toString()
+    progress.innerText = 'Composition synced'
   },
 
   buildTable: function () {
