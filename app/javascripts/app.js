@@ -12,8 +12,8 @@ import { UI } from "./ui.js"
 import notetoken_artifacts from '../../build/contracts/NoteToken.json'
 import compositionpart_artifacts from '../../build/contracts/CompositionPart.json'
 
-var NoteToken = contract(notetoken_artifacts)
-var CompositionPart = contract(compositionpart_artifacts)
+const NoteToken = contract(notetoken_artifacts)
+const CompositionPart = contract(compositionpart_artifacts)
 
 var accounts, account
 var infura
@@ -244,13 +244,13 @@ window.App = {
   },
 
   buildTable: function () {
-    var root = document.getElementById('comppart')
-    var table = document.createElement('table')
+    let root = document.getElementById('comppart')
+    let table = document.createElement('table')
     table.className = 'comptable'
     table.id = 'table'
     table.border = 1
-    var tbody = document.createElement('tbody')
-    var row, cell
+    let tbody = document.createElement('tbody')
+    let row, cell
 
     let col = document.createElement('col')
     tbody.appendChild(col)
@@ -285,6 +285,14 @@ window.App = {
         cell.className = 'note'
         cell.id = i + '#' + x
         cell.setAttribute('onclick', "toggleNote('" + cell.id + "')")
+        cell.addEventListener('mouseover', () => {
+          col = document.getElementById(x.toString())
+          col.style.backgroundColor = 'gray'
+        })
+        cell.addEventListener('mouseleave', () => {
+          col = document.getElementById(x.toString())
+          col.style.backgroundColor = ''
+        })
         cell.title = 'Pitch: ' + noteName.name + ' Place: ' + (x)
         row.appendChild(cell)
       }
@@ -296,8 +304,8 @@ window.App = {
   },
 
   getNoteBalance: async function () {
-    var balance = document.getElementById('balance')
-    var notesLeft = document.getElementById('notesLeft')
+    let balance = document.getElementById('balance')
+    let notesLeft = document.getElementById('notesLeft')
     let instance
     if (!infura) {
       instance = await NoteToken.deployed()
@@ -314,7 +322,7 @@ window.App = {
 }
 
 window.purchaseNotes = async function () {
-  var num = document.getElementById('purchase').value
+  let num = document.getElementById('purchase').value
   let price = num * 0.001
 
   let instance = await NoteToken.deployed()
@@ -325,7 +333,7 @@ window.purchaseNotes = async function () {
 }
 
 window.returnNotes = async function () {
-  var num = document.getElementById('return').value
+  let num = document.getElementById('return').value
 
   let instance = await NoteToken.deployed()
   let res = await instance.returnNotes(num, { gas: 100000, from: account })
@@ -339,13 +347,13 @@ window.toggleNote = async function (id) {
     return
   }
 
-  var split = id.indexOf('#')
-  var _pitch = id.substr(0, split)
-  var _place = id.substr(split + 1)
+  let split = id.indexOf('#')
+  let _pitch = id.substr(0, split)
+  let _place = id.substr(split + 1)
   _pitch = Number(_pitch)
   _place = Number(_place)
 
-  var cell = document.getElementById(id)
+  let cell = document.getElementById(id)
 
   if (cell.style.backgroundColor === 'black') {
     return
@@ -378,8 +386,8 @@ window.toggleNote = async function (id) {
     return
   }
   else {
-    var noteName = getNoteName(_pitch)
-    var note = noteName.name
+    let noteName = getNoteName(_pitch)
+    let note = noteName.name
     if (note.indexOf('/') !== -1) {
       note = note.substr((note.indexOf('/') + 1))
     }
@@ -412,7 +420,7 @@ window.removeNotes = async function () {
 }
 
 window.placeNotes = async function () {
-  var numNotes = pitchStack.length
+  let numNotes = pitchStack.length
   let instance = await CompositionPart.deployed()
   let res = await instance.placeNotes(pitchStack, placeStack, numNotes, { from: account })
 
@@ -428,19 +436,17 @@ window.play = async function () {
     return new Promise(resolve => setTimeout(resolve, ms))
   }
 
-  var from = document.getElementById('from').value
-  var to = document.getElementById('to').value
+  let from = document.getElementById('from').value
+  let to = document.getElementById('to').value
 
-  var tempo = document.getElementById('tempo').value
-  var tempoInMs = 60000 / tempo
+  let tempo = document.getElementById('tempo').value
+  let tempoInMs = 60000 / tempo
 
-  var notes = []
+  let notes = []
   for (let i = (from - 1); i <= (to - 1); i++) {
     if (stopped) {
       return
     }
-
-    console.log(to)
     let element = document.getElementById((i).toString())
     if (element) {
       element.style.backgroundColor = 'lightgray'
@@ -476,13 +482,13 @@ window.loop = async function () {
     return new Promise(resolve => setTimeout(resolve, ms))
   }
 
-  var from = document.getElementById('from').value
-  var to = document.getElementById('to').value
+  let from = document.getElementById('from').value
+  let to = document.getElementById('to').value
 
-  var tempo = document.getElementById('tempo').value
-  var tempoInMs = 60000 / tempo
+  let tempo = document.getElementById('tempo').value
+  let tempoInMs = 60000 / tempo
 
-  var notes = []
+  let notes = []
   do {
     for (let i = (from - 1); i <= (to - 1); i++) {
       if (stopped) {
