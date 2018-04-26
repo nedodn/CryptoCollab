@@ -41,9 +41,11 @@ contract NoteToken is StandardToken, Ownable {
 
     function returnNotes(uint256 _numNotes) beforeEndTime() external {
         require(_numNotes <= balances[msg.sender]);
-
+        
+        uint256 refund = _numNotes * 0.001 ether;
         balances[msg.sender] = balances[msg.sender].sub(_numNotes);
         tokensLeft = tokensLeft.add(_numNotes);
+        msg.sender.transfer(refund)
     }
 
     function setCompositionAddress(address _compositionAddress) onlyOwner() external {
