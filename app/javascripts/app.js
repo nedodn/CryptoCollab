@@ -71,7 +71,6 @@ window.App = {
       }
     
       if (accs.length === 0) {
-        alert("It looks like you don't have an Ethereum client set up. You can still listen to the piece, thanks to Infura!")
         return
       }
     
