@@ -21,7 +21,7 @@ h2 {
   font-size: 32px;
 }
 
-tr:hover {
+table.comptable tr:hover {
   background-color: gray;
 }
 

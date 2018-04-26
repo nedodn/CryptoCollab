@@ -440,6 +440,7 @@ window.play = async function () {
       return
     }
 
+    console.log(to)
     let element = document.getElementById((i).toString())
     if (element) {
       element.style.backgroundColor = 'lightgray'
@@ -463,6 +464,7 @@ window.play = async function () {
       element.style.backgroundColor = 'white'
     }
   }
+  stopped = true
 }
 
 window.loop = async function () {
@@ -709,4 +711,16 @@ window.addEventListener('load', function () {
     infura = true
   }
   App.start()
+})
+
+window.addEventListener('keydown', (e) => {
+  if (e.keyCode === 32) {
+    e.preventDefault()
+    if (stopped) {
+      window.play()
+    }
+    else {
+      window.stop()
+    }
+  }
 })
