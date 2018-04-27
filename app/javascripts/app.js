@@ -413,18 +413,29 @@ window.toggleNote = async function (id) {
 }
 
 window.removeNotes = async function () {
-  let instance = await CompositionPart.deployed()
-  let res = await instance.removeNotes(pitchStack, placeStack, pitchStack.length, { from: account })
+  let progress = document.getElementById('progress')
+  progress.innerText = 'Removing Notes...'
 
+  let instance = await CompositionPart.deployed()
+  await instance.removeNotes(pitchStack, placeStack, pitchStack.length, { from: account })
+
+  progress.innerText = 'Composition Synced'
   App.clearStacks()
+  App.getNoteBalance()
 }
 
 window.placeNotes = async function () {
   let numNotes = pitchStack.length
-  let instance = await CompositionPart.deployed()
-  let res = await instance.placeNotes(pitchStack, placeStack, numNotes, { from: account })
+  
+  let progress = document.getElementById('progress')
+  progress.innerText = 'Placing Notes...'
 
+  let instance = await CompositionPart.deployed()
+  await instance.placeNotes(pitchStack, placeStack, numNotes, { from: account })
+
+  progress.innerText = 'Composition Synced'
   App.clearStacks()
+  App.getNoteBalance()
 }
 
 window.play = async function () {
