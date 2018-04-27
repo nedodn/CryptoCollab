@@ -133,15 +133,10 @@ table.comptable tbody {
   display: inline-flex;
 }
 
-#p {
-  margin-bottom: 5%;
-}
-
 .console-divider {
     float: left;
     padding: 5px;
     margin-right: 5px;
-    margin-bottom: 5px;
 }
 
 .console-divider h4 {
