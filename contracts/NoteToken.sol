@@ -22,6 +22,8 @@ contract NoteToken is StandardToken, Ownable {
         require(now > endTime);
         _;
     }
+    event TokensBought(uint256 _num, uint256 _tokensLeft);
+    event TokensReturned(uint256 _num, uint256 _tokensLeft);
 
     function NoteToken(uint256 _endTime) public {
         totalSupply = 5000;
@@ -37,6 +39,8 @@ contract NoteToken is StandardToken, Ownable {
 
         balances[msg.sender] = balances[msg.sender].add(_numNotes);
         tokensLeft = tokensLeft.sub(_numNotes);
+
+        emit TokensBought(_numNotes, tokensLeft);
     }
 
     function returnNotes(uint256 _numNotes) beforeEndTime() external {
@@ -45,7 +49,8 @@ contract NoteToken is StandardToken, Ownable {
         uint256 refund = _numNotes * 0.001 ether;
         balances[msg.sender] = balances[msg.sender].sub(_numNotes);
         tokensLeft = tokensLeft.add(_numNotes);
-        msg.sender.transfer(refund)
+        msg.sender.transfer(refund);
+        emit TokensReturned(_numNotes, tokensLeft);
     }
 
     function setCompositionAddress(address _compositionAddress) onlyOwner() external {
@@ -54,7 +59,7 @@ contract NoteToken is StandardToken, Ownable {
         compositionAddress = _compositionAddress;
     }
 
-    function transferToComposition(address _from, uint256 _value) public returns (bool) {
+    function transferToComposition(address _from, uint256 _value) beforeEndTime() public returns (bool) {
         require(msg.sender == compositionAddress);
         require(_value <= balances[_from]);
 
