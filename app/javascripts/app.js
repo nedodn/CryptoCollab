@@ -79,7 +79,7 @@ window.App = {
     })
 
     var EventsContract = web3.eth.contract(compositionpart_artifacts.abi)
-    var EventsInstance = EventsContract.at("0x5c4f09ef4d09ef43fc15014b4ca2790b82748a18")
+    var EventsInstance = EventsContract.at('0xd5404680a72cafe263eacd2aa5a4eaa3bfa9182f')
     PlacedEvents = EventsInstance.NotePlaced({fromBlock: "latest"})
     RemovedEvents = EventsInstance.NoteRemoved({fromBlock: "latest"})
 
@@ -233,7 +233,6 @@ window.App = {
       if (places[i] >= start && places[i] < end) {
         let id = pitches[i].toString() + '#' + places[i].toString()
         let cell = document.getElementById(id)
-        console.log(id)
         cell.style.backgroundColor = 'purple'
       }
     }
@@ -380,7 +379,7 @@ window.toggleNote = async function (id) {
       noteArray[_pitch][_place] = true      
     }
     else {
-      cell.style.backgroundColor = 'white'
+      cell.style.backgroundColor = ''
       noteArray[_pitch][_place] = false
     }
     return
@@ -413,29 +412,62 @@ window.toggleNote = async function (id) {
 }
 
 window.removeNotes = async function () {
+  if (pitchStack.length === 0) {
+    return
+  }
   let progress = document.getElementById('progress')
   progress.innerText = 'Removing Notes...'
+  let res
 
   let instance = await CompositionPart.deployed()
-  await instance.removeNotes(pitchStack, placeStack, pitchStack.length, { from: account })
-
-  progress.innerText = 'Composition Synced'
-  App.clearStacks()
-  App.getNoteBalance()
+  try {
+    res = await instance.removeNotes(pitchStack, placeStack, pitchStack.length, { from: account })
+  } catch (e) {
+    console.log(e)
+    progress.innerText = 'Composition Synced'
+    return
+  }
+  if (res.receipt.status === '0x0') {
+    progress.innerText = 'Something went wrong'
+    setTimeout(() => { progress.innerText = 'Composition Synced' }, 3000)
+  }
+  else {
+    progress.innerText = 'Composition Synced'
+    App.clearStacks()
+    App.getNoteBalance()
+  }
+  console.log(res)
 }
 
 window.placeNotes = async function () {
   let numNotes = pitchStack.length
+
+  if (numNotes === 0) {
+    return
+  }
   
   let progress = document.getElementById('progress')
   progress.innerText = 'Placing Notes...'
+  let res
 
   let instance = await CompositionPart.deployed()
-  await instance.placeNotes(pitchStack, placeStack, numNotes, { from: account })
-
-  progress.innerText = 'Composition Synced'
-  App.clearStacks()
-  App.getNoteBalance()
+  try {
+    res = await instance.placeNotes(pitchStack, placeStack, numNotes, { from: account })
+  } catch (e) {
+    console.log(e)
+    progress.innerText = 'Composition Synced'
+    return
+  }
+  if (res.receipt.status === '0x0') {
+    progress.innerText = 'Something went wrong'
+    setTimeout(() => { progress.innerText = 'Composition Synced' }, 3000)
+  }
+  else {
+    progress.innerText = 'Composition Synced'
+    App.clearStacks()
+    App.getNoteBalance()
+  }
+  console.log(res)
 }
 
 window.play = async function () {
