@@ -16,7 +16,7 @@ const NoteToken = contract(notetoken_artifacts)
 const CompositionPart = contract(compositionpart_artifacts)
 
 var accounts, account
-var infura
+var remoteNode
 var PlacedEvents, RemovedEvents
 
 var noteArray = []
@@ -78,16 +78,20 @@ window.App = {
       account = accounts[0]
     })
 
-    var EventsContract = web3.eth.contract(compositionpart_artifacts.abi)
-    var EventsInstance = EventsContract.at('0xd5404680a72cafe263eacd2aa5a4eaa3bfa9182f')
-    PlacedEvents = EventsInstance.NotePlaced({fromBlock: "latest"})
-    RemovedEvents = EventsInstance.NoteRemoved({fromBlock: "latest"})
+    var EventsContract = eventWeb3.eth.contract(compositionpart_artifacts.abi)
+    var EventsInstance = EventsContract.at('0x160bcb977cfb124fddac1f4879955887f228de35')
+    PlacedEvents = EventsInstance.NotePlaced({fromBlock: '0', toBlock: 'latest'})
+    RemovedEvents = EventsInstance.NoteRemoved({fromBlock: '0', toBlock: 'latest'})
 
     PlacedEvents.watch((error, event) => {
       if(!error) {
         let _composer = event.args.composer
         let _pitch = event.args.pitch.toNumber()
         let _place = event.args.place.toNumber()
+
+       if (document.getElementById(_composer + _pitch.toString() + _place.toString() + 'place')) {
+        return
+       }
 
         noteArray[_pitch][_place] = true
         composerArray[_pitch][_place] = _composer
@@ -107,6 +111,7 @@ window.App = {
         let elem = document.createElement('tr')
         let note = getNoteName(_pitch)
         elem.innerHTML = '<td>' + _composer + ' placed ' + note.name + ' at ' + _place.toString() + '</td>'
+        elem.id = _composer + _pitch.toString() + _place.toString() + 'place'
         feed.appendChild(elem)
       }
     })
@@ -117,6 +122,10 @@ window.App = {
         let _pitch = event.args.pitch.toNumber()
         let _place = event.args.place.toNumber()
 
+        if (document.getElementById(_composer + _pitch.toString() + _place.toString() + 'remove')) {
+          return
+        }
+
         noteArray[_pitch][_place] = false
         composerArray[_pitch][_place] = 0
 
@@ -124,7 +133,7 @@ window.App = {
           let id = _pitch.toString() + "#" + _place.toString()
           let cell = document.getElementById(id)
 
-          cell.style.backgroundColor = 'white'
+          cell.style.backgroundColor = ''
           
           let x = cell.title.search('Composer')
           let newTitle = cell.title.substr(0, (x-1))
@@ -135,6 +144,7 @@ window.App = {
         let elem = document.createElement('tr')
         let note = getNoteName(_pitch)
         elem.innerHTML = '<td>' + _composer + ' removed ' + note.name + ' at ' + _place.toString() + '</td>'
+        elem.id = _composer + _pitch.toString() + _place.toString() + 'remove'
         feed.appendChild(elem)
       }
     })
@@ -198,10 +208,12 @@ window.App = {
   buildArray: async function () {
     let progress = document.getElementById('progress')
 
-    if (!infura) {
+    if (!remoteNode) {
       CompositionPart.setProvider(readWeb3.currentProvider)
     }
+
     let instance = await CompositionPart.deployed()
+   
 
     for (let i = 0; i < 128; i++) {
       progress.innerText = 'Getting line ' + i.toString() + ' of 127'
@@ -219,21 +231,20 @@ window.App = {
       }
     }
 
-    if (!infura) {
+    if (!remoteNode) {
       CompositionPart.setProvider(web3.currentProvider)
       instance = await CompositionPart.deployed()
-    }
 
-
-    let _notes = await instance.getPlacedNotes.call({ from: account })
-    let pitches = _notes[0]
-    let places = _notes[1]
-
-    for (let i = 0; i < pitches.length; i++) {
-      if (places[i] >= start && places[i] < end) {
-        let id = pitches[i].toString() + '#' + places[i].toString()
-        let cell = document.getElementById(id)
-        cell.style.backgroundColor = 'purple'
+      let _notes = await instance.getPlacedNotes.call({ from: account })
+      let pitches = _notes[0]
+      let places = _notes[1]
+  
+      for (let i = 0; i < pitches.length; i++) {
+        if (places[i] >= start && places[i] < end) {
+          let id = pitches[i].toString() + '#' + places[i].toString()
+          let cell = document.getElementById(id)
+          cell.style.backgroundColor = 'purple'
+        }
       }
     }
 
@@ -306,7 +317,7 @@ window.App = {
     let balance = document.getElementById('balance')
     let notesLeft = document.getElementById('notesLeft')
     let instance
-    if (!infura) {
+    if (!remoteNode) {
       instance = await NoteToken.deployed()
       let _balance = await instance.balanceOf.call(account, { from: account })
       balance.innerText = 'You own ' + _balance.toNumber() + ' Notes'
@@ -322,27 +333,39 @@ window.App = {
 
 window.purchaseNotes = async function () {
   let num = document.getElementById('purchase').value
+  if (num == 0) {
+    return
+  }
   let price = num * 0.001
 
   let instance = await NoteToken.deployed()
-  let res = await instance.purchaseNotes(num, { value: web3.toWei(price, 'ether'), from: account })
-  
+  try {
+    let res = await instance.purchaseNotes(num, { value: web3.toWei(price, 'ether'), from: account })
+    console.log(res)
+  } catch (e) {
+    console.log(e)
+  }
   App.getNoteBalance()
-  console.log(res)
 }
 
 window.returnNotes = async function () {
   let num = document.getElementById('return').value
+  if (num == 0) {
+    return
+  }
 
   let instance = await NoteToken.deployed()
-  let res = await instance.returnNotes(num, { gas: 100000, from: account })
-    
+  try {
+    let res = await instance.returnNotes(num, { value: web3.toWei(price, 'ether'), from: account })
+    console.log(res)
+  } catch (e) {
+    console.log(e)
+  }
   App.getNoteBalance()
-  console.log(res)
 }
 
 window.toggleNote = async function (id) {
-  if (infura) {
+  if (remoteNode) {
     return
   }
 
@@ -611,7 +634,7 @@ window.setInstrument = function () {
         "envelope": {
             "attack": 0.2,
             "decay": 0.3,
-            "sustain": 0.1,
+            "sustain": 0.4,
             "release": 1.2
         },
         "modulation" : {
@@ -751,13 +774,15 @@ window.addEventListener('load', function () {
     console.warn('Using web3 detected from external source.')
     // Use Mist/MetaMask's provider
     window.web3 = new Web3(web3.currentProvider)
-    window.readWeb3 = new Web3(new Web3.providers.HttpProvider("https://rinkeby.infura.io/mXHEyD5OI3wXAnDE6uT4"))
-    infura = false
+    window.readWeb3 = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io/mXHEyD5OI3wXAnDE6uT4"))
+    window.eventWeb3 = new Web3(new Web3.providers.HttpProvider("http://34.216.192.31:8545"))
+    remoteNode = false
   } else {
-    console.warn("Using web3 provided by Infura")
-    // use Infura node for web3
-    window.web3 = new Web3(new Web3.providers.HttpProvider("https://rinkeby.infura.io/mXHEyD5OI3wXAnDE6uT4"))
-    infura = true
+    console.warn("Using web3 provided by remoteNode")
+    // use remoteNode node for web3
+    window.web3 = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io/mXHEyD5OI3wXAnDE6uT4"))
+    window.eventWeb3 = new Web3(new Web3.providers.HttpProvider("http://34.216.192.31:8545"))
+    remoteNode = true
   }
   App.start()
 })
