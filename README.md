@@ -1,5 +1,5 @@
 # CryptoCollab
-Decentralized MIDI Composition Project
+Decentralized Music Composition Experiment
 
 To run on your own:
 
