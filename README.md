@@ -32,3 +32,5 @@ Press Play!
   1. The y-axis of the grid represents MIDI values 0-127, x-axis represents the note's place in the piece
   
   Also hosted on IPFS at https://gateway.ipfs.io/ipfs/QmRrupqygzhZY8zwcyX7M4vVQog1iwhJ1wriShj544gCNZ/
+  
+  NoteToken contract is deployed at <a href="https://etherscan.io/address/0x9f352d623371eda3a28f9d9c8ca73a5124f2d9fc">0x9f352d623371eda3a28f9d9c8ca73a5124f2d9fc</a>
