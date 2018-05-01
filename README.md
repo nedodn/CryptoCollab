@@ -34,4 +34,5 @@ Press Play!
   Also hosted on IPFS at https://gateway.ipfs.io/ipfs/QmRrupqygzhZY8zwcyX7M4vVQog1iwhJ1wriShj544gCNZ/
   
   NoteToken contract is deployed at <a href="https://etherscan.io/address/0x9f352d623371eda3a28f9d9c8ca73a5124f2d9fc">0x9f352d623371eda3a28f9d9c8ca73a5124f2d9fc</a>
+  
   CompositionPart contract is deployed at <a href="https://etherscan.io/address/0x160bcb977cfb124fddac1f4879955887f228de35">0x160bcb977cfb124fddac1f4879955887f228de35</a>
