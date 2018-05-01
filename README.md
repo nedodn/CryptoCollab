@@ -30,3 +30,5 @@ Press Play!
  
  ## Other Info
   1. The y-axis of the grid represents MIDI values 0-127, x-axis represents the note's place in the piece
+  
+  Also hosted on IPFS at https://gateway.ipfs.io/ipfs/QmRrupqygzhZY8zwcyX7M4vVQog1iwhJ1wriShj544gCNZ/
