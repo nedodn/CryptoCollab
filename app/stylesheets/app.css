@@ -48,8 +48,14 @@ col:hover {
     margin: 0;
 }
 
+#title-name {
+  margin: auto;
+  width: 15%;
+}
+
 #title-eth {
     float: right;
+    font-size: 10px;
 }
 
 #title-eth p {

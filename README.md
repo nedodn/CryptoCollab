@@ -1,19 +1,15 @@
 # CryptoCollab
-Decentralized MIDI Composition Project
+Decentralized Music Composition Experiment
 
-To run:
+To run on your own:
 
  1. Download project
-
- 2. Install truffle: $npm install -g truffle
  
- 3. Install project: $npm install
+ 2. Install project: $npm install
  
- 4. Start a local blockchain running on port 8545 (Ganache or testrpc)
+ 3. Run dev server: $npm run dev
  
- 5. Migrate Contracts: $truffle migrate --reset
- 
- 6. Run dev server: $npm run dev
+ 4. It should now be available at http://localhost:8080
 
 # How To Use
 
