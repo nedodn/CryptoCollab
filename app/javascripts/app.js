@@ -80,8 +80,8 @@ window.App = {
 
     var EventsContract = eventWeb3.eth.contract(compositionpart_artifacts.abi)
     var EventsInstance = EventsContract.at('0x160bcb977cfb124fddac1f4879955887f228de35')
-    PlacedEvents = EventsInstance.NotePlaced({fromBlock: '0', toBlock: 'latest'})
-    RemovedEvents = EventsInstance.NoteRemoved({fromBlock: '0', toBlock: 'latest'})
+    PlacedEvents = EventsInstance.NotePlaced({fromBlock: '5529369', toBlock: 'latest'})
+    RemovedEvents = EventsInstance.NoteRemoved({fromBlock: '5529369', toBlock: 'latest'})
 
     PlacedEvents.watch((error, event) => {
       if(!error) {
@@ -89,9 +89,9 @@ window.App = {
         let _pitch = event.args.pitch.toNumber()
         let _place = event.args.place.toNumber()
 
-       if (document.getElementById(_composer + _pitch.toString() + _place.toString() + 'place')) {
+      if (document.getElementById(_composer + _pitch.toString() + _place.toString() + 'place')) {
         return
-       }
+      }
 
         noteArray[_pitch][_place] = true
         composerArray[_pitch][_place] = _composer
@@ -100,10 +100,10 @@ window.App = {
           let id = _pitch.toString() + "#" + _place.toString()
           let cell = document.getElementById(id)
           if (account === _composer) {
-            cell.style.backgroundColor = 'purple'
+           cell.style.backgroundColor = 'purple'
           }
           else {
-            cell.style.backgroundColor = 'black'
+           cell.style.backgroundColor = 'black'
           }
           cell.title = cell.title + ' Composer: ' + _composer
         }
