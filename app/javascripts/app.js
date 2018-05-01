@@ -78,7 +78,7 @@ window.App = {
       account = accounts[0]
     })
 
-    var EventsContract = eventWeb3.eth.contract(compositionpart_artifacts.abi)
+    var EventsContract = web3.eth.contract(compositionpart_artifacts.abi)
     var EventsInstance = EventsContract.at('0x160bcb977cfb124fddac1f4879955887f228de35')
     PlacedEvents = EventsInstance.NotePlaced({fromBlock: '5529369', toBlock: 'latest'})
     RemovedEvents = EventsInstance.NoteRemoved({fromBlock: '5529369', toBlock: 'latest'})
@@ -775,13 +775,11 @@ window.addEventListener('load', function () {
     // Use Mist/MetaMask's provider
     window.web3 = new Web3(web3.currentProvider)
     window.readWeb3 = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io/mXHEyD5OI3wXAnDE6uT4"))
-    window.eventWeb3 = new Web3(new Web3.providers.HttpProvider("http://34.216.192.31:8545"))
     remoteNode = false
   } else {
     console.warn("Using web3 provided by remoteNode")
     // use remoteNode node for web3
     window.web3 = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io/mXHEyD5OI3wXAnDE6uT4"))
-    window.eventWeb3 = new Web3(new Web3.providers.HttpProvider("http://34.216.192.31:8545"))
     remoteNode = true
   }
   App.start()
