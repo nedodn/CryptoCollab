@@ -356,7 +356,7 @@ window.returnNotes = async function () {
 
   let instance = await NoteToken.deployed()
   try {
-    let res = await instance.returnNotes(num, { value: web3.toWei(price, 'ether'), from: account })
+    let res = await instance.returnNotes(num, { from: account })
     console.log(res)
   } catch (e) {
     console.log(e)
