@@ -13,6 +13,8 @@ To run on your own:
 
 # How To Use
 
+Link to Medium Article explanation: https://medium.com/@odennate/cryptocollab-a-decentralized-music-composition-experiment-bbcf3bcbbe63
+
 Purchase notes, current price of 0.001 ETH
 
 Select notes to place (up to 10 at a time)
